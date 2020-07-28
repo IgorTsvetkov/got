@@ -7,6 +7,7 @@ use yii\db\ActiveRecord;
 
 class User extends ActiveRecord implements \yii\web\IdentityInterface
 {
+    private $passwordHash;
     /**
      * {@inheritdoc}
      */
