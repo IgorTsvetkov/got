@@ -17,6 +17,9 @@ $config = [
             'cookieValidationKey' => 'B8Fj0sXZIIoQLrXzkdEFeV6rhwzvPSvZ',
             'baseUrl'=> ''
         ],
+        "authManager"=>[
+           'class' => 'yii\rbac\DbManager' 
+        ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
