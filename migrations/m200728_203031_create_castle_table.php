@@ -15,7 +15,6 @@ class m200728_203031_create_castle_table extends Migration
         $this->createTable('{{%castle}}', [
             'id' => $this->primaryKey(),
             'name' => $this->string(),
-            'src' => $this->string(),
             'cost' => $this->integer(),
             'rent' => $this->integer(),
             'rent_home1' => $this->integer(),
@@ -24,11 +23,11 @@ class m200728_203031_create_castle_table extends Migration
             'rent_home4' => $this->integer(),
             'rent_inn' => $this->integer(),
             'homes_inn_cost' => $this->integer(),
+            'group_id'=>$this->integer()
         ]);
         $this->insert('{{%castle}}',[
             'id'=>1,
             'name' => "harrenhall",
-            'src' => "",
             'cost' =>"220",
             'rent' =>"18" ,
             'rent_home1' => "90",
@@ -41,7 +40,6 @@ class m200728_203031_create_castle_table extends Migration
         $this->insert('{{%castle}}',[
             "id"=>2,
             'name' => "lannisport",
-            'src' => "",
             'cost' =>"220",
             'rent' =>"18" ,
             'rent_home1' => "90",
@@ -54,7 +52,6 @@ class m200728_203031_create_castle_table extends Migration
         $this->insert('{{%castle}}',[
             "id"=>3,
             'name' => "casterly rock",
-            'src' => "",
             'cost' =>"240",
             'rent' =>"20" ,
             'rent_home1' => "100",
