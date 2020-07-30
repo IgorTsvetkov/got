@@ -13,6 +13,8 @@ use Workerman\Worker;
 use yii\behaviors\TimestampBehavior;
 use yii\console\ExitCode;
 use yii\console\Controller;
+use yii\web\Session;
+
 require_once __DIR__ .'/../vendor/autoload.php';
 /**
  * This command echoes the first argument that you have entered.
@@ -24,63 +26,81 @@ require_once __DIR__ .'/../vendor/autoload.php';
  */
 class SessionController extends Controller
 {
-    public function behaviors()
-    {
-        return[            
-            TimestampBehavior::classname(),
-        ];
-    }
-    /**
-     * This command echoes what you have entered as the message.
-     * @param string $message the message to be echoed.
-     * @return int Exit code
-     */
-    public function actionStart()
-    {
-        $worker=new Worker("websocket://127.0.0.1:8989");
-        $worker->count=1;
-        $worker->onConnect=function($connection){
-            $connection->send('Connected');
-        };
+    // public function behaviors()
+    // {
+    //     return[            
+    //         TimestampBehavior::classname(),
+    //     ];
+    // }
+    // /**
+    //  * This command echoes what you have entered as the message.
+    //  * @param string $message the message to be echoed.
+    //  * @return int Exit code
+    //  */
+    // public function actionStart()
+    // {
+    //     $worker=new Worker("websocket://127.0.0.1:8989");
+    //     $worker->count=1;
+    //     $worker->onConnect=function($connection){
+    //         $connection->send('Connected');
+    //     };
 
-        $worker->onMessage=function($connection,$data)use($worker){
-            $user=User::find()->one();
-            $currentSession=Session::find(["user_id"=>$user->id],)->orderBy(['id'=>SORT_DESC])->one();
+    //     $worker->onMessage=function($connection,$data)use($worker){
+    //         $user=User::find()->one();
+    //         $currentSession=Session::find(["user_id"=>$user->id],)->orderBy(['id'=>SORT_DESC])->one();
 
-            foreach($worker->connections as $con){
-                $con->send("username:".$user->username);
-            }
-        };
-        Worker::runAll();
-        ExitCode::OK;
-    }
-    public function actionJoinToRoom($id){
-        $user=User::find()->one();
+    //         foreach($worker->connections as $con){
+    //             $con->send("username:".$user->username);
+    //         }
+    //     };
+    //     Worker::runAll();
+    //     ExitCode::OK;
+    // }
+    // public function actionJoinToRoom($id){
+    //     $user=User::find()->one();
 
         
-        if(Yii::$app->user->hasUnfinishedSession())
-        {
-            //Предложить пользователю продолжить предыдущую сессию
-            return;
-        }              
-    }
+    //     if(Yii::$app->user->hasUnfinishedSession())
+    //     {
+    //         //Предложить пользователю продолжить предыдущую сессию
+    //         return;
+    //     }              
+    // }
     public function actionCreateRoom($name="default"){
-        $user=Yii::$app->user;
-        if($user->hasUnfinishedSession())
-        {
-            //Предложить пользователю продолжить предыдущую сессию
-            return;
-        }
-        $session=new Session();
-        $session->user_id=$user->id;
-        $session->save();
-        return $this->view("room");
+        // $user=Yii::$app->user->login();
+        // echo $user->username;
+        // if($user->hasUnfinishedSession())
+        // {
+        //     //Предложить пользователю продолжить предыдущую сессию
+        //     return;
+        // }
+        // $session=new Session();
+        // $session->user_id=$user->id;
+        // $session->save();
+        // return $this->view("room");
     }
     public function actionTest()
     {
-        $user=User::find()->one();
-        echo "username:".$user->username;
-        ExitCode::OK;
+            $worker=new Worker("websocket://127.0.0.1:8989");
+            $worker->count=1;
+            $worker->onConnect=function($connection){
+                $connection->send('Connected');
+            };
+            
+            $worker->onMessage=function($connection,$data)use($worker){
+                var_dump(json_decode($data));
+                // $user=User::findOne($userInfo->id);
+                // if($user->validateAuthKey($userInfo->authKey)){
+                //     Yii::$app->user->login($user);
+                //     // $connection->send(Yii::$app->user->getId());
+                //     $connection->send("yes");                    
+                // }
+                // else{
+                //     $connection->send("no");                    
 
-    }
+                // }
+            };
+            Worker::runAll();
+            ExitCode::OK;
+        }
 }

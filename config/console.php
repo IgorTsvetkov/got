@@ -28,6 +28,14 @@ $config = [
                 ],
             ],
         ],
+        'user' => [
+            'class'=>'yii\web\User',
+            'identityClass' => 'app\models\User',
+            'enableAutoLogin' => true,
+        ],
+        'session' => [ 
+            'class' => 'yii\web\Session'
+        ],
         'db' => $db,
     ],
     'params' => $params,

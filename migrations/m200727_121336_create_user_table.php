@@ -24,7 +24,7 @@ class m200727_121336_create_user_table extends Migration
             'id'=>'1',
             'username'=>'admin',
             'passwordHash'=>Yii::$app->security->generatePasswordHash('adminpassword'),
-            'authKey'=>Yii::$app->security->generateRandomString()
+            'authKey'=>Yii::$app->security->generateRandomString(),
         ]);
         $this->insert('{{%user}}',[
             'id'=>'2',

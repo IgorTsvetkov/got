@@ -6,19 +6,18 @@ use Yii;
 use yii\db\ActiveRecord;
 class User extends ActiveRecord implements \yii\web\IdentityInterface
 {
-    private $passwordHash;
 
-    public static function getSession(){
-        return $this->hasMany(Session::className(),["user_id"=>"id"]);
-    }
-    public function hasUnfinishedSession(){
-        $hasUnfinishedSession = Session::find([
-            "user_id" => $this->id,
-            "finished_at"=>null
-            ])
-            ->count()>0;
-        return $hasUnfinishedSession;
-    }
+    // public static function getSession(){
+    //     return $this->hasMany(Session::className(),["user_id"=>"id"]);
+    // }
+    // public function hasUnfinishedSession(){
+    //     $hasUnfinishedSession = Session::find([
+    //         "user_id" => $this->id,
+    //         "finished_at"=>null
+    //         ])
+    //         ->count()>0;
+    //     return $hasUnfinishedSession;
+    // }
     /**
      * {@inheritdoc}
      */
