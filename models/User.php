@@ -78,4 +78,10 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
     {
         return Yii::$app->getSecurity()->validatePassword($password,$this->passwordHash);
     }
+    public static function getUserHasAuthKey($id,$authKey){
+        $user=User::findOne($id);
+        if($user->validateAuthKey($authKey))
+            return $user;
+        return false;
+    }
 }

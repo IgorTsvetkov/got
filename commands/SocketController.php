@@ -8,10 +8,12 @@
 namespace app\commands;
 
 use Yii;
-use app\models\User;
-use Workerman\Worker;
 use yii\console\ExitCode;
+use app\models\UserSocket;
 use yii\console\Controller;
+use app\websockets\MyWorker;
+use yii\behaviors\TimestampBehavior;
+
 require_once __DIR__ .'/../vendor/autoload.php';
 /**
  * This command echoes the first argument that you have entered.
@@ -23,33 +25,26 @@ require_once __DIR__ .'/../vendor/autoload.php';
  */
 class SocketController extends Controller
 {
-    /**
-     * This command echoes what you have entered as the message.
-     * @param string $message the message to be echoed.
-     * @return int Exit code
-     */
-    public function actionStart()
+    public function actionTest()
     {
-        $worker=new Worker("websocket://127.0.0.1:8989");
+        $worker=new MyWorker("websocket://127.0.0.1:8989");
         $worker->count=1;
         $worker->onConnect=function($connection){
             $connection->send('Connected');
         };
-
-        $worker->onMessage=function($connection,$data)use($worker){
-            $user=User::find()->one();
-            foreach($worker->connections as $con){
-                $con->send("username:".$user->username);
+        $worker->onMessageDecoded=function($connection,$data)use($worker){            
+            if(UserSocket::getUserByUserInfo($data->userInfo)){
+                $connection->onMessageEncoded([
+                    "message"=>"yes1",
+                    "status code"=>200
+                ]);                    
+            }
+            else{
+                $connection->send([
+                    "status code"=>401
+                    ]); 
             }
         };
-        Worker::runAll();
-        ExitCode::OK;
-    }
-    public function actionTest()
-    {
-        $user=User::find()->one();
-        echo "username:".$user->username;
-        ExitCode::OK;
-
+        MyWorker::runAll();
     }
 }

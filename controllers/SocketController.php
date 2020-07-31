@@ -22,7 +22,8 @@ class SocketController extends \yii\web\Controller
         $user=User::findOne($id);
         $userInfo=[
             "id"=>$user->id,
-            "authKey"=>$user->authKey
+            "authKey"=>$user->authKey,
+            "cookie"=>$_COOKIE
         ];
         return json_encode($userInfo);
         // return json_encode($id);
