@@ -27,10 +27,11 @@ class m200728_203031_create_castle_table extends Migration
             // 'group_id'=>$this->integer()
         ]);
         $this->insert('{{%castle}}',[
+            'id'=>1,
             'name' => "harrenhall",
             'src'=>"/images/cells/1",
             'cost' =>"220",
-            'rent' =>"18" ,
+            'rent' =>"18",
             'rent_home1' => "90",
             'rent_home2' => "250",
             'rent_home3' => "700",
@@ -39,6 +40,7 @@ class m200728_203031_create_castle_table extends Migration
             'homes_inn_cost' => "150",
         ]);
         $this->insert('{{%castle}}',[
+            'id'=>2,
             'name' => "lannisport",
             'src'=>"/images/cells/3",
             'cost' =>"220",
@@ -51,6 +53,7 @@ class m200728_203031_create_castle_table extends Migration
             'homes_inn_cost' => "150",
         ]);
         $this->insert('{{%castle}}',[
+            'id'=>3,
             'name' => "casterly rock",
             'src'=>"/images/cells/4",
             'cost' =>"240",
@@ -63,6 +66,7 @@ class m200728_203031_create_castle_table extends Migration
             'homes_inn_cost' => "150",
         ]);
         $this->insert('{{%castle}}',[
+            'id'=>4,
             'name' => "astapor",
             'src'=>"/images/cells/6",
             'cost' =>"260",
@@ -75,6 +79,7 @@ class m200728_203031_create_castle_table extends Migration
             'homes_inn_cost' => "150",
         ]);
         $this->insert('{{%castle}}',[
+            'id'=>5,
             'name' => "yunkai",
             'src'=>"/images/cells/7",
             'cost' =>"260",
@@ -87,6 +92,7 @@ class m200728_203031_create_castle_table extends Migration
             'homes_inn_cost' => "150",
         ]);
         $this->insert('{{%castle}}',[
+            'id'=>6,
             'name' => "meereen",            
             'src'=>"/images/cells/9",
             'cost' =>"280",
@@ -100,6 +106,7 @@ class m200728_203031_create_castle_table extends Migration
         ]);
         
         $this->insert('{{%castle}}',[
+            'id'=>7,
             'name' => "horn hill",
             'src'=>"/images/cells/10",
             'cost' =>"300",
@@ -112,6 +119,7 @@ class m200728_203031_create_castle_table extends Migration
             'homes_inn_cost' => "200",
         ]);
         $this->insert('{{%castle}}',[
+            'id'=>8,
             'name' => "highgarden",
             'src'=>"/images/cells/11",
             'cost' =>"300",
@@ -124,6 +132,7 @@ class m200728_203031_create_castle_table extends Migration
             'homes_inn_cost' => "200",
         ]);
         $this->insert('{{%castle}}',[
+            'id'=>9,
             'name' => "oldtown",
             'src'=>"/images/cells/13",
             'cost' =>"320",
@@ -136,6 +145,7 @@ class m200728_203031_create_castle_table extends Migration
             'homes_inn_cost' => "200",
         ]);
         $this->insert('{{%castle}}',[
+            'id'=>10,
             'name' => "bravos",
             'src'=>"/images/cells/16",
             'cost' =>"200",
@@ -148,6 +158,7 @@ class m200728_203031_create_castle_table extends Migration
             'homes_inn_cost' => "100",
         ]);
         $this->insert('{{%castle}}',[
+            'id'=>11,
             'name' => "qarth",
             'src'=>"/images/cells/18",
             'cost' =>"180",
@@ -160,6 +171,7 @@ class m200728_203031_create_castle_table extends Migration
             'homes_inn_cost' => "100",
         ]);
         $this->insert('{{%castle}}',[
+            'id'=>12,
             'name' => "dragonstone",
             'src'=>"/images/cells/19",
             'cost' =>"350",
@@ -172,6 +184,7 @@ class m200728_203031_create_castle_table extends Migration
             'homes_inn_cost' => "200",
         ]);
         $this->insert('{{%castle}}',[
+            'id'=>13,
             'name' => "volantis",
             'src'=>"/images/cells/22",
             'cost' =>"180",
@@ -184,6 +197,7 @@ class m200728_203031_create_castle_table extends Migration
             'homes_inn_cost' => "100",
         ]);
         $this->insert('{{%castle}}',[
+            'id'=>14,
             'name' => "king's landing",
             'src'=>"/images/cells/23",
             'cost' =>"400",
@@ -196,6 +210,7 @@ class m200728_203031_create_castle_table extends Migration
             'homes_inn_cost' => "200",
         ]);
         $this->insert('{{%castle}}',[
+            'id'=>15,
             'name' => "the eyrie",
             'src'=>"/images/cells/26",
             'cost' =>"160",
@@ -208,6 +223,7 @@ class m200728_203031_create_castle_table extends Migration
             'homes_inn_cost' => "100",
         ]);
         $this->insert('{{%castle}}',[
+            'id'=>16,
             'name' => "riverrun",
             'src'=>"/images/cells/27",
             'cost' =>"140",
@@ -220,6 +236,7 @@ class m200728_203031_create_castle_table extends Migration
             'homes_inn_cost' => "100",
         ]);
         $this->insert('{{%castle}}',[
+            'id'=>17,
             'name' => "the twins",
             'src'=>"/images/cells/29",
             'cost' =>"140",
@@ -232,6 +249,7 @@ class m200728_203031_create_castle_table extends Migration
             'homes_inn_cost' => "100",
         ]);
         $this->insert('{{%castle}}',[
+            'id'=>18,
             'name' => "winterfell",
             'src'=>"/images/cells/30",
             'cost' =>"120",
@@ -244,6 +262,7 @@ class m200728_203031_create_castle_table extends Migration
             'homes_inn_cost' => "50",
         ]);
         $this->insert('{{%castle}}',[
+            'id'=>19,
             'name' => "the wall",
             'src'=>"/images/cells/31",
             'cost' =>"100",
@@ -256,6 +275,7 @@ class m200728_203031_create_castle_table extends Migration
             'homes_inn_cost' => "50",
         ]);
         $this->insert('{{%castle}}',[
+            'id'=>20,
             'name' => "pyke",
             'src'=>"/images/cells/33",
             'cost' =>"100",
@@ -268,6 +288,7 @@ class m200728_203031_create_castle_table extends Migration
             'homes_inn_cost' => "50",
         ]);
         $this->insert('{{%castle}}',[
+            'id'=>21,
             'name' => "sunspear",
             'src'=>"/images/cells/36",
             'cost' =>"60",
@@ -280,6 +301,7 @@ class m200728_203031_create_castle_table extends Migration
             'homes_inn_cost' => "50",
         ]);
         $this->insert('{{%castle}}',[
+            'id'=>22,
             'name' => "tower of joy",
             'src'=>"/images/cells/38",
             'cost' =>"60",
