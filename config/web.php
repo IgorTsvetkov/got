@@ -60,6 +60,7 @@ $config = [
                 'class' => 'yii\rest\UrlRule', 'controller' => 'castle',
                 'class' => 'yii\rest\UrlRule', 'controller' => 'cell'
             ],
+
             ],
         ],
     ],
