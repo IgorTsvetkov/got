@@ -6,8 +6,8 @@ use Yii;
 use yii\db\ActiveRecord;
 class UserSocket extends User implements \yii\web\IdentityInterface
 {
-    public static function getUserByUserInfo($userinfo){
-        return static::getUserHasAuthKey($userinfo->id,$userinfo->authKey);
+    public static function getUserByAuthInfo($authInfo){
+        return static::getUserHasAuthKey($authInfo->id,$authInfo->authKey);
     }
     public static function getUserHasAuthKey($id,$authKey){
         $user=User::findOne($id);

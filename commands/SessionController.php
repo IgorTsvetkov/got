@@ -6,12 +6,15 @@
  */
 
 namespace app\commands;
+
+use Yii;
+use app\models\User;
+use Workerman\Worker;
+use yii\behaviors\TimestampBehavior;
 use yii\console\ExitCode;
-use app\models\UserSocket;
 use yii\console\Controller;
-use app\websockets\MyWorker;
-use app\websockets\MyTcpConnection;
-use app\websockets\MyUdpConnection;
+use yii\web\Session;
+
 require_once __DIR__ .'/../vendor/autoload.php';
 /**
  * This command echoes the first argument that you have entered.
@@ -21,12 +24,8 @@ require_once __DIR__ .'/../vendor/autoload.php';
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
  */
-class AuthController extends Controller
+class SessionController extends Controller
 {
-    public function beforeAction($action)
-    {
-        return parent::beforeAction($action);
-    }
     // public function behaviors()
     // {
     //     return[            
@@ -68,7 +67,6 @@ class AuthController extends Controller
     //     }              
     // }
     public function actionCreateRoom($name="default"){
-        // User::getUserSocket()s
         // $user=Yii::$app->user->login();
         // echo $user->username;
         // if($user->hasUnfinishedSession())
@@ -83,26 +81,26 @@ class AuthController extends Controller
     }
     public function actionTest()
     {
-        $worker=new MyWorker("websocket://127.0.0.1:8989");
-        $worker->count=1;
-        $worker->onConnect=function(MyTcpConnection $connection){
-            $connection->sendEncoded(['message'=>'Connected']);
-        };
-        $worker->onMessageDecoded=function(MyTcpConnection $connection,$data)use($worker){     
-            // var_dump($data);       
-            if(UserSocket::getUserByAuthInfo($data->authInfo)){
-                $connection->sendEncoded([
-                    "message"=>"yes1",
-                    "status code"=>200
-                ]);                    
-            }
-            else{
-                $connection->sendEncoded([
-                    "status code"=>401
-                    ]); 
-            }
-        };
-        MyWorker::runAll();
-        ExitCode::OK;
-    }
+            $worker=new Worker("websocket://127.0.0.1:8989");
+            $worker->count=1;
+            $worker->onConnect=function($connection){
+                $connection->send('Connected');
+            };
+            
+            $worker->onMessage=function($connection,$data)use($worker){
+                var_dump(json_decode($data));
+                // $user=User::findOne($authInfo->id);
+                // if($user->validateAuthKey($authInfo->authKey)){
+                //     Yii::$app->user->login($user);
+                //     // $connection->send(Yii::$app->user->getId());
+                //     $connection->send("yes");                    
+                // }
+                // else{
+                //     $connection->send("no");                    
+
+                // }
+            };
+            Worker::runAll();
+            ExitCode::OK;
+        }
 }

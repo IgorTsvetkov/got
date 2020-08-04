@@ -33,7 +33,7 @@ class m200727_121336_create_user_table extends Migration
             'authKey'=>Yii::$app->security->generateRandomString()
         ]);
         $this->insert('{{%user}}',[
-            'id'=>'2',
+            'id'=>'3',
             'username'=>'moderator02',
             'passwordHash'=>Yii::$app->security->generatePasswordHash('moderator02password'),
             'authKey'=>Yii::$app->security->generateRandomString()

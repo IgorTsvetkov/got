@@ -5,7 +5,7 @@ use yii\db\Migration;
 /**
  * Handles the creation of table `{{%cell}}`.
  */
-class m200730_084531_create_cell_table extends Migration
+class m200729_084531_create_cell_table extends Migration
 {
     /**
      * {@inheritdoc}
@@ -14,15 +14,13 @@ class m200730_084531_create_cell_table extends Migration
     {
         $this->createTable('{{%cell}}', [
             'id' => $this->primaryKey(),
-            'src' => $this->string(),
             'position'=>$this->integer(),
             'event_id' => $this->string(),
             'castle_id' => $this->string(),
         ]);
         $this->insert('{{%cell}}',[
-            'src' => "",
             'position'=>"0",
-            'event_id' =>"",
+            'event_id' =>"1",
             'castle_id' =>"",
             ]);
     }

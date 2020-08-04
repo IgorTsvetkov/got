@@ -9,4 +9,4 @@
 </p>
 <button id="select">click me</button>
 <div id="messages"></div>
-<script src="/web/js/socket.js"></script>
+<script src="/web/js/socket.js" type="module"></script>

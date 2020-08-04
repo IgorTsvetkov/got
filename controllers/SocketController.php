@@ -20,12 +20,12 @@ class SocketController extends \yii\web\Controller
     {
         $id=Yii::$app->user->getId();
         $user=User::findOne($id);
-        $userInfo=[
+        $authInfo=[
             "id"=>$user->id,
             "authKey"=>$user->authKey,
             "cookie"=>$_COOKIE
         ];
-        return json_encode($userInfo);
+        return json_encode($authInfo);
         // return json_encode($id);
     }
 

@@ -33,13 +33,15 @@ class SocketController extends Controller
             $connection->send('Connected');
         };
         $worker->onMessageDecoded=function($connection,$data)use($worker){            
-            if(UserSocket::getUserByUserInfo($data->userInfo)){
-                $connection->onMessageEncoded([
+            if(UserSocket::getUserByAuthInfo($data->authInfo)){
+                var_dump("auth success");
+                $connection->send([
                     "message"=>"yes1",
                     "status code"=>200
                 ]);                    
             }
             else{
+                var_dump("auth success");
                 $connection->send([
                     "status code"=>401
                     ]); 
