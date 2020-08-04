@@ -31,3 +31,20 @@ tests/_support/_generated
 
 #vagrant folder
 /.vagrant
+
+
+
+#VUE-CLI
+.DS_Store
+node_modules
+/dist
+
+# local env files
+.env.local
+.env.*.local
+
+# Log files
+npm-debug.log*
+
+# Editor directories and files
+.vscode

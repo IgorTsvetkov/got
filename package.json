@@ -1,0 +1,39 @@
+{
+  "name": "got",
+  "version": "1.0.0",
+  "description": "<h2>What is it</h2>\r <p>It's basic yii2 project with <strong>hidden web folder</strong></p>\r <h3>Installation rules for <strong>Openserver</strong></h3>\r <h4>Step 1</h4>\r <p>Clone this project to your <strong>ospanel/domain</strong> folder<p/>\r <h4>Step 2</h4>\r <p>Type in console:</p>\r <code>composer install</code>\r <h4>Step 3</h4>\r <p>Restart openserver</p>\r ---\r <p>Ready</p>",
+  "main": "index.js",
+  "private": true,
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "lodash": "^4.17.19",
+    "vue": "^2.6.11"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.11.0",
+    "@babel/preset-env": "^7.11.0",
+    "babel-loader": "^8.1.0",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
+    "vue-loader": "^15.9.3",
+    "vue-template-compiler": "^2.6.11",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "webpack --mode=development --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IgorTsvetkov/got.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/IgorTsvetkov/got/issues"
+  },
+  "homepage": "https://github.com/IgorTsvetkov/got#readme"
+}
