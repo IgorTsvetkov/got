@@ -20,8 +20,9 @@ export default {
         data() {
             return {
                 urlBase:"http://got",
-                cells:{
-                    0:{src:"/images/t-2.jpg",name:"harenhall"},
+                cells:[],
+                // cells:{
+                //     0:{src:"/images/t-2.jpg",name:"harenhall"},
                     //top
                     // 0:{src:"./assets/top/t-0.jpg",name:"inn at the croassroads"},
                     // 1:{src:"./assets/top/t-1.jpg",name:"harenhall",price:"220",bg:"red"},
@@ -65,13 +66,17 @@ export default {
                     // 37:{src:"./assets/bottom/b-8.jpg"},
                     // 38:{src:"./assets/bottom/b-9.jpg"},
                     // 39:{src:"./assets/bottom/b-10.jpg"},
-                }
+                // }
             }
         },
         created(){
-            axios.get(this.urlBase+"/site/about")
-            .then(res => {
-                console.log(res)
+            axios.get("/cells",{
+                params:{
+                    expand:"castle"
+                }
+            })
+            .then(({data}) => {
+                this.cells=data;
             })
             .catch(err => {
                 console.error(err); 

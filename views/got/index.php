@@ -8,6 +8,7 @@
 <body>
     <div id="app">
         <map-component></map-component>
-    </body>
-    <script src="/web/js/main.js"></script>
+    </div>
+</body>
+<script src="/web/js/main.js"></script>
 </html>

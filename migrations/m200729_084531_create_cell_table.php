@@ -20,8 +20,8 @@ class m200729_084531_create_cell_table extends Migration
         ]);
         $this->insert('{{%cell}}',[
             'position'=>"0",
-            'event_id' =>"1",
-            'castle_id' =>"",
+            'event_id' =>"",
+            'castle_id' =>"1",
             ]);
     }
 
