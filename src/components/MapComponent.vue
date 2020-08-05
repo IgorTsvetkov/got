@@ -1,7 +1,6 @@
 <template>
     <div class="f f-center">
         <div class="grid">
-            12
             <div v-for="(cell,index) in cells" :key="index">
                 <div v-if="cell">
                 <ImageComponent  :src="getImage(cell)"
@@ -11,7 +10,7 @@
                 </div>
             </div>
             <div class="cell-center">
-                <img src="/web/images/t-1.jpg" alt="">
+                <img src="/web/images/center.jpg" alt="">
             </div>
             <img class="empty-center">
     </div>
