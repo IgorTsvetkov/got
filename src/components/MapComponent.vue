@@ -2,13 +2,9 @@
     <div class="f f-center">
         <div class="grid">
             <div class="relative f" v-for="(cell,index) in cells" :key="index">
-                <div  class="absolute figurine">
-
-                    <img v-if="cell.position===0" height="100%" src="/web/images/figurines/figure1.png">
-                    <img v-if="cell.position===0" height="100%" src="/web/images/figurines/figure2.png">
-                    <img v-if="cell.position===0" height="100%" src="/web/images/figurines/figure3.png">
-                    <img v-if="cell.position===0" height="100%" src="/web/images/figurines/figure4.png">
-                    <img v-if="cell.position===0" height="100%" src="/web/images/figurines/figure5.png">
+                <div v-if="cell.position===position"  class="absolute figurine">
+                    <img  height="100%" src="/web/images/figurines/figure1.png">
+                       <div style="background:red"> position:{{position}}</div>
                 </div>
                 <div class="f f-center-horizontal">
                     <ImageComponent 
@@ -25,6 +21,10 @@
             </div>
             <img class="empty-center">
     </div>
+    <div class="absolute">
+    <button  @click="move">Move</button>
+
+    </div>
     </div>
 </template>
 
@@ -36,6 +36,7 @@ export default {
         data() {
             return {
                 cells:[],
+                position:0,
             }
         },
         created(){
@@ -59,6 +60,13 @@ export default {
                        cell.event?cell.event.src:
                        cell.utility?cell.utility.src:
                        "";
+            },
+            move(){
+                if(this.position===39){
+                    this.position=0;
+                    return;
+                }
+                this.position+=1;
             }
         },
     }

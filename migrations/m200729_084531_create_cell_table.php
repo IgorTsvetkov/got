@@ -78,7 +78,7 @@ class m200729_084531_create_cell_table extends Migration
             'property_id' =>"9",
         ]);
         $this->insert('{{%cell}}',[
-            'position'=>"25",
+            'position'=>"14",
             'tax_id'=>"2"
         ]);
         $this->insert('{{%cell}}',[
@@ -86,99 +86,99 @@ class m200729_084531_create_cell_table extends Migration
             'event_id' =>"4",
         ]);
         $this->insert('{{%cell}}',[
-            'position'=>"16",
+            'position'=>"39",
             'property_id' =>"10",
         ]);
         $this->insert('{{%cell}}',[
-            'position'=>"17",
+            'position'=>"16",
             'event_id'=>"10"
         ]);
         $this->insert('{{%cell}}',[
-            'position'=>"18",
+            'position'=>"38",
             'property_id' =>"11",
         ]);
         $this->insert('{{%cell}}',[
-            'position'=>"19",
+            'position'=>"17",//17
             'property_id' =>"12",
         ]);
         $this->insert('{{%cell}}',[
-            'position'=>"20",            
+            'position'=>"37",            
             'event_id' =>"5",
         ]);
         $this->insert('{{%cell}}',[
-            'position'=>"21",            
+            'position'=>"18",//18            
             'event_id' =>"6",
         ]);
         $this->insert('{{%cell}}',[
-            'position'=>"22",
+            'position'=>"36",
             'property_id' =>"13",
         ]);
         $this->insert('{{%cell}}',[
-            'position'=>"23",
+            'position'=>"19",//19
             'property_id' =>"14",
         ]);
         $this->insert('{{%cell}}',[
-            'position'=>"24",            
+            'position'=>"35",            
             'event_id' =>"7",
         ]);
         $this->insert('{{%cell}}',[
-            'position'=>"14",            
+            'position'=>"34",            
             'tax_id' =>"3",
         ]);
         $this->insert('{{%cell}}',[
-            'position'=>"26",
+            'position'=>"33",
             'property_id' =>"15",
         ]);
         $this->insert('{{%cell}}',[
-            'position'=>"27",
+            'position'=>"32",
             'property_id' =>"16",
         ]);
         $this->insert('{{%cell}}',[
-            'position'=>"28",            
+            'position'=>"31",            
             'utility_id' =>"2",
         ]);
         $this->insert('{{%cell}}',[
-            'position'=>"29",
+            'position'=>"30",
             'property_id' =>"17",
         ]);
         $this->insert('{{%cell}}',[
-            'position'=>"30",
+            'position'=>"29",
             'property_id' =>"18",
         ]);
         $this->insert('{{%cell}}',[
-            'position'=>"31",
+            'position'=>"28",
             'property_id' =>"19",
         ]);
         $this->insert('{{%cell}}',[
-            'position'=>"32",            
+            'position'=>"27",            
             'event_id' =>"2",
         ]);
         $this->insert('{{%cell}}',[            
-            'position'=>"33",
+            'position'=>"26",
             'property_id' =>"20",
         ]);
         $this->insert('{{%cell}}',[
-            'position'=>"34",            
+            'position'=>"25",            
             'tax_id' =>"4",
         ]);
         $this->insert('{{%cell}}',[
-            'position'=>"35",            
+            'position'=>"24",            
             'event_id' =>"8",
         ]);
         $this->insert('{{%cell}}',[
-            'position'=>"36",
+            'position'=>"23",//23
             'property_id' =>"21",
         ]);
         $this->insert('{{%cell}}',[
-            'position'=>"37",            
+            'position'=>"22",//22            
             'event_id' =>"3",
         ]);
         $this->insert('{{%cell}}',[
-            'position'=>"38",
+            'position'=>"21",//21
             'property_id' =>"22",
         ]);
         $this->insert('{{%cell}}',[
-            'position'=>"39",            
+            'position'=>"20",//20            
             'event_id' =>"9",
         ]);
        
