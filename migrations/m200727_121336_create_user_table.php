@@ -19,7 +19,6 @@ class m200727_121336_create_user_table extends Migration
             'authKey'=>$this->string(32),
             'accessToken'=>$this->string(),
         ]);
-
         $this->insert('{{%user}}',[
             'id'=>'1',
             'username'=>'admin',

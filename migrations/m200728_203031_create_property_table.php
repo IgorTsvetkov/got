@@ -3,19 +3,19 @@
 use yii\db\Migration;
 
 /**
- * Handles the creation of table `{{%castle}}`.
+ * Handles the creation of table `{{%property}}`.
  */
-class m200728_203031_create_castle_table extends Migration
+class m200728_203031_create_property_table extends Migration
 {
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-        $this->createTable('{{%castle}}', [
+        $this->createTable('{{%property}}', [
             'id' => $this->primaryKey(),
             'name' => $this->string(),
-            'src'=>$this->string(),
+            'src' => $this->string(),
             'cost' => $this->integer(),
             'rent' => $this->integer(),
             'rent_home1' => $this->integer(),
@@ -24,294 +24,316 @@ class m200728_203031_create_castle_table extends Migration
             'rent_home4' => $this->integer(),
             'rent_inn' => $this->integer(),
             'homes_inn_cost' => $this->integer(),
-            // 'group_id'=>$this->integer()
+            'group_id' => $this->integer(),
         ]);
-        $this->insert('{{%castle}}',[
-            'id'=>1,
+        $this->insert('{{%property}}', [
+            'id' => 1,
             'name' => "harrenhall",
-            'src'=>"/images/cells/1",
-            'cost' =>"220",
-            'rent' =>"18",
+            'src' => "/images/cells/1.jpg",
+            'cost' => "220",
+            'rent' => "18",
             'rent_home1' => "90",
             'rent_home2' => "250",
             'rent_home3' => "700",
             'rent_home4' => "875",
             'rent_inn' => "1050",
             'homes_inn_cost' => "150",
+            'group_id' => 1,
         ]);
-        $this->insert('{{%castle}}',[
-            'id'=>2,
+        $this->insert('{{%property}}', [
+            'id' => 2,
             'name' => "lannisport",
-            'src'=>"/images/cells/3",
-            'cost' =>"220",
-            'rent' =>"18" ,
+            'src' => "/images/cells/3.jpg",
+            'cost' => "220",
+            'rent' => "18",
             'rent_home1' => "90",
             'rent_home2' => "250",
             'rent_home3' => "700",
             'rent_home4' => "875",
             'rent_inn' => "1050",
             'homes_inn_cost' => "150",
+            'group_id' => 1,
         ]);
-        $this->insert('{{%castle}}',[
-            'id'=>3,
+        $this->insert('{{%property}}', [
+            'id' => 3,
             'name' => "casterly rock",
-            'src'=>"/images/cells/4",
-            'cost' =>"240",
-            'rent' =>"20" ,
+            'src' => "/images/cells/4.jpg",
+            'cost' => "240",
+            'rent' => "20",
             'rent_home1' => "100",
             'rent_home2' => "300",
             'rent_home3' => "750",
             'rent_home4' => "925",
             'rent_inn' => "1100",
             'homes_inn_cost' => "150",
+            'group_id' => 1,
         ]);
-        $this->insert('{{%castle}}',[
-            'id'=>4,
+        $this->insert('{{%property}}', [
+            'id' => 4,
             'name' => "astapor",
-            'src'=>"/images/cells/6",
-            'cost' =>"260",
-            'rent' =>"22" ,
+            'src' => "/images/cells/6.jpg",
+            'cost' => "260",
+            'rent' => "22",
             'rent_home1' => "110",
             'rent_home2' => "330",
             'rent_home3' => "800",
             'rent_home4' => "975",
             'rent_inn' => "1150",
             'homes_inn_cost' => "150",
+            'group_id' => 2,
         ]);
-        $this->insert('{{%castle}}',[
-            'id'=>5,
+        $this->insert('{{%property}}', [
+            'id' => 5,
             'name' => "yunkai",
-            'src'=>"/images/cells/7",
-            'cost' =>"260",
-            'rent' =>"22" ,
+            'src' => "/images/cells/7.jpg",
+            'cost' => "260",
+            'rent' => "22",
             'rent_home1' => "110",
             'rent_home2' => "330",
             'rent_home3' => "800",
             'rent_home4' => "975",
             'rent_inn' => "1150",
             'homes_inn_cost' => "150",
+            'group_id' => 2,
         ]);
-        $this->insert('{{%castle}}',[
-            'id'=>6,
-            'name' => "meereen",            
-            'src'=>"/images/cells/9",
-            'cost' =>"280",
-            'rent' =>"24" ,
+        $this->insert('{{%property}}', [
+            'id' => 6,
+            'name' => "meereen",
+            'src' => "/images/cells/9.jpg",
+            'cost' => "280",
+            'rent' => "24",
             'rent_home1' => "120",
             'rent_home2' => "360",
             'rent_home3' => "850",
             'rent_home4' => "1025",
             'rent_inn' => "1200",
             'homes_inn_cost' => "150",
+            'group_id' => 2,
         ]);
-        
-        $this->insert('{{%castle}}',[
-            'id'=>7,
+
+        $this->insert('{{%property}}', [
+            'id' => 7,
             'name' => "horn hill",
-            'src'=>"/images/cells/10",
-            'cost' =>"300",
-            'rent' =>"26" ,
+            'src' => "/images/cells/10.jpg",
+            'cost' => "300",
+            'rent' => "26",
             'rent_home1' => "130",
             'rent_home2' => "390",
             'rent_home3' => "900",
             'rent_home4' => "1100",
             'rent_inn' => "1275",
             'homes_inn_cost' => "200",
+            'group_id' => 3,
         ]);
-        $this->insert('{{%castle}}',[
-            'id'=>8,
+        $this->insert('{{%property}}', [
+            'id' => 8,
             'name' => "highgarden",
-            'src'=>"/images/cells/11",
-            'cost' =>"300",
-            'rent' =>"26" ,
+            'src' => "/images/cells/11.jpg",
+            'cost' => "300",
+            'rent' => "26",
             'rent_home1' => "130",
             'rent_home2' => "390",
             'rent_home3' => "900",
             'rent_home4' => "1100",
             'rent_inn' => "1275",
             'homes_inn_cost' => "200",
+            'group_id' => 3,
         ]);
-        $this->insert('{{%castle}}',[
-            'id'=>9,
+        $this->insert('{{%property}}', [
+            'id' => 9,
             'name' => "oldtown",
-            'src'=>"/images/cells/13",
-            'cost' =>"320",
-            'rent' =>"28" ,
+            'src' => "/images/cells/13.jpg",
+            'cost' => "320",
+            'rent' => "28",
             'rent_home1' => "150",
             'rent_home2' => "450",
             'rent_home3' => "1000",
             'rent_home4' => "1200",
             'rent_inn' => "1400",
             'homes_inn_cost' => "200",
+            'group_id' => 3,
         ]);
-        $this->insert('{{%castle}}',[
-            'id'=>10,
+        $this->insert('{{%property}}', [
+            'id' => 10,
             'name' => "bravos",
-            'src'=>"/images/cells/16",
-            'cost' =>"200",
-            'rent' =>"16" ,
+            'src' => "/images/cells/16.jpg",
+            'cost' => "200",
+            'rent' => "16",
             'rent_home1' => "80",
             'rent_home2' => "220",
             'rent_home3' => "600",
             'rent_home4' => "800",
             'rent_inn' => "1000",
             'homes_inn_cost' => "100",
+            'group_id' => 8,
         ]);
-        $this->insert('{{%castle}}',[
-            'id'=>11,
+        $this->insert('{{%property}}', [
+            'id' => 11,
             'name' => "qarth",
-            'src'=>"/images/cells/18",
-            'cost' =>"180",
-            'rent' =>"14" ,
+            'src' => "/images/cells/18.jpg",
+            'cost' => "180",
+            'rent' => "14",
             'rent_home1' => "70",
             'rent_home2' => "200",
             'rent_home3' => "550",
             'rent_home4' => "750",
             'rent_inn' => "950",
             'homes_inn_cost' => "100",
+            'group_id' => 8,
         ]);
-        $this->insert('{{%castle}}',[
-            'id'=>12,
+        $this->insert('{{%property}}', [
+            'id' => 12,
             'name' => "dragonstone",
-            'src'=>"/images/cells/19",
-            'cost' =>"350",
-            'rent' =>"35" ,
+            'src' => "/images/cells/19.jpg",
+            'cost' => "350",
+            'rent' => "35",
             'rent_home1' => "175",
             'rent_home2' => "500",
             'rent_home3' => "1100",
             'rent_home4' => "1300",
             'rent_inn' => "1500",
             'homes_inn_cost' => "200",
+            'group_id' => 4,
         ]);
-        $this->insert('{{%castle}}',[
-            'id'=>13,
+        $this->insert('{{%property}}', [
+            'id' => 13,
             'name' => "volantis",
-            'src'=>"/images/cells/22",
-            'cost' =>"180",
-            'rent' =>"14" ,
+            'src' => "/images/cells/22.jpg",
+            'cost' => "180",
+            'rent' => "14",
             'rent_home1' => "70",
             'rent_home2' => "200",
             'rent_home3' => "550",
             'rent_home4' => "750",
             'rent_inn' => "950",
             'homes_inn_cost' => "100",
+            'group_id' => 8,
         ]);
-        $this->insert('{{%castle}}',[
-            'id'=>14,
+        $this->insert('{{%property}}', [
+            'id' => 14,
             'name' => "king's landing",
-            'src'=>"/images/cells/23",
-            'cost' =>"400",
-            'rent' =>"50" ,
+            'src' => "/images/cells/23.jpg",
+            'cost' => "400",
+            'rent' => "50",
             'rent_home1' => "200",
             'rent_home2' => "600",
             'rent_home3' => "1400",
             'rent_home4' => "1700",
             'rent_inn' => "2000",
             'homes_inn_cost' => "200",
+            'group_id' => 4,
         ]);
-        $this->insert('{{%castle}}',[
-            'id'=>15,
+        $this->insert('{{%property}}', [
+            'id' => 15,
             'name' => "the eyrie",
-            'src'=>"/images/cells/26",
-            'cost' =>"160",
-            'rent' =>"12" ,
+            'src' => "/images/cells/26.jpg",
+            'cost' => "160",
+            'rent' => "12",
             'rent_home1' => "60",
             'rent_home2' => "180",
             'rent_home3' => "500",
             'rent_home4' => "700",
             'rent_inn' => "900",
             'homes_inn_cost' => "100",
+            'group_id' => 7,
         ]);
-        $this->insert('{{%castle}}',[
-            'id'=>16,
+        $this->insert('{{%property}}', [
+            'id' => 16,
             'name' => "riverrun",
-            'src'=>"/images/cells/27",
-            'cost' =>"140",
-            'rent' =>"10" ,
+            'src' => "/images/cells/27.jpg",
+            'cost' => "140",
+            'rent' => "10",
             'rent_home1' => "50",
             'rent_home2' => "150",
             'rent_home3' => "450",
             'rent_home4' => "625",
             'rent_inn' => "750",
             'homes_inn_cost' => "100",
+            'group_id' => 7,
         ]);
-        $this->insert('{{%castle}}',[
-            'id'=>17,
+        $this->insert('{{%property}}', [
+            'id' => 17,
             'name' => "the twins",
-            'src'=>"/images/cells/29",
-            'cost' =>"140",
-            'rent' =>"10" ,
+            'src' => "/images/cells/29.jpg",
+            'cost' => "140",
+            'rent' => "10",
             'rent_home1' => "50",
             'rent_home2' => "150",
             'rent_home3' => "450",
             'rent_home4' => "625",
             'rent_inn' => "750",
             'homes_inn_cost' => "100",
+            'group_id' => 7,
         ]);
-        $this->insert('{{%castle}}',[
-            'id'=>18,
+        $this->insert('{{%property}}', [
+            'id' => 18,
             'name' => "winterfell",
-            'src'=>"/images/cells/30",
-            'cost' =>"120",
-            'rent' =>"8" ,
+            'src' => "/images/cells/30.jpg",
+            'cost' => "120",
+            'rent' => "8",
             'rent_home1' => "40",
             'rent_home2' => "100",
             'rent_home3' => "300",
             'rent_home4' => "450",
             'rent_inn' => "650",
             'homes_inn_cost' => "50",
+            'group_id' => 6,
         ]);
-        $this->insert('{{%castle}}',[
-            'id'=>19,
+        $this->insert('{{%property}}', [
+            'id' => 19,
             'name' => "the wall",
-            'src'=>"/images/cells/31",
-            'cost' =>"100",
-            'rent' =>"6" ,
+            'src' => "/images/cells/31.jpg",
+            'cost' => "100",
+            'rent' => "6",
             'rent_home1' => "30",
             'rent_home2' => "90",
             'rent_home3' => "270",
             'rent_home4' => "400",
             'rent_inn' => "550",
             'homes_inn_cost' => "50",
+            'group_id' => 6,
         ]);
-        $this->insert('{{%castle}}',[
-            'id'=>20,
+        $this->insert('{{%property}}', [
+            'id' => 20,
             'name' => "pyke",
-            'src'=>"/images/cells/33",
-            'cost' =>"100",
-            'rent' =>"6" ,
+            'src' => "/images/cells/33.jpg",
+            'cost' => "100",
+            'rent' => "6",
             'rent_home1' => "30",
             'rent_home2' => "90",
             'rent_home3' => "270",
             'rent_home4' => "400",
             'rent_inn' => "550",
             'homes_inn_cost' => "50",
+            'group_id' => 6,
         ]);
-        $this->insert('{{%castle}}',[
-            'id'=>21,
+        $this->insert('{{%property}}', [
+            'id' => 21,
             'name' => "sunspear",
-            'src'=>"/images/cells/36",
-            'cost' =>"60",
-            'rent' =>"4" ,
+            'src' => "/images/cells/36.jpg",
+            'cost' => "60",
+            'rent' => "4",
             'rent_home1' => "20",
             'rent_home2' => "80",
             'rent_home3' => "180",
             'rent_home4' => "320",
             'rent_inn' => "450",
             'homes_inn_cost' => "50",
+            'group_id' => 4,
         ]);
-        $this->insert('{{%castle}}',[
-            'id'=>22,
+        $this->insert('{{%property}}', [
+            'id' => 22,
             'name' => "tower of joy",
-            'src'=>"/images/cells/38",
-            'cost' =>"60",
-            'rent' =>"2" ,
+            'src' => "/images/cells/38.jpg",
+            'cost' => "60",
+            'rent' => "2",
             'rent_home1' => "10",
             'rent_home2' => "30",
             'rent_home3' => "90",
             'rent_home4' => "160",
             'rent_inn' => "250",
             'homes_inn_cost' => "50",
+            'group_id' => 4,
         ]);
 
 
@@ -323,6 +345,6 @@ class m200728_203031_create_castle_table extends Migration
      */
     public function safeDown()
     {
-        $this->dropTable('{{%castle}}');
+        $this->dropTable('{{%property}}');
     }
 }
