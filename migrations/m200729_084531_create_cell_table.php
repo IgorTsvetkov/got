@@ -71,19 +71,19 @@ class m200729_084531_create_cell_table extends Migration
         ]);
         $this->insert('{{%cell}}',[
             'position'=>"12",
-            'event_id' =>"5",
+            'event_id' =>"3",
         ]);
         $this->insert('{{%cell}}',[
             'position'=>"13",
             'property_id' =>"9",
         ]);
         $this->insert('{{%cell}}',[
-            'position'=>"14",
+            'position'=>"25",
             'tax_id'=>"2"
         ]);
         $this->insert('{{%cell}}',[
             'position'=>"15",            
-            'event_id' =>"7",
+            'event_id' =>"4",
         ]);
         $this->insert('{{%cell}}',[
             'position'=>"16",
@@ -91,7 +91,7 @@ class m200729_084531_create_cell_table extends Migration
         ]);
         $this->insert('{{%cell}}',[
             'position'=>"17",
-            'event_id'=>"16"
+            'event_id'=>"10"
         ]);
         $this->insert('{{%cell}}',[
             'position'=>"18",
@@ -103,11 +103,11 @@ class m200729_084531_create_cell_table extends Migration
         ]);
         $this->insert('{{%cell}}',[
             'position'=>"20",            
-            'event_id' =>"8",
+            'event_id' =>"5",
         ]);
         $this->insert('{{%cell}}',[
             'position'=>"21",            
-            'event_id' =>"9",
+            'event_id' =>"6",
         ]);
         $this->insert('{{%cell}}',[
             'position'=>"22",
@@ -119,10 +119,10 @@ class m200729_084531_create_cell_table extends Migration
         ]);
         $this->insert('{{%cell}}',[
             'position'=>"24",            
-            'event_id' =>"10",
+            'event_id' =>"7",
         ]);
         $this->insert('{{%cell}}',[
-            'position'=>"25",            
+            'position'=>"14",            
             'tax_id' =>"3",
         ]);
         $this->insert('{{%cell}}',[
@@ -163,7 +163,7 @@ class m200729_084531_create_cell_table extends Migration
         ]);
         $this->insert('{{%cell}}',[
             'position'=>"35",            
-            'event_id' =>"14",
+            'event_id' =>"8",
         ]);
         $this->insert('{{%cell}}',[
             'position'=>"36",
@@ -171,7 +171,7 @@ class m200729_084531_create_cell_table extends Migration
         ]);
         $this->insert('{{%cell}}',[
             'position'=>"37",            
-            'event_id' =>"5",
+            'event_id' =>"3",
         ]);
         $this->insert('{{%cell}}',[
             'position'=>"38",
@@ -179,7 +179,7 @@ class m200729_084531_create_cell_table extends Migration
         ]);
         $this->insert('{{%cell}}',[
             'position'=>"39",            
-            'event_id' =>"15",
+            'event_id' =>"9",
         ]);
        
     }

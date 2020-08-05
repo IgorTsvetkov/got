@@ -27,6 +27,48 @@
 .bgred[data-v-96ec91dc]{
     background:red;
 }
+.text-center[data-v-96ec91dc]{
+    text-align: center;
+}
+.red[data-v-96ec91dc]{
+    background:red;
+    color:white;
+}
+.yellow[data-v-96ec91dc]{
+    background:rgb(255, 234, 46);
+    color:black;
+}
+.green[data-v-96ec91dc]{
+    background:green;
+    color:white;
+}
+.dark_purple[data-v-96ec91dc]{
+    background:purple;
+    color:white;
+}
+.brown[data-v-96ec91dc]{
+    background:brown;
+    color:white;
+}
+.dark_blue[data-v-96ec91dc]{
+    background:darkcyan;
+    color:white;
+}
+.light_blue[data-v-96ec91dc]{
+    background:cyan;
+    color:black;
+}
+.orange[data-v-96ec91dc]{
+    background:rgb(255, 90, 31);
+    color:white;
+}
+.green[data-v-96ec91dc]{
+    background:green;
+    color:white;
+}
+.height[data-v-96ec91dc]{
+    font-size: 1.3em;
+}
 
 
 body[data-v-5567ea9e]{
@@ -45,7 +87,6 @@ body[data-v-5567ea9e]{
     grid-column: 2/7;
     height: auto;
     width:100%;
-    background: yellow;
 }
 .empty-center[data-v-5567ea9e]{
     grid-row: 2/6;
@@ -75,5 +116,31 @@ body[data-v-5567ea9e]{
 }
 .cell-center img[data-v-5567ea9e]{
     width:inherit;
+}
+/*FIGURINE STYLES*/
+.absolute[data-v-5567ea9e]{
+    position: absolute;
+}
+.relative[data-v-5567ea9e]{
+    position: relative;
+}
+.f[data-v-5567ea9e]{
+    display:flex;
+}
+.f-center[data-v-5567ea9e]{
+    justify-items: center;
+    justify-content: center;
+    align-items: center;
+}
+.f-center-horizontal[data-v-5567ea9e]{
+    align-items: center;
+}
+.figurine[data-v-5567ea9e]{
+    height: 40px;
+    width:40px;
+    display: flex;
+    width: inherit;
+    flex-wrap: wrap;
+    z-index: 1;
 }
 

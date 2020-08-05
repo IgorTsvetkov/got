@@ -319,7 +319,7 @@ class m200728_203031_create_property_table extends Migration
             'rent_home4' => "320",
             'rent_inn' => "450",
             'homes_inn_cost' => "50",
-            'group_id' => 4,
+            'group_id' => 5,
         ]);
         $this->insert('{{%property}}', [
             'id' => 22,
@@ -333,7 +333,7 @@ class m200728_203031_create_property_table extends Migration
             'rent_home4' => "160",
             'rent_inn' => "250",
             'homes_inn_cost' => "50",
-            'group_id' => 4,
+            'group_id' => 5,
         ]);
 
 

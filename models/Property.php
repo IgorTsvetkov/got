@@ -3,6 +3,8 @@
 namespace app\models;
 
 use Yii;
+use app\models\PropertyGroup;
+use Codeception\Lib\Generator\Group;
 
 /**
  * This is the model class for table "property".
@@ -28,7 +30,13 @@ class Property extends \yii\db\ActiveRecord
     {
         return 'property';
     }
-
+    public function extraFields()
+    {
+        return ['group'];
+    }
+    public function getGroup(){
+        return $this->hasOne(PropertyGroup::class,['id'=>'group_id']);
+    }
     /**
      * {@inheritdoc}
      */

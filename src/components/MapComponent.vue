@@ -1,12 +1,23 @@
 <template>
     <div class="f f-center">
         <div class="grid">
-            <div v-for="(cell,index) in cells" :key="index">
-                <div v-if="cell">
-                <ImageComponent  :src="getImage(cell)"
-                 :price="cell.price"
-                 :text_bgcolor="cell.bg
-                 "></ImageComponent>
+            <div class="relative f" v-for="(cell,index) in cells" :key="index">
+                <div  class="absolute figurine">
+
+                    <img v-if="cell.position===0" height="100%" src="/web/images/figurines/figure1.png">
+                    <img v-if="cell.position===0" height="100%" src="/web/images/figurines/figure2.png">
+                    <img v-if="cell.position===0" height="100%" src="/web/images/figurines/figure3.png">
+                    <img v-if="cell.position===0" height="100%" src="/web/images/figurines/figure4.png">
+                    <img v-if="cell.position===0" height="100%" src="/web/images/figurines/figure5.png">
+                </div>
+                <div class="f f-center-horizontal">
+                    <ImageComponent 
+                    v-if="cell.property"
+                    :src="getImage(cell)"
+                    :price="cell.property.cost"
+                    :price_bgcolor="cell.property.group.color_name"
+                 ></ImageComponent>
+                <ImageComponent v-else :src="getImage(cell)"></ImageComponent>
                 </div>
             </div>
             <div class="cell-center">
@@ -30,7 +41,7 @@ export default {
         created(){
             axios.get("/cells",{
                 params:{
-                    expand:"property,tax,utility,event"
+                    expand:"property.group,tax,utility,event"
                 }
             })
             .then(({data}) => {
@@ -71,7 +82,6 @@ body{
     grid-column: 2/7;
     height: auto;
     width:100%;
-    background: yellow;
 }
 .empty-center{
     grid-row: 2/6;
@@ -101,5 +111,31 @@ body{
 }
 .cell-center img{
     width:inherit;
+}
+/*FIGURINE STYLES*/
+.absolute{
+    position: absolute;
+}
+.relative{
+    position: relative;
+}
+.f{
+    display:flex;
+}
+.f-center{
+    justify-items: center;
+    justify-content: center;
+    align-items: center;
+}
+.f-center-horizontal{
+    align-items: center;
+}
+.figurine{
+    height: 40px;
+    width:40px;
+    display: flex;
+    width: inherit;
+    flex-wrap: wrap;
+    z-index: 1;
 }
 </style>

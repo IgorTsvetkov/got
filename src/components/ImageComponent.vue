@@ -1,6 +1,6 @@
 <template>
         <div class="cell-wrapper f f-column">
-            <div v-if="this.price" :class="[price,price_bgcolor]">{{this.price}}</div>
+            <div v-if="this.price" class="text-center height" :class="[price_bgcolor]">{{this.price}}</div>
             <img :src="this.src" alt="">
         </div>
 </template>
@@ -13,21 +13,14 @@
                 default:""
                 },
             price:{
-                type: String,
-                default:""
+                type: Number,
+                default:undefined
             },
-            text_bgcolor:{
+            price_bgcolor:{
                 type:String,
                 default:"bgblack"
             }
         },
-        data() {
-            return {
-                price_bgcolor:this.text_bgcolor
-            }
-        },
-        created(){
-        }
     }
 </script>
 
@@ -59,5 +52,47 @@
 }
 .bgred{
     background:red;
+}
+.text-center{
+    text-align: center;
+}
+.red{
+    background:red;
+    color:white;
+}
+.yellow{
+    background:rgb(255, 234, 46);
+    color:black;
+}
+.green{
+    background:green;
+    color:white;
+}
+.dark_purple{
+    background:purple;
+    color:white;
+}
+.brown{
+    background:brown;
+    color:white;
+}
+.dark_blue{
+    background:darkcyan;
+    color:white;
+}
+.light_blue{
+    background:cyan;
+    color:black;
+}
+.orange{
+    background:rgb(255, 90, 31);
+    color:white;
+}
+.green{
+    background:green;
+    color:white;
+}
+.height{
+    font-size: 1.3em;
 }
 </style>
