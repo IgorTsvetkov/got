@@ -5,7 +5,7 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "castle".
+ * This is the model class for table "property".
  *
  * @property int $id
  * @property string|null $name
@@ -19,14 +19,14 @@ use Yii;
  * @property int|null $rent_inn
  * @property int|null $homes_inn_cost
  */
-class Castle extends \yii\db\ActiveRecord
+class Property extends \yii\db\ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return 'castle';
+        return 'property';
     }
 
     /**

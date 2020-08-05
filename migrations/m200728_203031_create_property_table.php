@@ -29,7 +29,7 @@ class m200728_203031_create_property_table extends Migration
         $this->insert('{{%property}}', [
             'id' => 1,
             'name' => "harrenhall",
-            'src' => "/images/cells/1.jpg",
+            'src' => "/web/images/cells/1.jpg",
             'cost' => "220",
             'rent' => "18",
             'rent_home1' => "90",
@@ -43,7 +43,7 @@ class m200728_203031_create_property_table extends Migration
         $this->insert('{{%property}}', [
             'id' => 2,
             'name' => "lannisport",
-            'src' => "/images/cells/3.jpg",
+            'src' => "/web/images/cells/3.jpg",
             'cost' => "220",
             'rent' => "18",
             'rent_home1' => "90",
@@ -57,7 +57,7 @@ class m200728_203031_create_property_table extends Migration
         $this->insert('{{%property}}', [
             'id' => 3,
             'name' => "casterly rock",
-            'src' => "/images/cells/4.jpg",
+            'src' => "/web/images/cells/4.jpg",
             'cost' => "240",
             'rent' => "20",
             'rent_home1' => "100",
@@ -71,7 +71,7 @@ class m200728_203031_create_property_table extends Migration
         $this->insert('{{%property}}', [
             'id' => 4,
             'name' => "astapor",
-            'src' => "/images/cells/6.jpg",
+            'src' => "/web/images/cells/6.jpg",
             'cost' => "260",
             'rent' => "22",
             'rent_home1' => "110",
@@ -85,7 +85,7 @@ class m200728_203031_create_property_table extends Migration
         $this->insert('{{%property}}', [
             'id' => 5,
             'name' => "yunkai",
-            'src' => "/images/cells/7.jpg",
+            'src' => "/web/images/cells/7.jpg",
             'cost' => "260",
             'rent' => "22",
             'rent_home1' => "110",
@@ -99,7 +99,7 @@ class m200728_203031_create_property_table extends Migration
         $this->insert('{{%property}}', [
             'id' => 6,
             'name' => "meereen",
-            'src' => "/images/cells/9.jpg",
+            'src' => "/web/images/cells/9.jpg",
             'cost' => "280",
             'rent' => "24",
             'rent_home1' => "120",
@@ -114,7 +114,7 @@ class m200728_203031_create_property_table extends Migration
         $this->insert('{{%property}}', [
             'id' => 7,
             'name' => "horn hill",
-            'src' => "/images/cells/10.jpg",
+            'src' => "/web/images/cells/10.jpg",
             'cost' => "300",
             'rent' => "26",
             'rent_home1' => "130",
@@ -128,7 +128,7 @@ class m200728_203031_create_property_table extends Migration
         $this->insert('{{%property}}', [
             'id' => 8,
             'name' => "highgarden",
-            'src' => "/images/cells/11.jpg",
+            'src' => "/web/images/cells/11.jpg",
             'cost' => "300",
             'rent' => "26",
             'rent_home1' => "130",
@@ -142,7 +142,7 @@ class m200728_203031_create_property_table extends Migration
         $this->insert('{{%property}}', [
             'id' => 9,
             'name' => "oldtown",
-            'src' => "/images/cells/13.jpg",
+            'src' => "/web/images/cells/13.jpg",
             'cost' => "320",
             'rent' => "28",
             'rent_home1' => "150",
@@ -156,7 +156,7 @@ class m200728_203031_create_property_table extends Migration
         $this->insert('{{%property}}', [
             'id' => 10,
             'name' => "bravos",
-            'src' => "/images/cells/16.jpg",
+            'src' => "/web/images/cells/16.jpg",
             'cost' => "200",
             'rent' => "16",
             'rent_home1' => "80",
@@ -170,7 +170,7 @@ class m200728_203031_create_property_table extends Migration
         $this->insert('{{%property}}', [
             'id' => 11,
             'name' => "qarth",
-            'src' => "/images/cells/18.jpg",
+            'src' => "/web/images/cells/18.jpg",
             'cost' => "180",
             'rent' => "14",
             'rent_home1' => "70",
@@ -184,7 +184,7 @@ class m200728_203031_create_property_table extends Migration
         $this->insert('{{%property}}', [
             'id' => 12,
             'name' => "dragonstone",
-            'src' => "/images/cells/19.jpg",
+            'src' => "/web/images/cells/19.jpg",
             'cost' => "350",
             'rent' => "35",
             'rent_home1' => "175",
@@ -198,7 +198,7 @@ class m200728_203031_create_property_table extends Migration
         $this->insert('{{%property}}', [
             'id' => 13,
             'name' => "volantis",
-            'src' => "/images/cells/22.jpg",
+            'src' => "/web/images/cells/22.jpg",
             'cost' => "180",
             'rent' => "14",
             'rent_home1' => "70",
@@ -212,7 +212,7 @@ class m200728_203031_create_property_table extends Migration
         $this->insert('{{%property}}', [
             'id' => 14,
             'name' => "king's landing",
-            'src' => "/images/cells/23.jpg",
+            'src' => "/web/images/cells/23.jpg",
             'cost' => "400",
             'rent' => "50",
             'rent_home1' => "200",
@@ -226,7 +226,7 @@ class m200728_203031_create_property_table extends Migration
         $this->insert('{{%property}}', [
             'id' => 15,
             'name' => "the eyrie",
-            'src' => "/images/cells/26.jpg",
+            'src' => "/web/images/cells/26.jpg",
             'cost' => "160",
             'rent' => "12",
             'rent_home1' => "60",
@@ -240,7 +240,7 @@ class m200728_203031_create_property_table extends Migration
         $this->insert('{{%property}}', [
             'id' => 16,
             'name' => "riverrun",
-            'src' => "/images/cells/27.jpg",
+            'src' => "/web/images/cells/27.jpg",
             'cost' => "140",
             'rent' => "10",
             'rent_home1' => "50",
@@ -254,7 +254,7 @@ class m200728_203031_create_property_table extends Migration
         $this->insert('{{%property}}', [
             'id' => 17,
             'name' => "the twins",
-            'src' => "/images/cells/29.jpg",
+            'src' => "/web/images/cells/29.jpg",
             'cost' => "140",
             'rent' => "10",
             'rent_home1' => "50",
@@ -268,7 +268,7 @@ class m200728_203031_create_property_table extends Migration
         $this->insert('{{%property}}', [
             'id' => 18,
             'name' => "winterfell",
-            'src' => "/images/cells/30.jpg",
+            'src' => "/web/images/cells/30.jpg",
             'cost' => "120",
             'rent' => "8",
             'rent_home1' => "40",
@@ -282,7 +282,7 @@ class m200728_203031_create_property_table extends Migration
         $this->insert('{{%property}}', [
             'id' => 19,
             'name' => "the wall",
-            'src' => "/images/cells/31.jpg",
+            'src' => "/web/images/cells/31.jpg",
             'cost' => "100",
             'rent' => "6",
             'rent_home1' => "30",
@@ -296,7 +296,7 @@ class m200728_203031_create_property_table extends Migration
         $this->insert('{{%property}}', [
             'id' => 20,
             'name' => "pyke",
-            'src' => "/images/cells/33.jpg",
+            'src' => "/web/images/cells/33.jpg",
             'cost' => "100",
             'rent' => "6",
             'rent_home1' => "30",
@@ -310,7 +310,7 @@ class m200728_203031_create_property_table extends Migration
         $this->insert('{{%property}}', [
             'id' => 21,
             'name' => "sunspear",
-            'src' => "/images/cells/36.jpg",
+            'src' => "/web/images/cells/36.jpg",
             'cost' => "60",
             'rent' => "4",
             'rent_home1' => "20",
@@ -324,7 +324,7 @@ class m200728_203031_create_property_table extends Migration
         $this->insert('{{%property}}', [
             'id' => 22,
             'name' => "tower of joy",
-            'src' => "/images/cells/38.jpg",
+            'src' => "/web/images/cells/38.jpg",
             'cost' => "60",
             'rent' => "2",
             'rent_home1' => "10",

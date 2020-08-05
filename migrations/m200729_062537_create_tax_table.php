@@ -5,7 +5,7 @@ use yii\db\Migration;
 /**
  * Handles the creation of table `{{%tax}}`.
  */
-class m200805_062537_create_tax_table extends Migration
+class m200729_062537_create_tax_table extends Migration
 {
     /**
      * {@inheritdoc}
@@ -24,7 +24,7 @@ class m200805_062537_create_tax_table extends Migration
         $this->insert('{{%tax}}',[
             'id' =>1,
             'name'=>'baratheon',
-            'src'=>'images/cells/34.jpg',#TO DO Extract logo from tax card image
+            'src'=>'web/images/cells/34.jpg',#TO DO Extract logo from tax card image
             'tax1'=>'25',
             'tax2'=>'50',
             'tax3'=>'100',
@@ -33,7 +33,7 @@ class m200805_062537_create_tax_table extends Migration
         $this->insert('{{%tax}}',[
             'id' =>2,
             'name'=>'stark',
-            'src'=>'images/cells/25.jpg',#TO DO Extract logo from tax card image
+            'src'=>'web/images/cells/25.jpg',#TO DO Extract logo from tax card image
             'tax1'=>'25',
             'tax2'=>'50',
             'tax3'=>'100',
@@ -42,7 +42,7 @@ class m200805_062537_create_tax_table extends Migration
         $this->insert('{{%tax}}',[
             'id' =>3,
             'name'=>'lanister',
-            'src'=>'images/cells/5.jpg',#TO DO Extract logo from tax card image
+            'src'=>'web/images/cells/5.jpg',#TO DO Extract logo from tax card image
             'tax1'=>'25',
             'tax2'=>'50',
             'tax3'=>'100',
@@ -51,7 +51,7 @@ class m200805_062537_create_tax_table extends Migration
         $this->insert('{{%tax}}',[
             'id' =>4,
             'name'=>'targaryen',
-            'src'=>'images/cells/14.jpg',#TO DO Extract logo from tax card image
+            'src'=>'web/images/cells/14.jpg',#TO DO Extract logo from tax card image
             'tax1'=>'25',
             'tax2'=>'50',
             'tax3'=>'100',

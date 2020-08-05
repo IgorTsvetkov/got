@@ -5,7 +5,7 @@ use yii\db\Migration;
 /**
  * Handles the creation of table `{{%utility}}`.
  */
-class m200805_064845_create_utility_table extends Migration
+class m200729_064845_create_utility_table extends Migration
 {
     /**
      * {@inheritdoc}
@@ -20,12 +20,12 @@ class m200805_064845_create_utility_table extends Migration
         $this->insert('{{%utility}}', [
             'id' => 1,
             'name' =>"the trident",
-            'src' =>"/images/cells/8.jpg",
+            'src' =>"/web/images/cells/8.jpg",
         ]);
         $this->insert('{{%utility}}', [
             'id' => 2,
             'name' =>"the kingsroad",
-            'src' =>"images/cells/28.jpg",
+            'src' =>"web/images/cells/28.jpg",
         ]);
     }
 

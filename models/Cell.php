@@ -10,7 +10,7 @@ use Yii;
  * @property int $id
  * @property int|null $position
  * @property string|null $event_id
- * @property string|null $castle_id
+ * @property string|null $property_id
  */
 class Cell extends \yii\db\ActiveRecord
 {
@@ -23,11 +23,23 @@ class Cell extends \yii\db\ActiveRecord
     }
     public function extraFields()
     {
-        return ['castle'];
+        return ['property','event','tax','utility'];
     }
-    public function getCastle()
+    public function getProperty()
     {
-        return $this->hasOne(Castle::className(),["id"=>"castle_id"]);
+        return $this->hasOne(Property::class,["id"=>"property_id"]);
+    }
+    public function getEvent()
+    {
+        return $this->hasOne(Event::class,["id"=>"event_id"]);
+    }
+    public function getTax()
+    {
+        return $this->hasOne(Tax::class,["id"=>"tax_id"]);
+    }
+    public function getUtility()
+    {
+        return $this->hasOne(Utility::class,["id"=>"utility_id"]);
     }
     /**
      * {@inheritdoc}
@@ -36,7 +48,7 @@ class Cell extends \yii\db\ActiveRecord
     {
         return [
             [['position'], 'integer'],
-            [['event_id', 'castle_id'], 'string', 'max' => 255],
+            [['event_id', 'property_id'], 'string', 'max' => 255],
         ];
     }
 
@@ -49,7 +61,9 @@ class Cell extends \yii\db\ActiveRecord
             'id' => 'ID',
             'position' => 'Position',
             'event_id' => 'Event ID',
-            'castle_id' => 'Castle ID',
+            'property_id' => 'Property ID',
+            'tax_id' => 'Tax ID',
+            'utility_id' => 'Utility ID',
         ];
     }
 }

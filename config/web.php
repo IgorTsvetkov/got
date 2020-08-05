@@ -57,7 +57,7 @@ $config = [
             'rules' => [
                 [
                     'class' => 'yii\rest\UrlRule', 'controller' => 'user',
-                'class' => 'yii\rest\UrlRule', 'controller' => 'castle',
+                'class' => 'yii\rest\UrlRule', 'controller' => 'property',
                 'class' => 'yii\rest\UrlRule', 'controller' => 'cell'
             ],
 

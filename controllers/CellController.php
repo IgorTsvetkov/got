@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use yii\web\Response;
 use yii\rest\ActiveController;
+use yii\data\ActiveDataProvider;
 
 class CellController extends ActiveController
 {
@@ -20,5 +21,28 @@ class CellController extends ActiveController
             ],
         ];
         return $behaviors;
+    }
+    public function actions()
+    {
+        $actions['index'] = [
+
+            'class' => 'yii\rest\IndexAction',
+        
+            'modelClass' => $this->modelClass,
+        
+            'prepareDataProvider' => function () {
+        
+                return new ActiveDataProvider([
+        
+                    'query' => $this->modelClass::find(),
+        
+                    'pagination' => false,
+        
+                ]);
+        
+            },
+        
+        ];
+        return $actions;
     }
 }
