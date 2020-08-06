@@ -144,3 +144,9 @@ body[data-v-5567ea9e]{
     z-index: 1;
 }
 
+
+.hero-img[data-v-44ea9c35]:hover{
+    cursor:pointer;
+    filter: brightness(80%);
+}
+

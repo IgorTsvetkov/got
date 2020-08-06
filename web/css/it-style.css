@@ -1,0 +1,321 @@
+:root{
+    --bg-color-primary:#e0e0e0;
+    --bg-color-secondary:#c5c5c5;
+    --text-color-primary:#656363;
+    --text-color-error:red;
+}
+.bg-primary{
+    background-color:var(--bg-color-primary);
+}
+.bg-secondary{
+    background-color:var(--bg-color-secondary);
+}
+.text-primary{
+    color:var(--text-color-primary);
+}
+.f{
+    display:flex;
+}
+.f-wrap{
+    flex-wrap: wrap;
+}
+.f-nowrap{
+    flex-wrap: nowrap;
+}
+.f-center{
+    align-items: center;
+    justify-content:center;
+}
+.f-center-horizontal{
+    justify-content: center;
+}
+.f-center-vertical{
+    align-items: center;
+}
+.f-row{
+    flex-direction: row;
+}
+.f-column{
+    flex-direction: column;
+}
+.it-p{
+    padding: 20px;
+}
+/*MARGINS START*/
+.m-70{
+    margin: 70px;
+}
+.m-70-t{
+    margin-top:70px
+}
+.m-70-l{
+    margin-left: 70px;
+}
+.m-70-r{
+    margin-right: 70px;
+}
+.m-70-b{
+    margin-right: 70px;
+}
+.m-50{
+    margin: 50px;
+}
+.m-50-t{
+    margin-top:50px
+}
+.m-50-l{
+    margin-left: 50px;
+}
+.m-50-r{
+    margin-right: 50px;
+}
+.m-50-b{
+    margin-right: 50px;
+}
+.m-30{
+    margin: 30px;
+}
+.m-30-t{
+    margin-top:30px
+}
+.m-30-l{
+    margin-left: 30px;
+}
+.m-30-r{
+    margin-right: 30px;
+}
+.m-30-b{
+    margin-right: 30px;
+}
+.m-20{
+    margin: 20px;
+}
+.m-20-t{
+    margin-top:20px
+}
+.m-20-l{
+    margin-left: 20px;
+}
+.m-20-r{
+    margin-right: 20px;
+}
+.m-20-b{
+    margin-right: 20px;
+}
+.m-10{
+    margin:10px;
+}
+.m-10-t{
+    margin-top:10px
+}
+.m-10-l{
+    margin-left: 10px;
+}
+.m-10-r{
+    margin-right: 10px;
+}
+.m-10-b{
+    margin-right: 10px;
+}
+.m-5{
+    margin: 5px;
+}
+.m-5-t{
+    margin-top:5px;
+}
+.m-5-l{
+    margin-left: 5px;
+}
+.m-5-r{
+    margin-right: 5px;
+}
+.m-5-b{
+    margin-right: 5px;
+}
+/*MARGINS END*/
+
+/*PADDING START*/
+.p-80{
+    padding: 80px;
+}
+.p-80-t{
+    padding-top: 80px;
+}   
+.p-80-b{
+    padding-bottom: 80px;
+}
+.p-80-l{
+    padding-left: 80px;
+}
+.p-80-r{
+    padding-right: 80px;
+}
+.p-40{
+    padding: 40px;
+}
+.p-40-t{
+    padding-top: 40px;
+}   
+.p-40-b{
+    padding-bottom: 40px;
+}
+.p-40-l{
+    padding-left: 40px;
+}
+.p-40-r{
+    padding-right: 40px;
+}
+.p-20{
+    padding: 20px;
+}
+.p-20-t{
+    padding-top: 20px;
+}
+.p-20-b{
+    padding-bottom: 20px;
+}
+.p-20-l{
+    padding-left: 20px;
+}
+.p-20-r{
+    padding-right: 20px;
+}
+.p-10{
+    padding:10px;
+}
+.p-10-t{
+    padding-top: 10px;
+}
+.p-10-b{
+    padding-bottom: 10px;
+}
+.p-10-l{
+    padding-left: 10px;
+}
+.p-10-r{
+    padding-right: 10px;
+}
+
+.p-5{
+    padding:5px;
+}
+.p-5-t{
+    padding-top: 5px;
+}
+.p-5-b{
+    padding-bottom: 5px;
+}
+.p-5-l{
+    padding-left: 5px;
+}
+.p-5-r{
+    padding-right: 5px;
+}
+/*PADDING END*/
+/*ALIGN-text*/
+.text-center{
+    text-align: center;
+}
+/*SIZE(HIGHT WIDTH) 100vh*/
+.h-inherit{
+    height: inherit;
+}
+.h-100vh{
+    height: 100vh;
+}
+.h-100vh-min{
+    min-height: 100vh;
+}
+.w-100vw{
+    width: 100vw;
+}
+.h-100{
+    height:100%;
+}
+.w-100{
+    width:100%;
+}
+
+/*BORDER_RADIUS BOX_SHADOW*/
+.box-shadow-3{
+    box-shadow: 0px 0px 3px black;
+}
+.box-shadow-3-inset{
+    box-shadow: inset 0px 0px 3px black;
+}
+.border-r-5{
+    border-radius:5px;
+}
+.border-r-5-t{
+    border-radius: 10px 10px 0px 0px;
+}
+.border-r-5-b{
+    border-radius: 0px 0px 10px 10px;
+}
+.border-r-10{
+    border-radius:10px
+}
+.border-r-10-t{
+    border-radius: 10px 10px 0px 0px;
+}
+.border-r-10-b{
+    border-radius: 0px 0px 10px 10px;
+}
+.border-r-20{
+    border-radius:20px;
+}
+
+textarea.reset,input.reset{
+    border:unset;
+    margin: unset;
+}
+textarea.reset,input.reset:focus{
+    outline: unset;
+}
+.box-shadow-top{
+    box-shadow: inset 0px 1px 3px 1px grey;
+}
+.box-shadow-bottom{
+    box-shadow: inset 0px -1px 3px 1px grey;
+}
+/*IGOR CUSTOMS*/
+/*BUTTON*/
+.it-btn{
+    border:unset;
+    box-shadow: 0px 0px 0px 1px gray;
+}
+.it-btn:hover{
+    background: var(--bg-color-primary);
+}
+/*BUTTON END*/
+.it-input-round{
+    border-radius: 20px;
+}
+/*INPUT*/
+.it-input{
+    box-shadow: inset 0 0 5px black;
+}
+.it-input:focus{
+    box-shadow: inset 0 0 8px black;
+}
+/*INPUT END*/
+.error{
+    background:var(--text-color-error);
+    color:white;
+    border-radius: 20px;
+}
+.error>div{
+    padding:8px;
+}
+.input-with-error-wrapper{
+    margin: 10px 0px;
+}
+.input-with-error-wrapper *:first-child{
+    border-radius: 20px 20px 0px 0px;
+}
+.input-with-error-wrapper *:last-child{
+    border-radius: 0px 0px 20px 20px;
+}
+.input-with-error-wrapper *:first-child:last-child{
+    border-radius: 20px 20px 20px 20px;
+}

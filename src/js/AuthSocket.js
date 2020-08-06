@@ -7,15 +7,17 @@ export default class AuthSocket extends WebSocket{
         this.onbeforeSend=null;
         super.onmessage=(e)=>{
             let parsedData=JSON.parse(e.data);
-            if(parsedData.hasOwnProperty("status code")){
-                if(parsedData["status code"]===200){       
-                    this.onmessageAuth(e,parsedData);
-                }    
-                //401 не удалось авторизоваться
-                else if(parsedData["status code"]===401){   
-                    this.authInfo=this.fetchauthInfoAsync();
-                    //пробуем снова отправить ту же информацию, но уже со свежими пользовательскими данными
-                    this.send(data);
+            if(typeof(parsedData)==="object"){
+                if(parsedData.hasOwnProperty("status code")){
+                    if(parsedData["status code"]===200){       
+                        this.onmessageAuth(e,parsedData);
+                    }    
+                    //401 не удалось авторизоваться
+                    else if(parsedData["status code"]===401){
+                        this.authInfo=this.fetchauthInfoAsync();
+                        //пробуем снова отправить ту же информацию, но уже со свежими пользовательскими данными
+                        this.send(data);
+                    }
                 }
             }
         }
@@ -35,15 +37,18 @@ export default class AuthSocket extends WebSocket{
         }
         return;
     }
-    async send(data=null){
+    async send(data={}){
         this._data=data;
         this._data.authInfo=await this.getauthInfo();
         if(await this.isNotGuest()){
-            if(typeof(this.onbeforeSend)!=="function")
+            if(this.onbeforeSend&&typeof(this.onbeforeSend)!=="function")
                 throw new Error(`onbeforeSend is not a function`);
-            this.onbeforeSend({data:this._data});
-            super.send(JSON.stringify(this._data));
+            if(this.onbeforeSend&&typeof(this.onbeforeSend)==="function")
+                this.onbeforeSend({data:this._data});
+            let stringify=JSON.stringify(this._data);
+            super.send(stringify);
         }
+        else console.warn("unauthorised user");
     }
     async fetchauthInfoAsync() {
         try{

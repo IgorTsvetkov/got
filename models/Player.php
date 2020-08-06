@@ -3,14 +3,19 @@
 namespace app\models;
 
 use Yii;
+use app\models\User;
+use app\models\GameSession;
 
 /**
  * This is the model class for table "player".
  *
  * @property int $id
- * @property int|null $session_id
- * @property string|null $user_id
+ * @property int|null $slot
  * @property int|null $position
+ *
+
+ * @property GameSession[] $gameSessions
+ * @property User[] $users
  */
 class Player extends \yii\db\ActiveRecord
 {
@@ -28,8 +33,7 @@ class Player extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['session_id', 'position'], 'integer'],
-            [['user_id'], 'string', 'max' => 255],
+            [['slot', 'position'], 'integer'],
         ];
     }
 
@@ -40,9 +44,28 @@ class Player extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'session_id' => 'Session ID',
-            'user_id' => 'User ID',
+            'slot' => 'Slot',
             'position' => 'Position',
         ];
+    }
+
+    /**
+     * Gets query for [[GameSessions]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getGameSession()
+    {
+        return $this->hasOne(GameSession::class, ['id' => 'game_session_id'])->viaTable('player_game_session', ['player_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[Users]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(User::class, ['id' => 'user_id'])->viaTable('player_user', ['player_id' => 'id']);
     }
 }

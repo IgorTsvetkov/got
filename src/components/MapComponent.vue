@@ -30,6 +30,7 @@
 
 <script>
 import ImageComponent from './ImageComponent.vue';
+import AuthSocket from '../js/AuthSocket';
 import axios from "axios";
 export default {
         components:{ImageComponent},
@@ -37,6 +38,7 @@ export default {
             return {
                 cells:[],
                 position:0,
+                authSocket:new AuthSocket("ws://127.0.0.1:8989/start")
             }
         },
         created(){
@@ -51,7 +53,14 @@ export default {
             })
             .catch(err => {
                 console.error(err); 
-            })
+            });
+
+            this.authSocket.onmessageAuth=(e,parsedData)=>{
+                if(parsedData.position){
+                    this.position=parsedData.position;
+                }
+            }
+            this.authSocket.onbeforeSend=({data})=>console.log("beforeSend",data);
         },
         methods: {
             getImage(cell) {
@@ -61,13 +70,9 @@ export default {
                        cell.utility?cell.utility.src:
                        "";
             },
-            move(){
-                if(this.position===39){
-                    this.position=0;
-                    return;
-                }
-                this.position+=1;
-            }
+            move(step=1){                             
+                this.authSocket.send({message:123});            
+            },
         },
     }
 </script>

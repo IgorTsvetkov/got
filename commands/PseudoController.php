@@ -82,7 +82,4 @@ class SocketController extends Controller
         };
         MyWorker::runAll();
     }
-    public function X(){
-        $startMatch=
-    }
 }

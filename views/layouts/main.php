@@ -20,14 +20,16 @@ AppAsset::register($this);
     <meta charset="<?= Yii::$app->charset ?>">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/web/js/main.css">
+
     <?php $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
 </head>
 
 <body>
-    <div id="app">
         <?php $this->beginBody() ?>
+    <div id="app">
 
         <div class="wrap">
             <?php
@@ -66,8 +68,6 @@ AppAsset::register($this);
                 <?= $content ?>
             </div>
         </div>
-        <hello-world-component></hello-world-component>
-
         <footer class="footer">
             <div class="container">
                 <p class="pull-left">&copy; My Company <?= date('Y') ?></p>
@@ -76,8 +76,8 @@ AppAsset::register($this);
             </div>
         </footer>
 
-        <?php $this->endBody() ?>
     </div>
+        <?php $this->endBody() ?>
 
     <script src="/web/js/main.js"></script>
 </body>

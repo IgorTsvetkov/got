@@ -23,7 +23,7 @@ class SocketController extends \yii\web\Controller
         $authInfo=[
             "id"=>$user->id,
             "authKey"=>$user->authKey,
-            "cookie"=>$_COOKIE
+            // "cookie"=>$_COOKIE
         ];
         return json_encode($authInfo);
         // return json_encode($id);

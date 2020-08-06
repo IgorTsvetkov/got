@@ -3,13 +3,20 @@
 namespace app\models;
 
 use Yii;
+use app\models\Player;
 use yii\db\ActiveRecord;
+use app\models\GameSession;
+
 class User extends ActiveRecord implements \yii\web\IdentityInterface
 {
-
-    // public static function getSession(){
-    //     return $this->hasMany(Session::className(),["user_id"=>"id"]);
-    // }
+    public function getGameSessions(){
+        return $this->hasMany(GameSession::class,["id"=>"session_id"])
+        ->viaTable("user_game_session",["user_id"=>"id"]);
+    }
+    public function getPlayers(){
+        return $this->hasMany(Player::class,["id"=>"player_id"])
+        ->viaTable("player_user",["user_id"=>"id"]);
+    }
     // public function hasUnfinishedSession(){
     //     $hasUnfinishedSession = Session::find([
     //         "user_id" => $this->id,
