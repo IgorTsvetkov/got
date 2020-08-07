@@ -39,6 +39,12 @@ class PreMatchController extends Controller
             $user=UserSocket::getUserByAuthInfo($data->authInfo);
             var_dump($user->id);
             if ($user) {
+                $activeSession=$user->activeGameSession;
+                if($activeSession)
+                    $connection->sendEncoded([
+                        "status code" => 200,
+                        "message"=>"You already have active game session"
+                    ]);
                 $gameSession=new GameSession();
                 $gameSession->save();
                 $player=new Player();
@@ -47,6 +53,8 @@ class PreMatchController extends Controller
                 $player->save();
                 $gameSession->link("players",$player);
                 $gameSession->link("users",$user);
+
+
 
                 $connection->sendEncoded([
                     "status code" => 200

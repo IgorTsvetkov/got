@@ -9,8 +9,13 @@ use app\models\GameSession;
 
 class User extends ActiveRecord implements \yii\web\IdentityInterface
 {
+    public function getActiveGameSession(){
+        return $this->hasOne(GameSession::class,["id"=>"game_session_id"])
+        // ->where(["finished_at"=>null])
+        ->viaTable("user_game_session",["user_id"=>"id"]);
+    }
     public function getGameSessions(){
-        return $this->hasMany(GameSession::class,["id"=>"session_id"])
+        return $this->hasMany(GameSession::class,["id"=>"game_session_id"])
         ->viaTable("user_game_session",["user_id"=>"id"]);
     }
     public function getPlayers(){

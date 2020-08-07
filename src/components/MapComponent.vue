@@ -38,10 +38,12 @@ export default {
             return {
                 cells:[],
                 position:0,
-                authSocket:new AuthSocket("ws://127.0.0.1:8989/start")
+                startSocket:new AuthSocket("ws://127.0.0.1:8989/start"),
+                moveSocket:new AuthSocket("ws://127.0.0.1:8989/move")
             }
         },
         created(){
+            alert("hello");
             axios.get("/cells",{
                 params:{
                     expand:"property.group,tax,utility,event"
@@ -55,12 +57,17 @@ export default {
                 console.error(err); 
             });
 
-            this.authSocket.onmessageAuth=(e,parsedData)=>{
+            this.moveSocket.onmessageAuth=(e,parsedData)=>{
                 if(parsedData.position){
                     this.position=parsedData.position;
                 }
             }
-            this.authSocket.onbeforeSend=({data})=>console.log("beforeSend",data);
+            //start
+            this.startSocket.send({message:"prematch start"});
+            this.startSocket.onmessageAuth=(e,{message})=>{
+                console.log("prematch start>>:",message);
+            };
+            this.moveSocket.onbeforeSend=({data})=>console.log("beforeSend",data);
         },
         methods: {
             getImage(cell) {
@@ -71,7 +78,7 @@ export default {
                        "";
             },
             move(step=1){                             
-                this.authSocket.send({message:123});            
+                this.moveSocket.send({message:123});            
             },
         },
     }
