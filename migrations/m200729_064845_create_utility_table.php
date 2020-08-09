@@ -25,7 +25,7 @@ class m200729_064845_create_utility_table extends Migration
         $this->insert('{{%utility}}', [
             'id' => 2,
             'name' =>"the kingsroad",
-            'src' =>"web/images/cells/28.jpg",
+            'src' =>"/web/images/cells/28.jpg",
         ]);
     }
 

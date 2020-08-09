@@ -74,10 +74,8 @@ class MovementController extends Controller
     }
     public function actionDo(){
 
-        $user=User::findOne(4);
+        $user=User::findOne(1);
         // var_dump($user);
-        $gameSession=$user->activeGameSession;
-
-        var_dump($gameSession->created_at);
+        var_dump($user->hasActiveGame());
     }
 }

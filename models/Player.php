@@ -19,6 +19,10 @@ use app\models\GameSession;
  */
 class Player extends \yii\db\ActiveRecord
 {
+    function init()
+    {
+        $this->position=0;
+    }
     /**
      * {@inheritdoc}
      */
@@ -34,6 +38,7 @@ class Player extends \yii\db\ActiveRecord
     {
         return [
             [['slot', 'position'], 'integer'],
+            [['slot','position'],'required']
         ];
     }
 

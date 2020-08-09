@@ -48,7 +48,7 @@ export default class AuthSocket extends WebSocket{
             let stringify=JSON.stringify(this._data);
             super.send(stringify);
         }
-        else console.warn("unauthorised user");
+        else window.location.href="/site/login";
     }
     async fetchauthInfoAsync() {
         try{

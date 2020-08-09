@@ -12,6 +12,7 @@ use yii\db\Expression;
  * This is the model class for table "game_session".
  *
  * @property int $id
+ * @property string|null $name
  * @property string|null $created_at
  * @property string|null $started_at
  * @property string|null $finished_at
@@ -23,6 +24,29 @@ use yii\db\Expression;
  */
 class GameSession extends \yii\db\ActiveRecord
 {
+    public function setUserInSlot(User $user,int $slot=1){
+        $player=new Player();
+        $player->slot=$slot;
+        $player->save();
+        $player->link("user",$user);
+        $this->link("users",$user);
+        $this->link("players",$player);
+    }
+    public function removeUserFromGame($user)
+    {
+        $this->unlink("user",$user);
+        // $this->unlink("player",$player);
+
+        // $player->unlink("user",$user);
+        // $player->delete();
+        // $player->save();
+    }
+    public function getIsStarted():bool{
+        return $this->started_at!=null?true:false;
+    }
+    public function getIsFinished():bool{
+        return $this->finished_at!=null?true:false;
+    }
     public function behaviors()
     {
         return[
@@ -48,7 +72,7 @@ class GameSession extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['created_at', 'started_at', 'finished_at'], 'string', 'max' => 255],
+            [['name','created_at', 'started_at', 'finished_at'], 'string', 'max' => 255],
         ];
     }
 
@@ -58,10 +82,11 @@ class GameSession extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'created_at' => 'Created At',
-            'started_at' => 'Started At',
-            'finished_at' => 'Finished At',
+            'id' => 'Id матча',
+            'name'=>"Название",
+            'created_at' => 'Комната создана',
+            'started_at' => 'Игра начата',
+            'finished_at' => 'Игра закончена',
         ];
     }
 

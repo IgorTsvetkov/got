@@ -71,11 +71,13 @@ export default {
         },
         methods: {
             getImage(cell) {
-                return cell.property?cell.property.src:
+                let x= cell.property?cell.property.src:
                        cell.tax?cell.tax.src:
                        cell.event?cell.event.src:
                        cell.utility?cell.utility.src:
                        "";
+                console.log(x);
+                return x;
             },
             move(step=1){                             
                 this.moveSocket.send({message:123});            

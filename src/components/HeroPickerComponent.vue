@@ -1,9 +1,10 @@
 <template>
-    <div class="f f-row f-center f-wrap">
+    <div class="f f-row f-center f-wrap text-center">
         <div v-for="(img, index) in imgs" :key="index">
             <div class="hero-img m-10">
                 <img  width="100px" :src="'/web/images/figurines/'+img">
             </div>
+            <h1>{{parsedUsernames[index]}}</h1>
         </div>
     </div>
 </template>
@@ -16,9 +17,9 @@ import AuthSocket from '../js/AuthSocket'
                 type: String,
                 default: "field_name"
             },
-            imgType:{
+            usernames:{
                 type:String,
-                default:"0"
+                default:""
             }
         },
         data() {
@@ -39,6 +40,15 @@ import AuthSocket from '../js/AuthSocket'
         created () {
             this.socket.onmessage=(e,{data})=>{
                 
+            }
+        },
+        computed: {
+            parsedUsernames() {
+                if(this.usernames){
+                    let x=JSON.parse(this.usernames); 
+                    console.log("usernames",x);
+                    return x;
+                }
             }
         },
     }

@@ -9,10 +9,14 @@ use app\models\GameSession;
 
 class User extends ActiveRecord implements \yii\web\IdentityInterface
 {
-    public function getActiveGameSession(){
+    public static function Me(){
+        return self::findOne(Yii::$app->user->id);
+    }
+    public function getLastGame():?GameSession{
         return $this->hasOne(GameSession::class,["id"=>"game_session_id"])
-        // ->where(["finished_at"=>null])
-        ->viaTable("user_game_session",["user_id"=>"id"]);
+        ->orderBy(['created_at'=>SORT_DESC])
+        ->viaTable("user_game_session",["user_id"=>"id"])
+        ->one();
     }
     public function getGameSessions(){
         return $this->hasMany(GameSession::class,["id"=>"game_session_id"])
