@@ -1,3 +1,6 @@
+.invalid-feedback{
+    display: inline-block;
+}
 :root{
     --bg-color-primary:#e0e0e0;
     --bg-color-secondary:#c5c5c5;
