@@ -7,10 +7,11 @@
  */
 
 namespace app\commands;
-use app\models\GameSession;
+use Yii;
 use app\models\Player;
 use yii\console\ExitCode;
 use app\models\UserSocket;
+use app\models\GameSession;
 use yii\console\Controller;
 use app\websockets\MyWorker;
 use app\websockets\MyTcpConnection;
@@ -31,6 +32,65 @@ class PreMatchController extends Controller
     public function beforeAction($action)
     {
         return parent::beforeAction($action);
+    }
+    public function actionChangeSlot(){
+        $worker = new MyWorker("websocket://127.0.0.1:8989/change-slot");
+        $worker->count = 1;
+        $worker->onMessageDecoded = function (MyTcpConnection $connection, $data) use ($worker) {
+            $user=UserSocket::getUserByAuthInfo($data->authInfo);
+            var_dump($user->id);
+            $slot=$data->slot;
+
+
+            if ($user) {
+                $game=$user->getLastGame();
+                if($game->getIsStarted()){
+                    $error=["message"=>"you can't change slot after game have been started"]; 
+                    $connection->sendEncoded([
+                        "status code" => 200,
+                        "error"=>$error
+                    ]);
+                    return;
+                }
+                if(Player::find(["game_session_id"=>$game->id])->where(["slot"=>$slot])->limit(1)->one()){
+                    $error=["message"=>"Этот слот уже занят игроком"];
+                    $connection->sendEncoded([
+                        "status code" => 200,
+                        "error"=>$error
+                    ]);
+                    return;
+                }
+                if(Player::find(["game_session_id"=>$game->id])->where(["slot"=>$slot])->limit(1)->one()===null){
+                    $player=$user->getLastPlayer();
+                    $player->slot=$slot;
+                    $player->save();
+                }
+                $gameInfo=[
+                    'game_id'=>$game->id,
+                    'users'=>array_map(function($user){
+                        return[
+                            "username"=>$user->username,
+                            "slot"=>$user->lastPlayer->slot
+                        ];
+                    },$game->users)
+                ];
+
+                foreach ($worker->connections as $connection) {
+                    $connection->sendEncoded([
+                        "status code" => 200,
+                        "data"=>$gameInfo
+                    ]);
+                }
+ 
+            } else {
+                var_dump("auth false");
+                $connection->sendEncoded([
+                    "status code" => 401
+                ]);
+            }
+        };
+        MyWorker::runAll();
+        
     }
     public function actionStart(){
         $worker = new MyWorker("websocket://127.0.0.1:8989/start");

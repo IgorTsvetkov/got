@@ -18,22 +18,16 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
         ->viaTable("user_game_session",["user_id"=>"id"])
         ->one();
     }
+    public function getLastPlayer():?Player{
+        return $this->hasMany(Player::class,["user_id"=>"id"])->orderBy(["id"=>SORT_DESC])->limit(1)->one();
+    }
     public function getGameSessions(){
         return $this->hasMany(GameSession::class,["id"=>"game_session_id"])
         ->viaTable("user_game_session",["user_id"=>"id"]);
     }
     public function getPlayers(){
-        return $this->hasMany(Player::class,["id"=>"player_id"])
-        ->viaTable("player_user",["user_id"=>"id"]);
+        return $this->hasMany(Player::class,["user_id"=>"id"]);
     }
-    // public function hasUnfinishedSession(){
-    //     $hasUnfinishedSession = Session::find([
-    //         "user_id" => $this->id,
-    //         "finished_at"=>null
-    //         ])
-    //         ->count()>0;
-    //     return $hasUnfinishedSession;
-    // }
     /**
      * {@inheritdoc}
      */
@@ -99,5 +93,14 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
         if($user->validateAuthKey($authKey))
             return $user;
         return false;
+    }
+        /**
+     * Gets query for [[UserGameSessions]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUserGameSessions()
+    {
+        return $this->hasMany(UserGameSession::className(), ['user_id' => 'id']);
     }
 }

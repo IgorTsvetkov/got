@@ -145,8 +145,24 @@ body[data-v-5567ea9e]{
 }
 
 
-.hero-img[data-v-44ea9c35]:hover{
-    cursor:pointer;
-    filter: brightness(80%);
+.hpc-block[data-v-44ea9c35]{
+    background: #909090;
+    border: unset;
+    border-radius: 10px;
+    box-shadow: 0 0 3px 1px black;
+}
+.hpc-block[data-v-44ea9c35]:hover {
+  cursor: pointer;
+  filter: brightness(80%);
+}
+.hpc-error[data-v-44ea9c35]{
+    background:rgb(199, 4, 4);
+    color:white;
+    padding: 20px;
+    border-radius:10px;
+    margin:5px;
+}
+.hpc-green[data-v-44ea9c35]{
+    color:darkgreen;
 }
 

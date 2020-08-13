@@ -24,7 +24,7 @@ $this->title = 'Список игр';
                 <?foreach ($game->getAttributes() as $attr):?>
                 <td> <?= $attr ?> </td>
                 <?endforeach?>
-                <td><a href="/got/join-to-game?session_id=<?=$game->id?>">Присоединиться</a></td>
+                <td><a href="/match/join?game_id=<?=$game->id?>">Присоединиться</a></td>
             </tr>
             <?endforeach?>
         </tbody>

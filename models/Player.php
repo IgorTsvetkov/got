@@ -5,11 +5,14 @@ namespace app\models;
 use Yii;
 use app\models\User;
 use app\models\GameSession;
+use yii\behaviors\BlameableBehavior;
 
 /**
  * This is the model class for table "player".
  *
  * @property int $id
+ * @property int|null $user_id
+ * @property int|null $game_session_id
  * @property int|null $slot
  * @property int|null $position
  *
@@ -37,8 +40,8 @@ class Player extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['slot', 'position'], 'integer'],
-            [['slot','position'],'required']
+            [['game_session_id','slot', 'position'], 'integer'],
+            [['game_session_id','slot','position'],'required']
         ];
     }
 
@@ -61,7 +64,7 @@ class Player extends \yii\db\ActiveRecord
      */
     public function getGameSession()
     {
-        return $this->hasOne(GameSession::class, ['id' => 'game_session_id'])->viaTable('player_game_session', ['player_id' => 'id']);
+        return $this->hasOne(GameSession::class, ['id' => 'game_session_id']);
     }
 
     /**
@@ -71,6 +74,6 @@ class Player extends \yii\db\ActiveRecord
      */
     public function getUser()
     {
-        return $this->hasOne(User::class, ['id' => 'user_id'])->viaTable('player_user', ['player_id' => 'id']);
+        return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 }

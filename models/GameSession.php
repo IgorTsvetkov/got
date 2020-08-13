@@ -25,20 +25,22 @@ use yii\db\Expression;
 class GameSession extends \yii\db\ActiveRecord
 {
     public function setUserInSlot(User $user,int $slot=1){
-        $player=new Player();
-        $player->slot=$slot;
-        $player->save();
-        $player->link("user",$user);
         $this->link("users",$user);
-        $this->link("players",$player);
-    }
-    public function removeUserFromGame($user)
-    {
-        $this->unlink("user",$user);
-        // $this->unlink("player",$player);
 
-        // $player->unlink("user",$user);
-        // $player->delete();
+        $player=new Player(); 
+          
+        $player->slot=$slot;
+        $player->user_id=$user->id;
+        $player->game_session_id=$this->id;
+        $player->save();
+    }
+    public function removeUser($user)
+    {
+        $junction=UserGameSession::findOne(["user_id"=>$user->id,"game_session_id"=>$this->id]);
+        $junction->delete();
+        // $junction->save();
+        $player=Player::find()->where(["user_id"=>$user->id])->orderBy(['game_session_id'=>SORT_DESC])->limit(1)->one();
+        $player->delete();
         // $player->save();
     }
     public function getIsStarted():bool{
@@ -97,7 +99,7 @@ class GameSession extends \yii\db\ActiveRecord
      */
     public function getPlayers()
     {
-        return $this->hasMany(Player::className(), ['id' => 'player_id'])->viaTable('player_game_session', ['game_session_id' => 'id']);
+        return $this->hasMany(Player::className(), ['game_session_id' => 'id']);
     }
 
     /**
@@ -109,4 +111,13 @@ class GameSession extends \yii\db\ActiveRecord
     {
         return $this->hasMany(User::className(), ['id' => 'user_id'])->viaTable('user_game_session', ['game_session_id' => 'id']);
     }
+    /**
+     * Gets query for [[UserGameSessions]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUserGameSessions()
+    {
+        return $this->hasMany(UserGameSession::className(), ['game_session_id' => 'id']);
+    }    
 }
