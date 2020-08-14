@@ -445,6 +445,18 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _Ima
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/index.js?!./src/components/Test.vue?vue&type=script&lang=js&":
+/*!********************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib??vue-loader-options!./src/components/Test.vue?vue&type=script&lang=js& ***!
+  \********************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _js_AuthSocket__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../js/AuthSocket */ \"./src/js/AuthSocket.js\");\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n\n/* harmony default export */ __webpack_exports__[\"default\"] = ({\n  data() {\n    return {\n      messageSend: \"\",\n      socket: new _js_AuthSocket__WEBPACK_IMPORTED_MODULE_0__[\"default\"](\"ws://127.0.0.1:8989/auth\"),\n      messages: []\n    };\n  },\n\n  created() {\n    this.socket.onmessageAuth = (e, data) => {\n      console.log('data :>> ', data);\n      this.messages.push(data.message);\n    };\n  },\n\n  methods: {\n    click() {\n      this.socket.send({\n        message: this.messageSend\n      });\n      this.messageSend = \"\";\n    }\n\n  }\n});\n\n//# sourceURL=webpack:///./src/components/Test.vue?./node_modules/babel-loader/lib!./node_modules/vue-loader/lib??vue-loader-options");
+
+/***/ }),
+
 /***/ "./node_modules/mini-css-extract-plugin/dist/loader.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib/index.js?!./src/components/HeroPickerComponent.vue?vue&type=style&index=0&id=44ea9c35&scoped=true&lang=css&":
 /*!****************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/mini-css-extract-plugin/dist/loader.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib??vue-loader-options!./src/components/HeroPickerComponent.vue?vue&type=style&index=0&id=44ea9c35&scoped=true&lang=css& ***!
@@ -559,6 +571,18 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) *
 
 /***/ }),
 
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./src/components/Test.vue?vue&type=template&id=dc87507c&scoped=true&":
+/*!**********************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./src/components/Test.vue?vue&type=template&id=dc87507c&scoped=true& ***!
+  \**********************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"render\", function() { return render; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"staticRenderFns\", function() { return staticRenderFns; });\nvar render = function() {\n  var _vm = this\n  var _h = _vm.$createElement\n  var _c = _vm._self._c || _h\n  return _c(\n    \"div\",\n    [\n      _c(\"input\", {\n        directives: [\n          {\n            name: \"model\",\n            rawName: \"v-model\",\n            value: _vm.messageSend,\n            expression: \"messageSend\"\n          }\n        ],\n        attrs: { type: \"text\" },\n        domProps: { value: _vm.messageSend },\n        on: {\n          input: function($event) {\n            if ($event.target.composing) {\n              return\n            }\n            _vm.messageSend = $event.target.value\n          }\n        }\n      }),\n      _vm._v(\" \"),\n      _vm._l(_vm.messages, function(message, i) {\n        return _c(\"div\", { key: i }, [\n          _vm._v(\"\\n        \" + _vm._s(message) + \"\\n    \")\n        ])\n      }),\n      _vm._v(\" \"),\n      _c(\"button\", { on: { click: _vm.click } }, [_vm._v(\"Click\")])\n    ],\n    2\n  )\n}\nvar staticRenderFns = []\nrender._withStripped = true\n\n\n\n//# sourceURL=webpack:///./src/components/Test.vue?./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options");
+
+/***/ }),
+
 /***/ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js":
 /*!********************************************************************!*\
   !*** ./node_modules/vue-loader/lib/runtime/componentNormalizer.js ***!
@@ -658,7 +682,7 @@ eval("var g; // This works in non-strict mode\n\ng = function () {\n  return thi
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _components_HelloWorldComponent_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./components/HelloWorldComponent.vue */ \"./src/components/HelloWorldComponent.vue\");\n/* harmony import */ var _components_MapComponent_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./components/MapComponent.vue */ \"./src/components/MapComponent.vue\");\n/* harmony import */ var _components_HeroPickerComponent_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/HeroPickerComponent.vue */ \"./src/components/HeroPickerComponent.vue\");\nwindow.Vue = __webpack_require__(/*! vue */ \"./node_modules/vue/dist/vue.js\");\n\n\n\nconst app = new Vue({\n  el: '#app',\n  components: {\n    HelloWorldComponent: _components_HelloWorldComponent_vue__WEBPACK_IMPORTED_MODULE_0__[\"default\"],\n    MapComponent: _components_MapComponent_vue__WEBPACK_IMPORTED_MODULE_1__[\"default\"],\n    HeroPickerComponent: _components_HeroPickerComponent_vue__WEBPACK_IMPORTED_MODULE_2__[\"default\"]\n  }\n});\n\n//# sourceURL=webpack:///./src/app.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _components_HelloWorldComponent_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./components/HelloWorldComponent.vue */ \"./src/components/HelloWorldComponent.vue\");\n/* harmony import */ var _components_MapComponent_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./components/MapComponent.vue */ \"./src/components/MapComponent.vue\");\n/* harmony import */ var _components_HeroPickerComponent_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/HeroPickerComponent.vue */ \"./src/components/HeroPickerComponent.vue\");\n/* harmony import */ var _components_Test_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/Test.vue */ \"./src/components/Test.vue\");\nwindow.Vue = __webpack_require__(/*! vue */ \"./node_modules/vue/dist/vue.js\");\n\n\n\n\nconst app = new Vue({\n  el: '#app',\n  components: {\n    HelloWorldComponent: _components_HelloWorldComponent_vue__WEBPACK_IMPORTED_MODULE_0__[\"default\"],\n    MapComponent: _components_MapComponent_vue__WEBPACK_IMPORTED_MODULE_1__[\"default\"],\n    HeroPickerComponent: _components_HeroPickerComponent_vue__WEBPACK_IMPORTED_MODULE_2__[\"default\"],\n    Test: _components_Test_vue__WEBPACK_IMPORTED_MODULE_3__[\"default\"]\n  }\n});\n\n//# sourceURL=webpack:///./src/app.js?");
 
 /***/ }),
 
@@ -842,6 +866,42 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _nod
 
 /***/ }),
 
+/***/ "./src/components/Test.vue":
+/*!*********************************!*\
+  !*** ./src/components/Test.vue ***!
+  \*********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _Test_vue_vue_type_template_id_dc87507c_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Test.vue?vue&type=template&id=dc87507c&scoped=true& */ \"./src/components/Test.vue?vue&type=template&id=dc87507c&scoped=true&\");\n/* harmony import */ var _Test_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Test.vue?vue&type=script&lang=js& */ \"./src/components/Test.vue?vue&type=script&lang=js&\");\n/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ \"./node_modules/vue-loader/lib/runtime/componentNormalizer.js\");\n\n\n\n\n\n/* normalize component */\n\nvar component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__[\"default\"])(\n  _Test_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[\"default\"],\n  _Test_vue_vue_type_template_id_dc87507c_scoped_true___WEBPACK_IMPORTED_MODULE_0__[\"render\"],\n  _Test_vue_vue_type_template_id_dc87507c_scoped_true___WEBPACK_IMPORTED_MODULE_0__[\"staticRenderFns\"],\n  false,\n  null,\n  \"dc87507c\",\n  null\n  \n)\n\n/* hot reload */\nif (false) { var api; }\ncomponent.options.__file = \"src/components/Test.vue\"\n/* harmony default export */ __webpack_exports__[\"default\"] = (component.exports);\n\n//# sourceURL=webpack:///./src/components/Test.vue?");
+
+/***/ }),
+
+/***/ "./src/components/Test.vue?vue&type=script&lang=js&":
+/*!**********************************************************!*\
+  !*** ./src/components/Test.vue?vue&type=script&lang=js& ***!
+  \**********************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_Test_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../node_modules/babel-loader/lib!../../node_modules/vue-loader/lib??vue-loader-options!./Test.vue?vue&type=script&lang=js& */ \"./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/index.js?!./src/components/Test.vue?vue&type=script&lang=js&\");\n/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__[\"default\"] = (_node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_Test_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__[\"default\"]); \n\n//# sourceURL=webpack:///./src/components/Test.vue?");
+
+/***/ }),
+
+/***/ "./src/components/Test.vue?vue&type=template&id=dc87507c&scoped=true&":
+/*!****************************************************************************!*\
+  !*** ./src/components/Test.vue?vue&type=template&id=dc87507c&scoped=true& ***!
+  \****************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Test_vue_vue_type_template_id_dc87507c_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../node_modules/vue-loader/lib??vue-loader-options!./Test.vue?vue&type=template&id=dc87507c&scoped=true& */ \"./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./src/components/Test.vue?vue&type=template&id=dc87507c&scoped=true&\");\n/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, \"render\", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Test_vue_vue_type_template_id_dc87507c_scoped_true___WEBPACK_IMPORTED_MODULE_0__[\"render\"]; });\n\n/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, \"staticRenderFns\", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Test_vue_vue_type_template_id_dc87507c_scoped_true___WEBPACK_IMPORTED_MODULE_0__[\"staticRenderFns\"]; });\n\n\n\n//# sourceURL=webpack:///./src/components/Test.vue?");
+
+/***/ }),
+
 /***/ "./src/js/AuthSocket.js":
 /*!******************************!*\
   !*** ./src/js/AuthSocket.js ***!
@@ -850,7 +910,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _nod
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"default\", function() { return AuthSocket; });\nclass AuthSocket extends WebSocket {\n  constructor(...args) {\n    super(...args);\n    this._data = {};\n    this._authInfo = null;\n    this.onmessageAuth = null;\n    this.onbeforeSend = null;\n\n    super.onmessage = e => {\n      let parsedData = JSON.parse(e.data);\n\n      if (typeof parsedData === \"object\") {\n        if (parsedData.hasOwnProperty(\"status code\")) {\n          if (parsedData[\"status code\"] === 200) {\n            this.onmessageAuth(e, parsedData);\n          } //401 не удалось авторизоваться\n          else if (parsedData[\"status code\"] === 401) {\n              this.authInfo = this.fetchauthInfoAsync(); //пробуем снова отправить ту же информацию, но уже со свежими пользовательскими данными\n\n              this.send(data);\n            }\n        }\n      }\n    };\n  }\n\n  async getauthInfo() {\n    if (!this._authInfo) this._authInfo = await this.fetchauthInfoAsync();\n    return this._authInfo;\n  }\n\n  set authInfo(value) {\n    this._authInfo = value;\n  }\n\n  async isNotGuest() {\n    let authInfo = await this.getauthInfo();\n\n    if (authInfo.id && authInfo.authKey) {\n      return true;\n    }\n\n    return;\n  }\n\n  async send(data = {}) {\n    this._data = data;\n    this._data.authInfo = await this.getauthInfo();\n\n    if (await this.isNotGuest()) {\n      if (this.onbeforeSend && typeof this.onbeforeSend !== \"function\") throw new Error(`onbeforeSend is not a function`);\n      if (this.onbeforeSend && typeof this.onbeforeSend === \"function\") this.onbeforeSend({\n        data: this._data\n      });\n      let stringify = JSON.stringify(this._data);\n      super.send(stringify);\n    } else window.location.href = \"/site/login\";\n  }\n\n  async fetchauthInfoAsync() {\n    try {\n      let response = await fetch(\"/socket/auth\", {\n        method: 'GET',\n        credentials: 'include'\n      });\n      console.warn(\"getUsetInfo\");\n      return await response.json();\n    } catch (error) {\n      throw new Error(error);\n    }\n  }\n\n}\n\n//# sourceURL=webpack:///./src/js/AuthSocket.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"default\", function() { return AuthSocket; });\nclass AuthSocket extends WebSocket {\n  constructor(...args) {\n    super(...args);\n    this._data = {};\n    this._authInfo = null;\n    this.onmessageAuth = null;\n    this.onbeforeSend = null;\n\n    super.onmessage = e => {\n      let parsedData = JSON.parse(e.data);\n\n      if (typeof parsedData === \"object\") {\n        if (parsedData.hasOwnProperty(\"status code\")) {\n          //401 не удалось авторизоваться\n          if (parsedData[\"status code\"] === 401) {\n            this.authInfo = this.fetchAuthInfoAsync(); //пробуем снова отправить ту же информацию, но уже со свежими пользовательскими данными\n\n            this.send(data);\n          }\n        }\n\n        this.onmessageAuth(e, parsedData);\n      }\n    };\n  }\n\n  async getauthInfo() {\n    if (!this._authInfo) this._authInfo = await this.fetchAuthInfoAsync();\n    return this._authInfo;\n  }\n\n  set authInfo(value) {\n    this._authInfo = value;\n  }\n\n  async isNotGuest() {\n    let authInfo = await this.getauthInfo();\n\n    if (authInfo.id && authInfo.authKey) {\n      return true;\n    }\n\n    return;\n  }\n\n  async send(data = {}) {\n    if (typeof data === \"object\") {\n      this._data = data;\n      this._data.authInfo = await this.getauthInfo();\n\n      if (await this.isNotGuest()) {\n        if (this.onbeforeSend && typeof this.onbeforeSend !== \"function\") throw new Error(`onbeforeSend is not a function`);\n        if (this.onbeforeSend && typeof this.onbeforeSend === \"function\") this.onbeforeSend({\n          data: this._data\n        });\n        let stringify = JSON.stringify(this._data);\n        super.send(stringify);\n      } else window.location.href = \"/site/login\";\n    } else throw new Error(\"type of sended data is \" + typeof data + \" need Object\");\n  }\n\n  async fetchAuthInfoAsync() {\n    try {\n      let response = await fetch(\"/socket/auth\", {\n        method: 'GET',\n        credentials: 'include'\n      });\n      console.warn(\"getUsetInfo\");\n      return await response.json();\n    } catch (error) {\n      throw new Error(error);\n    }\n  }\n\n}\n\n//# sourceURL=webpack:///./src/js/AuthSocket.js?");
 
 /***/ })
 

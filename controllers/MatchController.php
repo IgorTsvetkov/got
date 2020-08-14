@@ -7,9 +7,28 @@ use app\models\User;
 use yii\helpers\VarDumper;
 use app\models\GameSession;
 use app\models\Player;
+use yii\filters\AccessControl;
 
 class MatchController extends \yii\web\Controller
 {
+    public function behaviors()
+    {
+        return[
+            [
+                'class'=>AccessControl::className(),
+                'rules'=>[
+                    [
+                    'allow'=>false,
+                    'roles'=>['?']
+                    ],
+                    [
+                        'allow'=>true,
+                        'roles'=>['@']
+                    ]
+                ]
+            ]
+        ];
+    }
     public function beforeAction($action)
     {
         $actions=["index","create-lobby","join"];
@@ -50,28 +69,23 @@ class MatchController extends \yii\web\Controller
         
         return $this->redirect("/match/connect");
     }
-    public function actionConnect()
-    {        
-        $game=User::Me()->getLastGame();
+    public function actionConnect($isJson=false)
+    {   $user=User::Me();
+        $game=$user->getLastGame();
         if(!$game)
             return $this->redirect("/match");
-            return $this->render('create',[
-                'game_id'=>$game->id,
-                'users'=>json_encode(array_map(fn($user)=>[
-                    "username"=>$user->username,
-                    "slot"=>$user->lastPlayer->slot
-                ],$game->users))
-                ]);
-    }
-    public function actionConnectJson(){
-        $game=User::Me()->getLastGame();
-            return $this->asJson([
-                'game_id'=>$game->id,
-                'users'=>json_encode(array_map(fn($user)=>[
-                    "username"=>$user->username,
-                    "slot"=>$user->lastPlayer->slot
-                ],$game->users))
-                ]);
+        $data=[
+            'game_id'=>$game->id,
+            'users'=>json_encode(array_map(function($user){
+                return[
+                "username"=>$user->username,
+                "slot"=>$user->lastPlayer->slot
+                ];
+            },$game->users))
+        ];
+        if($isJson)
+            return $this->asJson($data);
+        return $this->render('create',$data);
     }
     public function actionLeft(int $game_id){
         $user=User::me();
