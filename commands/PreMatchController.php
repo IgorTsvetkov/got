@@ -42,34 +42,10 @@ class PreMatchController extends Controller
             $connection->sendEncoded(["message"=>$data->message]);
         });                
     }
-    public function actionChangeSlot(){
-        $this->startWebSocket("/change-slot",function($user,$connection,$data,$worker){
-            $slot=$data->slot;
-            $game=$user->getLastGame();
-            if($game->getIsStarted()){
-                $connection->sendEncoded(["error"=>["message"=>"you can't change slot after game have been started"]]);
-                return;
-            }
-            if(Player::find(["game_session_id"=>$game->id])->where(["slot"=>$slot])->limit(1)->one()){
-                $connection->sendEncoded(["error"=>["message"=>"Этот слот уже занят игроком"]]);
-                return;
-            }
-            if(Player::find(["game_session_id"=>$game->id])->where(["slot"=>$slot])->limit(1)->one()===null){
-                $player=$user->getLastPlayer();
-                $player->slot=$slot;
-                $player->save();
-            }
-            $gameInfo=[
-                'game_id'=>$game->id,
-                'users'=>array_map(function($user){
-                    return[
-                        "username"=>$user->username,
-                        "slot"=>$user->lastPlayer->slot
-                    ];
-                },$game->users)
-            ];
+    public function actionSendToAll(){
+        $this->startWebSocket("/send-to-all",function($user,$connection,$data,$worker){
             foreach ($worker->connections as $connection) {
-                $connection->sendEncoded(["data"=>$gameInfo]);
+                $connection->sendEncoded($data);
             }
         });
     }

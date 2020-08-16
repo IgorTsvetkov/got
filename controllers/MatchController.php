@@ -74,14 +74,19 @@ class MatchController extends \yii\web\Controller
         $game=$user->getLastGame();
         if(!$game)
             return $this->redirect("/match");
+        
+        $users=array_map(function($user){
+            return[
+            "id"=>$user->id,
+            "username"=>$user->username,
+            "slot"=>$user->lastPlayer->slot
+            ];
+        },$game->users);
+        $users=usort($users,function($a,$b){return $a->slot>$b->slot?1:-1;});
         $data=[
             'game_id'=>$game->id,
-            'users'=>json_encode(array_map(function($user){
-                return[
-                "username"=>$user->username,
-                "slot"=>$user->lastPlayer->slot
-                ];
-            },$game->users))
+            'owner_id'=>$game->players[0]->user_id,
+            'users'=>json_encode($users)
         ];
         if($isJson)
             return $this->asJson($data);
@@ -98,17 +103,20 @@ class MatchController extends \yii\web\Controller
     public function actionChangeSlot(int $slot){
         $user=User::Me();
         $game=$user->getLastGame();
+        $data=null;
         if($game->IsStarted){
-            return $this->asJson(["error"=>["message"=>"you can't change slot after game have been started"]]);
+            $data=["error"=>["message"=>"you can't change slot after game have been started"]];
         }
-        if(Player::find(["game_session_id"=>$game->id])->where(["slot"=>$slot])->limit(1)->one()){
-            return $this->asJson(["error"=>["message"=>"Этот слот занят другим игроком"]]);
+        elseif(Player::find(["game_session_id"=>$game->id])->where(["slot"=>$slot])->limit(1)->one()){
+            $data=["error"=>["message"=>"Этот слот занят другим игроком"]];
         }
-        if(Player::find(["game_session_id"=>$game->id])->where(["slot"=>$slot])->limit(1)->one()===null){
+        elseif(Player::find(["game_session_id"=>$game->id])->where(["slot"=>$slot])->limit(1)->one()===null){
             $player=$user->getLastPlayer();
             $player->slot=$slot;
             $player->save();
+            $data=["success"=>true];
         }
-        return $this->redirect("/match/connect-json");
+        // return $this->redirect("/match/connect-json");
+        return $this->asJson($data);
     }
 }

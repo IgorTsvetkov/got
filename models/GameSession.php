@@ -28,7 +28,7 @@ class GameSession extends \yii\db\ActiveRecord
         $this->link("users",$user);
 
         $player=new Player(); 
-          
+        $player->hero_id=1;//default hero: faceless men  
         $player->slot=$slot;
         $player->user_id=$user->id;
         $player->game_session_id=$this->id;

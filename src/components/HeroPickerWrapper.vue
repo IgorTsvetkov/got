@@ -1,15 +1,8 @@
 <template>
-  <div class="btn btn-warning p-1 rounded shadow m-1" @click="changeSlot(index)">
-    {{img.name}}
-    <div class="hero-img m-1">
-      <img width="100px" :src="'/web/images/figurines/'+img.src" />
+    <div>
+        <slot></slot>
+        <div v-if="error" class="lead bg-warning text-light border shadow  p-20">{{error.message}}</div>
     </div>
-    <h4 class="h4 bg-dark p-1 text-light lead shadow" v-if="users[index]">
-      {{users[index]}}
-      <img src="/web/images/crown.svg" width="25px" />
-    </h4>
-    <h4 class="h4 bg-dark p-1 text-light lead shadow" v-else>{{"Место "+(1+index)}}</h4>
-  </div>
 </template>
 
 <script>
@@ -25,14 +18,11 @@ export default {
       type: String,
       default: "",
     },
-    onwer_id: {
-      type: String,
-      default: "",
-    },
   },
   data() {
     return {
       imgs: [
+        { src: "figure1.png", name: "Faceless men" },
         { src: "figure1.png", name: "Stannis Baratheon" },
         { src: "figure2.png", name: "Robert Baratheon" },
         { src: "figure3.png", name: "Daenerys Targaryen" },
@@ -84,37 +74,9 @@ export default {
         this.users = this.usersTransform(res.data.users);
     };
   },
-  computed: {
-    // parsedUsers() {
-    //     if(this.users){
-    //         let x=JSON.parse(this.users);
-    //         window.x=x;
-    //         let b={};
-    //         x.forEach((item,key)=>b[item.slot]=item.username);
-    //         console.log("users",b);
-    //         return b;
-    //     }
-    // }
-  },
 };
 </script>
 
-<style scoped>
-.hpc-block {
-  background: #909090;
-  border: unset;
-  border-radius: 10px;
-  box-shadow: 0 0 3px 1px black;
-}
-.hpc-block:hover {
-  cursor: pointer;
-  filter: brightness(80%);
-}
-.hpc-error {
-  background: rgb(199, 4, 4);
-  color: white;
-  padding: 20px;
-  border-radius: 10px;
-  margin: 5px;
-}
+<style lang="scss" scoped>
+
 </style>

@@ -13,6 +13,7 @@ use yii\behaviors\BlameableBehavior;
  * @property int $id
  * @property int|null $user_id
  * @property int|null $game_session_id
+ * @property int|null $hero_id
  * @property int|null $slot
  * @property int|null $position
  *
@@ -40,8 +41,8 @@ class Player extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['game_session_id','slot', 'position'], 'integer'],
-            [['game_session_id','slot','position'],'required']
+            [['game_session_id',"hero_id",'slot', 'position'], 'integer'],
+            [['game_session_id',"hero_id",'slot','position'],'required']
         ];
     }
 
