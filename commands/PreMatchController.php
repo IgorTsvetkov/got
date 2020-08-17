@@ -43,7 +43,7 @@ class PreMatchController extends Controller
         });                
     }
     public function actionSendToAll(){
-        $this->startWebSocket("/send-to-all",function($user,$connection,$data,$worker){
+        $this->startWebSocket("/send-to-all",function($user,$connection,$data,$worker){   
             foreach ($worker->connections as $connection) {
                 $connection->sendEncoded($data);
             }
@@ -101,5 +101,24 @@ class PreMatchController extends Controller
             }
         };
         MyWorker::runAll();
+    }
+
+    public function actionX(){
+        // $data=GameSession::find(["id"=>1])
+        // ->joinWith(["players"])
+        // ->joinWith("players.hero")
+        // ->joinWith(["players.user"=>function($query){
+        //     $query->select("id,username");
+        // }])
+        // ->one();
+        $data=GameSession::find(["id"=>1])
+        ->joinWith(["players"=>function($query){
+            $query->orderBy(['slot'=>SORT_ASC]);
+        },"players.hero","players.user"=>function($query){
+            $query->select(["id","username"]);
+        }])
+        ->asArray()
+        ->one();
+        var_dump($data["players"]);
     }
 }

@@ -59,6 +59,16 @@ class Player extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[Hero]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getHero()
+    {
+        return $this->hasOne(Hero::class, ['id' => 'hero_id']);
+    }
+
+    /**
      * Gets query for [[GameSessions]].
      *
      * @return \yii\db\ActiveQuery

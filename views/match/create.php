@@ -6,24 +6,17 @@ use app\models\GameSession;
 use yii\helpers\Html;
 use yii\helpers\VarDumper;
 
-VarDumper::dump($users, 10, true);
-VarDumper::dump($users, 10, true);
 
 $this->title = 'Создать игру';
 ?>
 <div>
     <h1><?= Html::encode($this->title) ?></h1>
-    <h2><?= GameSession::instance()->getAttributeLabel("id") ?>:<?= $game_id ?></h2>
+    <h2><?= GameSession::instance()->getAttributeLabel("id") ?>:<?= $game["id"] ?></h2>
     <form action="/got/create" method="post">
         <div class="bg-secondary">
             <div class="flex flex-row justify-content-center align-items-center flex-wrap text-center lead">
-                <hero-picker-wrapper>
-                    <?for($i=0,$i<6;$i++):?>
-                        <hero-picker-component 
-                        is_owner="<?=$owner_id==$users[$i]->id?>" 
-                        username='<?= $users[$i]->username ?>'
-                        >
-                    <?endforeach;?>
+                <hero-picker-wrapper game='<?=json_encode($game)?>'>
+
                 </hero-picker-wrapper>
             </div>
             

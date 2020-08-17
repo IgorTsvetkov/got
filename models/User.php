@@ -12,11 +12,10 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
     public static function Me(){
         return self::findOne(Yii::$app->user->id);
     }
-    public function getLastGame():?GameSession{
+    public function getLastGame(){
         return $this->hasOne(GameSession::class,["id"=>"game_session_id"])
         ->orderBy(['created_at'=>SORT_DESC])
-        ->viaTable("user_game_session",["user_id"=>"id"])
-        ->one();
+        ->viaTable("user_game_session",["user_id"=>"id"]);
     }
     public function getLastPlayer():?Player{
         return $this->hasMany(Player::class,["user_id"=>"id"])->orderBy(["id"=>SORT_DESC])->limit(1)->one();

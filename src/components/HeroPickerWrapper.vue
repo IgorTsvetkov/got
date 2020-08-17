@@ -1,71 +1,57 @@
 <template>
     <div>
-        <slot></slot>
-        <div v-if="error" class="lead bg-warning text-light border shadow  p-20">{{error.message}}</div>
+          <div v-for="(item,key) in [...Array(5).keys()]" :key="key">
+            {{ key }}
+          </div>
+          <div v-for="player in gameParsed.players" :key="player.id">     
+                <hero-picker-component
+                :is_owner="gameParsed.players[0].user_id==player.user_id" 
+                :username="player.user.username"
+                :hero_src="player.hero.src"
+                :hero_name="player.hero.name"
+                :index="player.slot"
+                @changeSlot="refreshPageEveryone"
+                >
+                </hero-picker-component>
+            </div>
+        <!-- <div v-if="error" class="lead bg-warning text-light border shadow  p-20">{{error.message}}</div> -->
     </div>
 </template>
 
 <script>
 import AuthSocket from "../js/AuthSocket";
 import axios from "axios";
+import HeroPickerComponent from './HeroPickerComponent.vue';
 export default {
-  props: {
-    name: {
-      type: String,
-      default: "field_name",
-    },
-    users_string: {
-      type: String,
-      default: "",
-    },
+  components:{
+    HeroPickerComponent
   },
-  data() {
+  props: {
+    game:{
+      type:String,
+      default:""
+    }
+  },
+    data() {
     return {
-      imgs: [
-        { src: "figure1.png", name: "Faceless men" },
-        { src: "figure1.png", name: "Stannis Baratheon" },
-        { src: "figure2.png", name: "Robert Baratheon" },
-        { src: "figure3.png", name: "Daenerys Targaryen" },
-        { src: "figure4.png", name: "Tyrion Lannister" },
-        { src: "figure5.png", name: "Jaime Lannister" },
-        { src: "figure6.png", name: "Robb Stark" },
-        { src: "figure7.png", name: "Jon Show" },
-        { src: "figure8.png", name: "Cersei Lannister" },
-      ],
-      users: {},
-      error: null,
       socket: new AuthSocket("ws://127.0.0.1:8989/send-to-all"),
+      six:range(1,6),
     };
   },
   methods: {
-    changeSlot(value) {
-      // this.socket.send({slot:value});
-      let result = axios.post(`/match/change-slot?slot=${value}`);
-      if (result.error) {
-        this.error = result.error;
-        return;
-      }
-      this.error = null;
-      this.socket.send({ refresh: true });
-    },
-    usersStringToObj(users_string) {
-      let users = JSON.parse(users_string);
-      return this.usersTransform(users);
-    },
-    usersTransform(users) {
-      let obj = {};
-      users.forEach((item, key) => (obj[item.slot] = item.username));
-      return obj;
-    },
+    refreshPageEveryone(){
+      this.socket.send({refresh:true});
+    }
   },
   created() {
-    this.users = this.usersStringToObj(this.users_string);
-
+    window.x=this.gameParsed;
+    //set csrf for all post request
+    axios.defaults.headers.common['X-CSRF-TOKEN']=window.yii.getCsrfToken();
     this.socket.onmessageAuth = (e, res) => {
       console.log(res);
       if (res.refresh)
         axios
-          .get("/match/connect?isJson=true")
+          .get("/match/connect?layout=false")
           .then((res) => {
             console.log(res);
           })
@@ -73,6 +59,14 @@ export default {
       if (res.data && res.data.users)
         this.users = this.usersTransform(res.data.users);
     };
+  },
+  computed: {
+    gameParsed:function(){
+      return JSON.parse(this.game);
+    },
+    playerSlot:function(){
+
+    }
   },
 };
 </script>

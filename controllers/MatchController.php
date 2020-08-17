@@ -37,7 +37,7 @@ class MatchController extends \yii\web\Controller
             if(Yii::$app->user->isGuest)
                 return $this->redirect("/site/login");
             $user=User::me();
-            $lastGame=$user->getLastGame();
+            $lastGame=$user->getLastGame()->one();
             if($lastGame&&$lastGame->isStarted===false){
                 return $this->redirect("/match/connect");
             }            
@@ -69,32 +69,24 @@ class MatchController extends \yii\web\Controller
         
         return $this->redirect("/match/connect");
     }
-    public function actionConnect($isJson=false)
+    public function actionConnect($json=false)
     {   $user=User::Me();
-        $game=$user->getLastGame();
-        if(!$game)
-            return $this->redirect("/match");
-        
-        $users=array_map(function($user){
-            return[
-            "id"=>$user->id,
-            "username"=>$user->username,
-            "slot"=>$user->lastPlayer->slot
-            ];
-        },$game->users);
-        $users=usort($users,function($a,$b){return $a->slot>$b->slot?1:-1;});
-        $data=[
-            'game_id'=>$game->id,
-            'owner_id'=>$game->players[0]->user_id,
-            'users'=>json_encode($users)
-        ];
-        if($isJson)
-            return $this->asJson($data);
-        return $this->render('create',$data);
+        $game=$user->getLastGame()->joinWith(["players"=>function($query){
+            $query->orderBy(['slot'=>SORT_ASC]);
+        },"players.hero","players.user"=>function($query){
+            $query->select(["id","username"]);
+        }])
+        ->asArray()
+        ->one();
+        // if($isJson)
+        //     return $this->asJson($game);
+        // if($json==true)
+        // VarDumper::dump($game,10,true);
+        return $this->render('create',compact("game"));
     }
     public function actionLeft(int $game_id){
         $user=User::me();
-        $game=$user->getLastGame();
+        $game=$user->getLastGame()->one();
         if($game->id==$game_id){
             $game->removeUser($user);
         }
@@ -102,7 +94,7 @@ class MatchController extends \yii\web\Controller
     }
     public function actionChangeSlot(int $slot){
         $user=User::Me();
-        $game=$user->getLastGame();
+        $game=$user->getLastGame()->one();
         $data=null;
         if($game->IsStarted){
             $data=["error"=>["message"=>"you can't change slot after game have been started"]];

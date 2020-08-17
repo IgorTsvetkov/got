@@ -1,14 +1,14 @@
 <template>
   <div class="btn btn-warning p-1 rounded shadow m-1" @click="changeSlot(index)">
-    {{img.name}}
+    {{hero_name}}
     <div class="hero-img m-1">
-      <img width="100px" :src="'/web/images/figurines/'+img.src" />
+      <img width="100px" :src="hero_src" />
     </div>
-    <h4 class="h4 bg-dark p-1 text-light lead shadow" v-if="users[index]">
-      {{users[index]}}
-      <img src="/web/images/crown.svg" width="25px" />
+    <h4 class="h4 bg-dark p-1 text-light lead shadow" v-if="username">
+      {{username}}
+      <img v-if="is_owner" src="/web/images/crown.svg" width="25px" />
     </h4>
-    <h4 class="h4 bg-dark p-1 text-light lead shadow" v-else>{{"Место "+(1+index)}}</h4>
+    <h4 class="h4 bg-dark p-1 text-light lead shadow" v-else>{{"Место "+(index)}}</h4>
   </div>
 </template>
 
@@ -17,104 +17,43 @@ import AuthSocket from "../js/AuthSocket";
 import axios from "axios";
 export default {
   props: {
-    name: {
-      type: String,
-      default: "field_name",
+    is_owner: {
+      type: Boolean,
+      default: false,
     },
-    users_string: {
-      type: String,
-      default: "",
-    },
-    onwer_id: {
+    username: {
       type: String,
       default: "",
     },
-  },
-  data() {
-    return {
-      imgs: [
-        { src: "figure1.png", name: "Stannis Baratheon" },
-        { src: "figure2.png", name: "Robert Baratheon" },
-        { src: "figure3.png", name: "Daenerys Targaryen" },
-        { src: "figure4.png", name: "Tyrion Lannister" },
-        { src: "figure5.png", name: "Jaime Lannister" },
-        { src: "figure6.png", name: "Robb Stark" },
-        { src: "figure7.png", name: "Jon Show" },
-        { src: "figure8.png", name: "Cersei Lannister" },
-      ],
-      users: {},
-      error: null,
-      socket: new AuthSocket("ws://127.0.0.1:8989/send-to-all"),
-    };
+    hero_src:{
+      type:String,
+      default:"/web/images/figurines/figure0.png"
+    },
+    hero_name:{
+      type:String,
+      default:"Faceless men"
+    },
+    index:{
+      type:String,
+      default:""
+    }
   },
   methods: {
     changeSlot(value) {
-      // this.socket.send({slot:value});
       let result = axios.post(`/match/change-slot?slot=${value}`);
       if (result.error) {
         this.error = result.error;
         return;
       }
       this.error = null;
-      this.socket.send({ refresh: true });
-    },
-    usersStringToObj(users_string) {
-      let users = JSON.parse(users_string);
-      return this.usersTransform(users);
-    },
-    usersTransform(users) {
-      let obj = {};
-      users.forEach((item, key) => (obj[item.slot] = item.username));
-      return obj;
+      this.$emit("changeSlot");
     },
   },
-  created() {
-    this.users = this.usersStringToObj(this.users_string);
-
-    this.socket.onmessageAuth = (e, res) => {
-      console.log(res);
-      if (res.refresh)
-        axios
-          .get("/match/connect?isJson=true")
-          .then((res) => {
-            console.log(res);
-          })
-          .catch((res) => console.log("Error REFRESH :>> ", res));
-      if (res.data && res.data.users)
-        this.users = this.usersTransform(res.data.users);
-    };
-  },
-  computed: {
-    // parsedUsers() {
-    //     if(this.users){
-    //         let x=JSON.parse(this.users);
-    //         window.x=x;
-    //         let b={};
-    //         x.forEach((item,key)=>b[item.slot]=item.username);
-    //         console.log("users",b);
-    //         return b;
-    //     }
-    // }
-  },
+  created(){
+    axios.defaults.headers.common['X-CSRF-TOKEN']=window.yii.getCsrfToken();
+  }
 };
 </script>
 
 <style scoped>
-.hpc-block {
-  background: #909090;
-  border: unset;
-  border-radius: 10px;
-  box-shadow: 0 0 3px 1px black;
-}
-.hpc-block:hover {
-  cursor: pointer;
-  filter: brightness(80%);
-}
-.hpc-error {
-  background: rgb(199, 4, 4);
-  color: white;
-  padding: 20px;
-  border-radius: 10px;
-  margin: 5px;
-}
 </style>
