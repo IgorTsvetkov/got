@@ -20,7 +20,7 @@ class m200816_211500_create_hero_table extends Migration
 
         $this->batchInsert('{{%hero}}',['src','name'],
             [ 
-                ["/web/images/figurines/figure0.png","Faceless men"],
+                ["/web/images/figurines/figure0.png","Faceless"],
                 ["/web/images/figurines/figure1.png","Stannis Baratheon"],
                 ["/web/images/figurines/figure2.png","Robert Baratheon"],
                 ["/web/images/figurines/figure3.png","Daenerys Targaryen"],

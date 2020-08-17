@@ -144,3 +144,23 @@ body[data-v-5567ea9e]{
     z-index: 1;
 }
 
+
+.z-index-100[data-v-44ea9c35] {
+  z-index: 100;
+}
+img.hover-img[data-v-44ea9c35]:hover,
+img.hover-img.reverse[data-v-44ea9c35] {
+  filter: grayscale(0.8);
+  cursor: pointer;
+}
+img.hover-img.reverse[data-v-44ea9c35]:hover {
+  filter: none;
+  cursor: pointer;
+}
+.img-picker[data-v-44ea9c35] {
+  width: 500px;
+}
+.line-height-2[data-v-44ea9c35] {
+  line-height: 2;
+}
+

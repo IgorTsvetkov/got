@@ -45,6 +45,8 @@ class PreMatchController extends Controller
     public function actionSendToAll(){
         $this->startWebSocket("/send-to-all",function($user,$connection,$data,$worker){   
             foreach ($worker->connections as $connection) {
+                var_dump("connections count");
+                var_dump(count($worker->connections));
                 $connection->sendEncoded($data);
             }
         });
@@ -90,7 +92,6 @@ class PreMatchController extends Controller
         $worker = new MyWorker($this->socketPath.$socketAction);
         $worker->onMessageDecoded = function (MyTcpConnection $connection, $data) use ($worker,$onMessageCallback) {
             $user=UserSocket::getUserByAuthInfo($data->authInfo);
-            var_dump($user->id);
             if ($user) {
                 $onMessageCallback($user,$connection,$data,$worker);
             } else {

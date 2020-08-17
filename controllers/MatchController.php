@@ -72,18 +72,16 @@ class MatchController extends \yii\web\Controller
     public function actionConnect($json=false)
     {   $user=User::Me();
         $game=$user->getLastGame()->joinWith(["players"=>function($query){
-            $query->orderBy(['slot'=>SORT_ASC]);
         },"players.hero","players.user"=>function($query){
             $query->select(["id","username"]);
         }])
         ->asArray()
         ->one();
-        // if($isJson)
-        //     return $this->asJson($game);
-        // if($json==true)
-        // VarDumper::dump($game,10,true);
+        if($json)
+            return $this->asJson($game);
         return $this->render('create',compact("game"));
     }
+    
     public function actionLeft(int $game_id){
         $user=User::me();
         $game=$user->getLastGame()->one();
@@ -100,13 +98,13 @@ class MatchController extends \yii\web\Controller
             $data=["error"=>["message"=>"you can't change slot after game have been started"]];
         }
         elseif(Player::find(["game_session_id"=>$game->id])->where(["slot"=>$slot])->limit(1)->one()){
-            $data=["error"=>["message"=>"Этот слот занят другим игроком"]];
+            $data=["error"=>["message"=>"Этот слот уже занят игроком"]];
         }
         elseif(Player::find(["game_session_id"=>$game->id])->where(["slot"=>$slot])->limit(1)->one()===null){
             $player=$user->getLastPlayer();
             $player->slot=$slot;
             $player->save();
-            $data=["success"=>true];
+            $data=["status"=>"success"];
         }
         // return $this->redirect("/match/connect-json");
         return $this->asJson($data);

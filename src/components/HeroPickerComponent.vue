@@ -1,14 +1,30 @@
 <template>
-  <div class="btn btn-warning p-1 rounded shadow m-1" @click="changeSlot(index)">
+  <div class="bg-warning p-1 rounded shadow m-1">
     {{hero_name}}
-    <div class="hero-img m-1">
-      <img width="100px" :src="hero_src" />
+    <div class="hero-img m-1 position-relative">
+      <img class="hover-img" width="100px" :src="hero_src" @click="toggleHeroes" />
+      <div
+        class="img-picker position-absolute z-index-100 shadow-lg bg-dark text-light"
+        v-if="is_current_player&&heroesPicker"
+      >
+        <div class="d-flex align-content-center justify-content-center bg-primary text-light">
+          <h4 class="w-100 lead m-0 line-height-2">Выбор персонажа</h4>
+          <button class="btn btn-danger sticky-top rounded-0" @click="toggleHeroes">&times;</button>
+        </div>
+        <div class="overflow-auto d-flex p-1">
+          <div v-for="hero in heroes" :key="hero.id">
+            <img class="hover-img reverse" width="100px" :src="hero.src" />
+          </div>
+        </div>
+      </div>
     </div>
-    <h4 class="h4 bg-dark p-1 text-light lead shadow" v-if="username">
-      {{username}}
-      <img v-if="is_owner" src="/web/images/crown.svg" width="25px" />
-    </h4>
-    <h4 class="h4 bg-dark p-1 text-light lead shadow" v-else>{{"Место "+(index)}}</h4>
+    <div @click="changeSlot(slot_index)">
+      <h4 class="h4 bg-dark p-1 text-light lead shadow" v-if="username">
+        {{username}}
+        <img v-if="is_king" src="/web/images/crown.svg" width="25px" />
+      </h4>
+      <h4 class="btn btn-secondary w-100 h4 p-1 lead shadow" v-else>Сесть</h4>
+    </div>
   </div>
 </template>
 
@@ -17,7 +33,7 @@ import AuthSocket from "../js/AuthSocket";
 import axios from "axios";
 export default {
   props: {
-    is_owner: {
+    is_king: {
       type: Boolean,
       default: false,
     },
@@ -25,35 +41,68 @@ export default {
       type: String,
       default: "",
     },
-    hero_src:{
-      type:String,
-      default:"/web/images/figurines/figure0.png"
+    hero_src: {
+      type: String,
+      default: "/web/images/figurines/figure0.png",
     },
-    hero_name:{
-      type:String,
-      default:"Faceless men"
+    hero_name: {
+      type: String,
+      default: "Faceless men",
     },
-    index:{
-      type:String,
-      default:""
-    }
+    slot_index: {
+      type: Number,
+      default: null,
+    },
+    is_current_player: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  data() {
+    return {
+      heroesPicker: false,
+      heroes: [],
+    };
   },
   methods: {
-    changeSlot(value) {
-      let result = axios.post(`/match/change-slot?slot=${value}`);
-      if (result.error) {
-        this.error = result.error;
-        return;
-      }
+    async changeSlot(value) {
+      let result = await axios.post(`/match/change-slot?slot=${value}`);
       this.error = null;
-      this.$emit("changeSlot");
+      this.$emit("changeSlot", result);
+    },
+    toggleHeroes() {
+      if (this.is_current_player) {
+        this.heroesPicker = !this.heroesPicker;
+      }
     },
   },
-  created(){
-    axios.defaults.headers.common['X-CSRF-TOKEN']=window.yii.getCsrfToken();
-  }
+  created() {
+    axios.defaults.headers.common["X-CSRF-TOKEN"] = window.yii.getCsrfToken();
+    axios.get("/hero").then((res) => {
+      //  console.log(res.data)
+      this.heroes = res.data;
+    });
+  },
 };
 </script>
 
 <style scoped>
+.z-index-100 {
+  z-index: 100;
+}
+img.hover-img:hover,
+img.hover-img.reverse {
+  filter: grayscale(0.8);
+  cursor: pointer;
+}
+img.hover-img.reverse:hover {
+  filter: none;
+  cursor: pointer;
+}
+.img-picker {
+  width: 500px;
+}
+.line-height-2 {
+  line-height: 2;
+}
 </style>
