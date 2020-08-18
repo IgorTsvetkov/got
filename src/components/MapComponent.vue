@@ -24,14 +24,31 @@
         </div>
       </div>
       <div class="cell-center">
-        <img src="/web/images/center.jpg" alt /> 
+        <img src="/web/images/center.jpg" alt />
       </div>
-      <img class="empty-center" />
-    </div>
-
-
-    <div v-if="this.player_id==this.gameParsed.turn_player_id" class="absolute">
-      <button class="btn btn-warning" @click="move()">Move</button>
+      <!-- <img class="empty-center" /> -->
+      <div class="empty-center">
+        <div class="w-100 h-100 d-flex bg-warning">
+          <div class="w-50 h-100 d-flex justify-content-center align-items-center">
+            <div v-if="this.player_id==this.gameParsed.turn_player_id">
+              <button class="btn btn-primary" @click="move()">Бросить кубик</button>
+            </div>
+          </div>
+          <div class="w-50 h-100 bg-primary">
+            <div class="bg-secondary w-100 h-75">
+                <div v-for="message in messages" :key="message.id">
+                    {{ message }}
+                </div>
+            </div>
+            <div class="container-fluid">
+              <div class="row">
+                <input class="col-9" v-model="message" type="text" />
+                <input class="col-3 m-0 btn btn-success"  value="Добавить" type="button" @click="sendMessage"/>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -56,12 +73,14 @@ export default {
     return {
       cells: [],
       position: 0,
-      moveSocket: new AuthSocket("ws://127.0.0.1:8989/send-to-all"),
-      gameParsed:undefined
+      socket: new AuthSocket("ws://127.0.0.1:8989/send-to-all"),
+      gameParsed: undefined,
+      message:"",
+      messages:[],
     };
   },
-  beforeMount(){
-      this.gameParsed=JSON.parse(this.game);
+  beforeMount() {
+    this.gameParsed = JSON.parse(this.game);
   },
   created() {
     //set csrf for all post request
@@ -79,28 +98,39 @@ export default {
       .catch((err) => {
         console.error(err);
       });
-    this.moveSocket.onmessageAuth = (e, parsedData) => {
+    this.socket.onmessageAuth = (e, parsedData) => {
       if (parsedData.action && parsedData.action == "move") {
-        let player=this.gameParsed.players.find(el=>el.id==parsedData.data.player_id);
-        player.position=parsedData.data.position;
-        console.log('parsedData.data.turn_player_id :>> ', parsedData.data.turn_player_id);
-        this.gameParsed.turn_player_id=parsedData.data.turn_player_id;
+        let player = this.gameParsed.players.find(
+          (el) => el.id == parsedData.data.player_id
+        );
+        player.position = parsedData.data.position;
+        console.log(
+          "parsedData.data.turn_player_id :>> ",
+          parsedData.data.turn_player_id
+        );
+        this.gameParsed.turn_player_id = parsedData.data.turn_player_id;
         this.$forceUpdate();
+      }
+      if(parsedData.action && parsedData.action == "chat"){
+          this.messages.push(parsedData.message);
       }
     };
   },
   methods: {
     move($player_id) {
       axios.post(`/got/move?player_id=${this.player_id}`).then((res) => {
-        this.moveSocket.send({
+        this.socket.send({
           action: "move",
-          data: { 
-              position: res.data.position,
-              player_id:this.player_id,
-              turn_player_id:res.data.turn_player_id
-                   },
+          data: {
+            position: res.data.position,
+            player_id: this.player_id,
+            turn_player_id: res.data.turn_player_id,
+          },
         });
       });
+    },
+    sendMessage(){
+        this.socket.send({action:"chat",message:this.message});
     },
     getImage(cell) {
       let x = cell.property
@@ -114,10 +144,9 @@ export default {
         : "";
       return x;
     },
-    findPlayer(id){
-        return this.gameParsed.players.find(p=>p.id=id);
-    }
-    
+    findPlayer(id) {
+      return this.gameParsed.players.find((p) => (p.id = id));
+    },
   },
   computed: {
     // turn_player_id: function () {
