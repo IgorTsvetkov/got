@@ -7,6 +7,7 @@ use app\models\User;
 use yii\helpers\VarDumper;
 use app\models\GameSession;
 use app\models\Player;
+use PHPUnit\Framework\MockObject\Builder\Identity;
 use yii\filters\AccessControl;
 
 class MatchController extends \yii\web\Controller
@@ -58,14 +59,19 @@ class MatchController extends \yii\web\Controller
     public function actionCreateLobby(){
         $user=User::me();
         $game=new GameSession();
-        $game->save();
-        $game->setUserInSlot($user,1);
+        $game->leader_user_id=$user->id;
+        $game->save();        
+        $player=Player::createAndLink($game,$user);
+        $player->save();
+
         return $this->redirect("/match/connect");
     }
     public function actionJoin($game_id){
         $game=GameSession::findOne($game_id);        
         $user=User::me();
-        $game->setUserInSlot($user,2);
+        $game->link("users",$user);
+        $player=Player::createAndLink($game,$user);
+        $player->save();
         
         return $this->redirect("/match/connect");
     }
@@ -77,6 +83,9 @@ class MatchController extends \yii\web\Controller
         }])
         ->asArray()
         ->one();
+        if($game["started_at"]&&$game["finished_at"]==false){
+            return $this->redirect("/got/game");            
+        }
         if($json)
             return $this->asJson($game);
         return $this->render('create',compact("game"));
@@ -108,5 +117,13 @@ class MatchController extends \yii\web\Controller
         }
         // return $this->redirect("/match/connect-json");
         return $this->asJson($data);
+    }
+    public function actionStart(int $game_id)
+    {       
+        $user=User::Me();
+        $game=GameSession::findOne($game_id);
+        if($game->leader_user_id===$user->id)
+            $game->touch("started_at");
+        return $this->asJson(["started"=>true]);
     }
 }

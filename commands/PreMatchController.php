@@ -7,7 +7,10 @@
  */
 
 namespace app\commands;
+
+use app\helpers\SocketController;
 use Yii;
+use app\models\User;
 use app\models\Player;
 use yii\console\ExitCode;
 use app\models\UserSocket;
@@ -16,10 +19,10 @@ use yii\console\Controller;
 use app\websockets\MyWorker;
 use app\websockets\MyTcpConnection;
 use app\websockets\MyUdpConnection;
-use Workerman\Connection\TcpConnection;
 use yii\behaviors\TimestampBehavior;
+use Workerman\Connection\TcpConnection;
 
-require_once __DIR__ . '/../vendor/autoload.php';
+
 /**
  * This command echoes the first argument that you have entered.
  *
@@ -28,14 +31,8 @@ require_once __DIR__ . '/../vendor/autoload.php';
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
  */
-class PreMatchController extends Controller
+class PreMatchController extends SocketController
 {   
-    public $socketPath="websocket://127.0.0.1:8989";
-    public function beforeAction($action)
-    {
-
-        return parent::beforeAction($action);
-    }
     public function actionAuth()
     {
         $this->startWebSocket("/auth",function($user,$connection,$data,$worker){
@@ -52,25 +49,26 @@ class PreMatchController extends Controller
         });
     }
     public function actionStart(){
-        $this->startWebSocket("/start",function($user,$connection,$data){
-            $activeSession=$user->activeGameSession;
-            if($activeSession){
-                $connection->sendEncoded([
-                    "message"=>"You already have active game session"
-                ]);
-                return;
-            }
-            $gameSession=new GameSession();
-            $gameSession->save();
-            $player=new Player();
-            $player->position=0;
-            $player->slot=1;
-            $player->save();
-            $gameSession->link("players",$player);
-            $gameSession->link("users",$user);
+        // $this->startWebSocket("/start",function(User $user,$connection,$data){
+        //     $game=$user->getLastGame()->one();
 
-            $connection->sendEncoded([]);
-        });
+        //     if($game-){
+        //         $connection->sendEncoded([
+        //             "message"=>"You already have active game session"
+        //         ]);
+        //         return;
+        //     }
+        //     $gameSession=new GameSession();
+        //     $gameSession->save();
+        //     $player=new Player();
+        //     $player->position=0;
+        //     $player->slot=1;
+        //     $player->save();
+        //     $gameSession->link("players",$player);
+        //     $gameSession->link("users",$user);
+
+        //     $connection->sendEncoded([]);
+        // });
     }
     public function actionPick()
     {
@@ -88,38 +86,9 @@ class PreMatchController extends Controller
             $connection->sendEncoded([]);
         });
     }
-    public function startWebSocket(string $socketAction="",callable $onMessageCallback){
-        $worker = new MyWorker($this->socketPath.$socketAction);
-        $worker->onMessageDecoded = function (MyTcpConnection $connection, $data) use ($worker,$onMessageCallback) {
-            $user=UserSocket::getUserByAuthInfo($data->authInfo);
-            if ($user) {
-                $onMessageCallback($user,$connection,$data,$worker);
-            } else {
-                var_dump("auth false");
-                $connection->sendEncoded([
-                    "status code" => 401
-                ]);
-            }
-        };
-        MyWorker::runAll();
-    }
 
     public function actionX(){
-        // $data=GameSession::find(["id"=>1])
-        // ->joinWith(["players"])
-        // ->joinWith("players.hero")
-        // ->joinWith(["players.user"=>function($query){
-        //     $query->select("id,username");
-        // }])
-        // ->one();
-        $data=GameSession::find(["id"=>1])
-        ->joinWith(["players"=>function($query){
-            $query->orderBy(['slot'=>SORT_ASC]);
-        },"players.hero","players.user"=>function($query){
-            $query->select(["id","username"]);
-        }])
-        ->asArray()
-        ->one();
-        var_dump($data["players"]);
+       $game=GameSession::findOne(1);
+        var_dump($game->leader_user_id);
     }
 }

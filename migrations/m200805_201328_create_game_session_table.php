@@ -15,6 +15,7 @@ class m200805_201328_create_game_session_table extends Migration
         $this->createTable('{{%game_session}}', [
             'id' => $this->primaryKey(),
             'name'=>$this->string(),
+            'leader_user_id'=>$this->integer(),
             'created_at' => $this->string(),
             'started_at'=>$this->string(),
             'finished_at'=>$this->string(),

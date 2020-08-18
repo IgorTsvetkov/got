@@ -8,6 +8,7 @@
 
 namespace app\commands;
 
+use app\helpers\SocketController;
 use app\models\User;
 use app\models\Player;
 use yii\console\ExitCode;
@@ -28,11 +29,26 @@ require_once __DIR__ . '/../vendor/autoload.php';
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
  */
-class MovementController extends Controller
+class MovementController extends SocketController
 {
     public function beforeAction($action)
     {
         return parent::beforeAction($action);
+    }
+    public function actionMove(){
+        $this->startWebSocket("/pick",function($user,$connection,$data){
+            $gameSession=GameSession::findOne($user->session_id);
+            if($gameSession&&!isset($gameSession[$data->playerSlot])){
+                $gameSession[$data->playerSlot]=$user->id;
+                $gameSession->save();
+                $connection->sendEncoded(
+                [
+                    "gameSession"=>$gameSession->attributes,
+                ]);
+                return;
+            }
+            $connection->sendEncoded([]);
+        });
     }
     public function actionTest()
     {   

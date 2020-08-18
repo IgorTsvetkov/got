@@ -12,8 +12,8 @@
           <button class="btn btn-danger sticky-top rounded-0" @click="toggleHeroes">&times;</button>
         </div>
         <div class="overflow-auto d-flex p-1">
-          <div v-for="hero in heroes" :key="hero.id">
-            <img class="hover-img reverse" width="100px" :src="hero.src" />
+          <div v-for="(hero) in heroes" :key="hero.id">
+            <img class="hover-img reverse" width="100px" :src="hero.src" @click="changeHero(hero.id)" />
           </div>
         </div>
       </div>
@@ -57,6 +57,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    player_id:{
+      type:Number,
+      default:undefined
+    }
   },
   data() {
     return {
@@ -65,16 +69,22 @@ export default {
     };
   },
   methods: {
+    async changeHero(hero_id){
+      let result = await axios.post(`/player/update-hero?player_id=${this.player_id}&hero_id=${hero_id}`);
+      console.log(result.data);
+      console.log('result.data change hero :>> ', result.data);
+      this.$emit("heroChanged", result);
+    },
     async changeSlot(value) {
       let result = await axios.post(`/match/change-slot?slot=${value}`);
-      this.error = null;
-      this.$emit("changeSlot", result);
+      this.$emit("slotChanged", result);
     },
     toggleHeroes() {
       if (this.is_current_player) {
         this.heroesPicker = !this.heroesPicker;
       }
     },
+
   },
   created() {
     axios.defaults.headers.common["X-CSRF-TOKEN"] = window.yii.getCsrfToken();
@@ -82,6 +92,11 @@ export default {
       //  console.log(res.data)
       this.heroes = res.data;
     });
+  },
+  computed: {
+    currentPlayer() {
+      return this.data 
+    }
   },
 };
 </script>

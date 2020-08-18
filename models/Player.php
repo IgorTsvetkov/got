@@ -22,7 +22,16 @@ use yii\behaviors\BlameableBehavior;
  * @property User[] $users
  */
 class Player extends \yii\db\ActiveRecord
-{
+{    
+    public static function createAndLink(GameSession $game,User $user){
+        $game->link("users",$user);
+        $player=new Player();
+        $player->hero_id=1;//default hero: faceless men  
+        $player->slot=$game->getFirstEmptySlot();
+        $player->user_id=$user->id;
+        $player->game_session_id=$game->id;
+        return $player;
+    }
     function init()
     {
         $this->position=0;
@@ -34,7 +43,7 @@ class Player extends \yii\db\ActiveRecord
     {
         return 'player';
     }
-
+    
     /**
      * {@inheritdoc}
      */

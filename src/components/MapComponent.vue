@@ -42,8 +42,7 @@ export default {
                 moveSocket:new AuthSocket("ws://127.0.0.1:8989/move")
             }
         },
-        created(){
-            alert("hello");
+        created(){  
             axios.get("/cells",{
                 params:{
                     expand:"property.group,tax,utility,event"

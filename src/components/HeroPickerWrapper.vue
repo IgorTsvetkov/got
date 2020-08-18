@@ -6,17 +6,19 @@
       <div v-for="(player,key) in this.players" :key="key">
         <div v-if="player">
           <hero-picker-component
-            :is_king="gameParsed.players[0].id==player.id"
+            :is_king="gameParsed.leader_user_id==player.user_id"
             :username="player.user.username"
             :hero_src="player.hero.src"
             :hero_name="player.hero.name"
             :slot_index="+player.slot"
             :is_current_player="player.user.id==current_user_id"
+            :player_id="+player.id"
             @changeSlot="refreshPageEveryone"
+            @heroChanged="refreshPageEveryone"
           ></hero-picker-component>
         </div>
         <div v-else>
-          <hero-picker-component :slot_index="key" @changeSlot="refreshPageEveryone"></hero-picker-component>
+          <hero-picker-component :slot_index="key"  @slotChanged="refreshPageEveryone"></hero-picker-component>
         </div>
       </div>
     </div>
@@ -26,7 +28,7 @@
 </template>
 
 <script>
-import AuthSocket from "../js/AuthSocket";
+
 import axios from "axios";
 import HeroPickerComponent from "./HeroPickerComponent.vue";
 export default {
@@ -45,9 +47,9 @@ export default {
   },
   data() {
     return {
-      socket: new AuthSocket("ws://127.0.0.1:8989/send-to-all"),
       updatedGame: undefined,
       error: undefined,
+      socket:this.$socketGet("send-to-all"),
     };
   },
   methods: {
@@ -74,6 +76,8 @@ export default {
             // this.$forceUpdate();
           })
           .catch((res) => console.log("Error REFRESH :>> ", res));
+      if(res.startGame)
+        window.location.pathname="/got/game";
       if (res.data && res.data.users)
         this.users = this.usersTransform(res.data.users);
     };
