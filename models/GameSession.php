@@ -14,6 +14,7 @@ use yii\db\Expression;
  * @property int $id
  * @property string|null $name
  * @property int|null $leader_user_id
+ * @property int|null $turn_player_id
  * @property string|null $created_at
  * @property string|null $started_at
  * @property string|null $finished_at

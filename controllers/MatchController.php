@@ -69,7 +69,6 @@ class MatchController extends \yii\web\Controller
     public function actionJoin($game_id){
         $game=GameSession::findOne($game_id);        
         $user=User::me();
-        $game->link("users",$user);
         $player=Player::createAndLink($game,$user);
         $player->save();
         
@@ -83,7 +82,7 @@ class MatchController extends \yii\web\Controller
         }])
         ->asArray()
         ->one();
-        if($game["started_at"]&&$game["finished_at"]==false){
+        if(!$game||$game["started_at"]&&$game["finished_at"]==false){
             return $this->redirect("/got/game");            
         }
         if($json)
@@ -123,7 +122,11 @@ class MatchController extends \yii\web\Controller
         $user=User::Me();
         $game=GameSession::findOne($game_id);
         if($game->leader_user_id===$user->id)
+        {
+            $game->turn_player_id=$game->players[0]->id;
+            $game->update();
             $game->touch("started_at");
+        }
         return $this->asJson(["started"=>true]);
     }
 }

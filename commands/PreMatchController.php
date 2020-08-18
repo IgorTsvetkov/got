@@ -88,7 +88,10 @@ class PreMatchController extends SocketController
     }
 
     public function actionX(){
-       $game=GameSession::findOne(1);
-        var_dump($game->leader_user_id);
+        $nextTurnPlayer=Player::find()->orderBy(["slot"=>SORT_ASC])->where([">","slot",4])->limit(1)->one();
+        if(empty($nextTurnPlayer))
+            $nextTurnPlayer=Player::find()->orderBy(["slot"=>SORT_ASC])->limit(1)->one();
+
+        var_dump($nextTurnPlayer);
     }
 }
