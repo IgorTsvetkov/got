@@ -1,8 +1,8 @@
 <template>
-        <div class="cell-wrapper f f-column">
-            <div v-if="this.price" class="text-center height" :class="[price_bgcolor]">{{this.price}}</div>
-            <img :src="this.src" alt="">
-        </div>
+    <div class="cell-wrapper f f-column">
+        <div v-if="this.price" class="text-center height" :class="[price_bgcolor]">{{this.price}}</div>
+        <img :src="this.src" alt="">
+    </div>
 </template>
 
 <script>
@@ -93,6 +93,7 @@
     color:white;
 }
 .height{
-    font-size: 1.3em;
+    /* font-size: 1.3em; */
+    font-size: 1.2vw;
 }
 </style>

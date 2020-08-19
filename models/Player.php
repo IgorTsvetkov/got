@@ -16,6 +16,7 @@ use yii\behaviors\BlameableBehavior;
  * @property int|null $hero_id
  * @property int|null $slot
  * @property int|null $position
+ * @property int|null $money
  *
 
  * @property GameSession[] $gameSessions

@@ -29,7 +29,6 @@
 </template>
 
 <script>
-import AuthSocket from "../js/AuthSocket";
 import axios from "axios";
 export default {
   props: {

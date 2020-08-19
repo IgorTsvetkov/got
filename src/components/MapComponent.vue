@@ -8,7 +8,7 @@
             <div v-if="cell.position==player.position">
               <div class="d-flex figurine">
                 <img height="100%" :src="player.hero.src" />
-                <div class="bg-danger">position:{{player.position}}</div>
+                <!-- <div class="bg-danger">position:{{player.position}}</div> -->
               </div>
             </div>
           </div>
@@ -26,26 +26,15 @@
       <div class="cell-center">
         <img src="/web/images/center.jpg" alt />
       </div>
-      <!-- <img class="empty-center" /> -->
       <div class="empty-center">
         <div class="w-100 h-100 d-flex bg-warning">
-          <div class="w-50 h-100 d-flex justify-content-center align-items-center">
+          <div class="w-50 h-inherit d-flex justify-content-center align-items-center">
             <div v-if="this.player_id==this.gameParsed.turn_player_id">
               <button class="btn btn-primary" @click="move()">Бросить кубик</button>
             </div>
           </div>
-          <div class="w-50 h-100 bg-primary">
-            <div class="bg-secondary w-100 h-75">
-                <div v-for="message in messages" :key="message.id">
-                    {{ message }}
-                </div>
-            </div>
-            <div class="container-fluid">
-              <div class="row">
-                <input class="col-9" v-model="message" type="text" />
-                <input class="col-3 m-0 btn btn-success"  value="Добавить" type="button" @click="sendMessage"/>
-              </div>
-            </div>
+          <div class="w-50 bg-primary d-flex flex-column h-100 p-2">
+            <chat :from="getPlayer.user.username" :from_img="getPlayer.hero.src"></chat>
           </div>
         </div>
       </div>
@@ -56,9 +45,10 @@
 <script>
 import ImageComponent from "./ImageComponent.vue";
 import AuthSocket from "../js/AuthSocket";
+import Chat from "./Chat.vue";
 import axios from "axios";
 export default {
-  components: { ImageComponent },
+  components: { ImageComponent, Chat },
   props: {
     game: {
       type: String,
@@ -73,14 +63,23 @@ export default {
     return {
       cells: [],
       position: 0,
-      socket: new AuthSocket("ws://127.0.0.1:8989/send-to-all"),
       gameParsed: undefined,
-      message:"",
-      messages:[],
+      socket: undefined,
     };
   },
   beforeMount() {
     this.gameParsed = JSON.parse(this.game);
+    this.socket = this.$socketGet(this.gameParsed.id, "send-to-all");
+    this.socket.addMessageCallback((e, parsedData) => {
+      if (parsedData.action && parsedData.action == "move") {
+        let player = this.gameParsed.players.find(
+          (el) => el.id == parsedData.data.player_id
+        );
+        player.position = parsedData.data.position;
+        this.gameParsed.turn_player_id = parsedData.data.turn_player_id;
+        this.$forceUpdate();
+      }
+    });
   },
   created() {
     //set csrf for all post request
@@ -98,29 +97,13 @@ export default {
       .catch((err) => {
         console.error(err);
       });
-    this.socket.onmessageAuth = (e, parsedData) => {
-      if (parsedData.action && parsedData.action == "move") {
-        let player = this.gameParsed.players.find(
-          (el) => el.id == parsedData.data.player_id
-        );
-        player.position = parsedData.data.position;
-        console.log(
-          "parsedData.data.turn_player_id :>> ",
-          parsedData.data.turn_player_id
-        );
-        this.gameParsed.turn_player_id = parsedData.data.turn_player_id;
-        this.$forceUpdate();
-      }
-      if(parsedData.action && parsedData.action == "chat"){
-          this.messages.push(parsedData.message);
-      }
-    };
   },
   methods: {
     move($player_id) {
       axios.post(`/got/move?player_id=${this.player_id}`).then((res) => {
         this.socket.send({
           action: "move",
+          uid: this.gameParsed.id,
           data: {
             position: res.data.position,
             player_id: this.player_id,
@@ -129,9 +112,7 @@ export default {
         });
       });
     },
-    sendMessage(){
-        this.socket.send({action:"chat",message:this.message});
-    },
+
     getImage(cell) {
       let x = cell.property
         ? cell.property.src
@@ -149,6 +130,9 @@ export default {
     },
   },
   computed: {
+    getPlayer: function () {
+      return this.gameParsed.players.find((p) => p.id == this.player_id);
+    },
     // turn_player_id: function () {
     //     return this.gameParsed.turn_player_id;
     // },
@@ -198,7 +182,6 @@ body {
 }
 .empty-center {
   width: 100%;
-  height: 100%;
 }
 .cell-center img {
   width: inherit;

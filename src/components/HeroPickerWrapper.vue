@@ -59,15 +59,15 @@ export default {
         return;
       }
       this.error = null;
-      this.socket.send({ refresh: true });
+      this.socket.send({action:"refresh"});
     },
   },
   created() {
     //set csrf for all post request
     axios.defaults.headers.common["X-CSRF-TOKEN"] = window.yii.getCsrfToken();
-    this.socket.onmessageAuth = (e, res) => {
+    this.socket.addMessageCallback((e, res) => {
       console.log(res);
-      if (res.refresh)
+      if (res.action=="refresh")
         axios
           .get("/match/connect?json=true")
           .then((res) => {
@@ -76,11 +76,11 @@ export default {
             // this.$forceUpdate();
           })
           .catch((res) => console.log("Error REFRESH :>> ", res));
-      if(res.startGame)
+      if(res.action=="start-game")
         window.location.pathname="/got/game";
       if (res.data && res.data.users)
         this.users = this.usersTransform(res.data.users);
-    };
+    });
   },
   computed: {
     gameParsed: function () {

@@ -11,7 +11,9 @@ class GotController extends \yii\web\Controller
     public function actionGame()
     {
         $user=User::Me();
-        $game=$user->getLastGame()->joinWith(["players","players.hero","users"])->asArray()->one();
+        $game=$user->getLastGame()->joinWith(["players","players.hero","players.user"=>function($query){$query->select("id,username");}])->asArray()->one();
+        if(empty($game)||$game->isFinished)
+            return $this->redirect("/");
         $player=$user->getLastPlayer();
         $player_id=$player->id;
         $this->layout=false;

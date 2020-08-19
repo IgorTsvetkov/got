@@ -19,6 +19,7 @@ class m200806_105814_create_player_table extends Migration
             "user_id"=>$this->integer(),
             'slot' => $this->integer(),
             'position' => $this->integer(),
+            'money'=>$this->integer(),
         ]);
     }
 

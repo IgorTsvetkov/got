@@ -1,24 +1,35 @@
 export default class AuthSocket extends WebSocket {
-    constructor(...args) {
+    constructor(game_id,...args) {
         super(...args);
+        //не уверен что это должно быть здесь, но шо поделать  _(-_-)-/
+        this.uid=game_id;
+        if(!this.uid)
+            throw new Error("game_id is null or undefined");
         this._data = {};
         this._authInfo = null;
         this.onmessageAuth = null;
+        this._onmessageCallbacks=[];
         this.onbeforeSend = null;
         super.onmessage = (e) => {
             let parsedData = JSON.parse(e.data);
             if (typeof (parsedData) === "object") {
                 if (parsedData.hasOwnProperty("status code")) {
                     //401 не удалось авторизоваться
-                    if (parsedData["status code"] === 401) {
-                        this.authInfo = this.fetchAuthInfoAsync();
+                    if(parsedData["status code"] === 401) {
+                      this.authInfo = this.fetchAuthInfoAsync();
                         //пробуем снова отправить ту же информацию, но уже со свежими пользовательскими данными
-                        this.send(data);
+                      this.send(data);
                     }
                 }
-                this.onmessageAuth(e, parsedData);
+                // this.onmessageAuth(e, parsedData);
+                this._onmessageCallbacks.forEach(callback => {
+                    callback(e,parsedData);
+                });
             }
         }
+    }
+    addMessageCallback(callback){
+        this._onmessageCallbacks.push(callback);
     }
     async getauthInfo() {
         if (!this._authInfo)
@@ -39,6 +50,7 @@ export default class AuthSocket extends WebSocket {
         if (typeof data === "object") {
             this._data = data;
             this._data.authInfo = await this.getauthInfo();
+            this._data.uid=this.uid;
             if (await this.isNotGuest()) {
                 if (this.onbeforeSend && typeof (this.onbeforeSend) !== "function")
                     throw new Error(`onbeforeSend is not a function`);

@@ -67,7 +67,93 @@
     color:white;
 }
 .height[data-v-96ec91dc]{
-    font-size: 1.3em;
+    /* font-size: 1.3em; */
+    font-size: 1.2vw;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*need */
+.h-vh[data-v-2bc3d388] {
+  height: 24vw;
 }
 
 
@@ -112,7 +198,6 @@ body[data-v-5567ea9e] {
 }
 .empty-center[data-v-5567ea9e] {
   width: 100%;
-  height: 100%;
 }
 .cell-center img[data-v-5567ea9e] {
   width: inherit;

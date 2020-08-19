@@ -3,9 +3,9 @@ window.Vue=require('vue');
 import AuthSocket from "./js/AuthSocket";
 
 Vue.prototype.$socketStorage=new Map();
-Vue.prototype.$socketGet=function(action){
+Vue.prototype.$socketGet=function(game_id,action){
     if(!this.$socketStorage.has(action))
-      this.$socketStorage.set(action,new AuthSocket("ws://127.0.0.1:8989/"+action));
+      this.$socketStorage.set(action,new AuthSocket(game_id,"ws://127.0.0.1:8989/"+action));
    return this.socket=this.$socketStorage.get(action);
   }
 import HelloWorldComponent from './components/HelloWorldComponent.vue';

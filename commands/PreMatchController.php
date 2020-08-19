@@ -42,8 +42,13 @@ class PreMatchController extends SocketController
     public function actionSendToAll(){
         $this->startWebSocket("/send-to-all",function($user,$connection,$data,$worker){   
             foreach ($worker->connections as $connection) {
-                var_dump("connections count");
-                var_dump(count($worker->connections));
+                // var_dump($data->uid);
+                if(empty($connection->uid))
+                    $connection->uid=$data->uid;
+                var_dump($connection->uid);
+                // if($connection->uid=)
+                // var_dump("connections count");
+                // var_dump(count($worker->connections));
                 $connection->sendEncoded($data);
             }
         });
@@ -70,22 +75,22 @@ class PreMatchController extends SocketController
         //     $connection->sendEncoded([]);
         // });
     }
-    public function actionPick()
-    {
-        $this->startWebSocket("/pick",function($user,$connection,$data){
-            $gameSession=GameSession::findOne($user->session_id);
-            if($gameSession&&!isset($gameSession[$data->playerSlot])){
-                $gameSession[$data->playerSlot]=$user->id;
-                $gameSession->save();
-                $connection->sendEncoded(
-                [
-                    "gameSession"=>$gameSession->attributes,
-                ]);
-                return;
-            }
-            $connection->sendEncoded([]);
-        });
-    }
+    // public function actionPick()
+    // {
+    //     $this->startWebSocket("/pick",function($user,$connection,$data){
+    //         $gameSession=GameSession::findOne($user->session_id);
+    //         if($gameSession&&!isset($gameSession[$data->playerSlot])){
+    //             $gameSession[$data->playerSlot]=$user->id;
+    //             $gameSession->save();
+    //             $connection->sendEncoded(
+    //             [
+    //                 "gameSession"=>$gameSession->attributes,
+    //             ]);
+    //             return;
+    //         }
+    //         $connection->sendEncoded([]);
+    //     });
+    // }
 
     public function actionX(){
         $nextTurnPlayer=Player::find()->orderBy(["slot"=>SORT_ASC])->where([">","slot",4])->limit(1)->one();

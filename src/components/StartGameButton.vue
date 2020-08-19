@@ -18,7 +18,7 @@
                 if(this.action)
                     axios.post(this.action).then(res=>{
                         if(res.data.started){
-                            this.socket.send({startGame:"true"});
+                            this.socket.send({action:"start-game"});
                         }
                     });
             }
