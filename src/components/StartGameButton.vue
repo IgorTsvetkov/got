@@ -12,6 +12,10 @@
                 type: String,
                 default: ""
             },
+            game_id:{
+                type:Number,
+                default:undefined
+            }
         },
         methods: {
             startGame(e) {
@@ -25,8 +29,11 @@
         },
         data() {
             return {
-                socket:this.$socketGet("send-to-all"),
+                socket:undefined,
             }
+        },
+        beforeCreate () {
+            this.socket=this.$socketGet(this.game_id,"send-to-all");
         },
     }
 </script>

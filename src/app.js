@@ -13,7 +13,7 @@ import MapComponent from './components/MapComponent.vue';
 import HeroPickerComponent from './components/HeroPickerComponent.vue';
 import HeroPickerWrapper from './components/HeroPickerWrapper.vue';
 import StartGameButton from './components/StartGameButton.vue';
-import Test from './components/Test.vue';
+import FormAjax from './components/FormAjax.vue';
 
 const app=new Vue({
     el:'#app',
@@ -22,7 +22,7 @@ const app=new Vue({
         MapComponent,
         HeroPickerComponent,
         HeroPickerWrapper,
-        Test,
-        StartGameButton
+        StartGameButton,
+        FormAjax
     }
 })

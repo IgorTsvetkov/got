@@ -113,3 +113,15 @@ a.desc:after {
 .nav > li > form > button.logout:focus {
     outline: none;
 }
+.z-index-10{
+    z-index: 10;
+}
+.opacity-8{
+opacity: 0.8;
+}
+.opacity-6{
+    opacity: 0.6;
+    }
+.opacity-4{
+    opacity: 0.4;
+    }

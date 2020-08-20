@@ -49,8 +49,12 @@ export default {
     return {
       updatedGame: undefined,
       error: undefined,
-      socket:this.$socketGet("send-to-all"),
+      socket:undefined,
     };
+  },
+  beforeCreate () {
+    this.gameParsed = JSON.parse(this.game);
+    this.socket = this.$socketGet(this.gameParsed.id, "send-to-all");
   },
   methods: {
     refreshPageEveryone(e) {
@@ -60,12 +64,7 @@ export default {
       }
       this.error = null;
       this.socket.send({action:"refresh"});
-    },
-  },
-  created() {
-    //set csrf for all post request
-    axios.defaults.headers.common["X-CSRF-TOKEN"] = window.yii.getCsrfToken();
-    this.socket.addMessageCallback((e, res) => {
+          this.socket.addMessageCallback((e, res) => {
       console.log(res);
       if (res.action=="refresh")
         axios
@@ -81,6 +80,12 @@ export default {
       if (res.data && res.data.users)
         this.users = this.usersTransform(res.data.users);
     });
+    },
+  },
+  created() {
+    //set csrf for all post request
+    axios.defaults.headers.common["X-CSRF-TOKEN"] = window.yii.getCsrfToken();
+
   },
   computed: {
     gameParsed: function () {

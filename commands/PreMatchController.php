@@ -40,16 +40,17 @@ class PreMatchController extends SocketController
         });                
     }
     public function actionSendToAll(){
-        $this->startWebSocket("/send-to-all",function($user,$connection,$data,$worker){   
+        $this->startWebSocket("/send-to-all",function($user,$currentConnection,$data,$worker){   
             foreach ($worker->connections as $connection) {
                 // var_dump($data->uid);
-                if(empty($connection->uid))
-                    $connection->uid=$data->uid;
-                var_dump($connection->uid);
+                if(isset($connection->uid)&&$connection->uid==$data->uid){
+                    var_dump("uid");
+                    var_dump($connection->uid);
+                    $connection->sendEncoded($data);
+                }
                 // if($connection->uid=)
                 // var_dump("connections count");
                 // var_dump(count($worker->connections));
-                $connection->sendEncoded($data);
             }
         });
     }

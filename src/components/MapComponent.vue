@@ -34,7 +34,11 @@
             </div>
           </div>
           <div class="w-50 bg-primary d-flex flex-column h-100 p-2">
-            <chat :from="getPlayer.user.username" :from_img="getPlayer.hero.src"></chat>
+            <chat 
+            :from="getPlayer.user.username" 
+            :from_img="getPlayer.hero.src"
+            :game_id="+gameParsed.id"
+            ></chat>
           </div>
         </div>
       </div>

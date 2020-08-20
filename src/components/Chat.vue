@@ -46,13 +46,25 @@ export default {
       type: String,
       default: undefined,
     },
+    game_id:{
+      type:Number,
+      default:undefined
+    }
   },
   data() {
     return {
-      socket: this.$socketGet("send-to-all"),
+      socket: undefined,
       message: "",
       messages: [],
     };
+  },
+  beforeMount () {
+    this.socket=this.$socketGet(this.game_id,"send-to-all");
+    this.socket.addMessageCallback((e, parsedData) => {
+      if (parsedData.action && parsedData.action == "chat") {
+        this.messages.unshift(parsedData.data);
+      }
+    });
   },
   methods: {
     sendMessage() {
@@ -66,13 +78,6 @@ export default {
       });
       this.message = "";
     },
-  },
-  created() {
-    this.socket.addMessageCallback((e, parsedData) => {
-      if (parsedData.action && parsedData.action == "chat") {
-        this.messages.unshift(parsedData.data);
-      }
-    });
   },
 };
 </script>

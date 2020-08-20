@@ -14,7 +14,7 @@ $this->title = 'Создать игру';
         <div class="bg-secondary">
                 <hero-picker-wrapper current_user_id="<?=Yii::$app->user->id?>" game='<?=json_encode($game)?>'>
                 <?php if ($game['leader_user_id'] == Yii::$app->user->id) : ?>
-                    <start-game-button action="/match/start?game_id=<?=$game["id"]?>">Начать игру</start-game-button>
+                    <start-game-button game_id="<?=$game->id?>" action="/match/start?game_id=<?=$game["id"]?>">Начать игру</start-game-button>
                 <?php endif; ?>
                 </hero-picker-wrapper>
         </div>

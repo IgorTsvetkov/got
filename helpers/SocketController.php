@@ -17,6 +17,8 @@ class SocketController extends Controller
         $worker->onMessageDecoded = function (MyTcpConnection $connection, $data) use ($worker,$onMessageCallback) {
             // $user=UserSocket::getUserByAuthInfo($data->authInfo);
             // if ($user) {
+                if(empty($connection->uid)&&isset($data->uid))
+                    $connection->uid=$data->uid;
                 $user=null;
                 $onMessageCallback($user,$connection,$data,$worker);
             // } else {

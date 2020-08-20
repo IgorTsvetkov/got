@@ -10,17 +10,20 @@ export default class AuthSocket extends WebSocket {
         this.onmessageAuth = null;
         this._onmessageCallbacks=[];
         this.onbeforeSend = null;
+        this.onopen=function(){
+            this.send({uid:this.uid});
+        }
         super.onmessage = (e) => {
             let parsedData = JSON.parse(e.data);
             if (typeof (parsedData) === "object") {
-                if (parsedData.hasOwnProperty("status code")) {
-                    //401 не удалось авторизоваться
-                    if(parsedData["status code"] === 401) {
-                      this.authInfo = this.fetchAuthInfoAsync();
-                        //пробуем снова отправить ту же информацию, но уже со свежими пользовательскими данными
-                      this.send(data);
-                    }
-                }
+                // if (parsedData.hasOwnProperty("status code")) {
+                //     //401 не удалось авторизоваться
+                //     if(parsedData["status code"] === 401) {
+                //       this.authInfo = this.fetchAuthInfoAsync();
+                //         //пробуем снова отправить ту же информацию, но уже со свежими пользовательскими данными
+                //       this.send(data);
+                //     }
+                // }
                 // this.onmessageAuth(e, parsedData);
                 this._onmessageCallbacks.forEach(callback => {
                     callback(e,parsedData);
@@ -46,23 +49,22 @@ export default class AuthSocket extends WebSocket {
         }
         return;
     }
-    async send(data = {}) {
+    send(data = {}) {
         if (typeof data === "object") {
             this._data = data;
-            this._data.authInfo = await this.getauthInfo();
+            // this._data.authInfo = await this.getauthInfo();
             this._data.uid=this.uid;
-            if (await this.isNotGuest()) {
+            // if (await this.isNotGuest()) {
                 if (this.onbeforeSend && typeof (this.onbeforeSend) !== "function")
                     throw new Error(`onbeforeSend is not a function`);
                 if (this.onbeforeSend && typeof (this.onbeforeSend) === "function")
                     this.onbeforeSend({ data: this._data });
                 let stringify = JSON.stringify(this._data);
                 super.send(stringify);
-            }
-            else window.location.href = "/site/login";
+            // }
+            // else window.location.href = "/site/login";
         }
         else throw new Error("type of sended data is "+typeof(data)+" need Object");
-
     }
     async fetchAuthInfoAsync() {
         try {
