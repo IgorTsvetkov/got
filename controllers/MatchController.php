@@ -49,10 +49,25 @@ class MatchController extends \yii\web\Controller
     public function actionIndex()
     {
         $games = GameSession::find()
+            ->select("game_session.id,game_session.name,user.username,COUNT(player.id) as count,game_session.created_at,game_session.started_at,game_session.finished_at")
             ->where(["started_at" => null])
             ->orderBy(["created_at" => SORT_DESC])
-            ->with("users")
+            ->joinWith(
+                [
+                    "leader"=>function($query){
+                $query->select("id,username");
+            },
+            "players"=>function($query){
+                $query->select("id,game_session_id");
+            }])
+            ->groupBy("game_session.id")
+            ->asArray()
             ->all();
+        VarDumper::dump($games,10,true);
+        // $games = GameSession::find()
+        //     ->where(["started_at" => null])
+        //     ->orderBy(["created_at" => SORT_DESC])
+        //     ->all();
         return $this->render('index', compact("games"));
     }
     public function actionCreateLobby()
@@ -92,7 +107,7 @@ class MatchController extends \yii\web\Controller
         return $this->render('create', compact("game"));
     }
 
-    public function actionLeft(int $game_id)
+    public function actionLeave(int $game_id)
     {
         $user = User::me();
         $game = $user->getLastGame()->one();
@@ -108,9 +123,9 @@ class MatchController extends \yii\web\Controller
         $data = null;
         if ($game->IsStarted) {
             $data = ["error" => ["message" => "you can't change slot after game have been started"]];
-        } elseif (Player::find(["game_session_id" => $game->id])->where(["slot" => $slot])->limit(1)->one()) {
+        } elseif (Player::find()->where(["game_session_id" => $game->id])->andWhere(["slot" => $slot])->limit(1)->one()) {
             $data = ["error" => ["message" => "Этот слот уже занят игроком"]];
-        } elseif (Player::find(["game_session_id" => $game->id])->where(["slot" => $slot])->limit(1)->one() === null) {
+        } elseif (Player::find()->where(["game_session_id" => $game->id])->andWhere(["slot" => $slot])->limit(1)->one() === null) {
             $player = $user->getLastPlayer();
             $player->slot = $slot;
             $player->save();

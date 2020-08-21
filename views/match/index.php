@@ -3,7 +3,7 @@
 use app\models\GameSession;
 use yii\helpers\VarDumper;
 use yii\widgets\DetailView;
-
+VarDumper::dump($models[0],10,true);
 $this->title = 'Список игр';
 ?>
 <h1>Список игр</h1>
@@ -21,8 +21,8 @@ $this->title = 'Список игр';
         <tbody>
             <?foreach ($games as $game):?>
             <tr>
-                <?foreach ($game->getAttributes() as $attr):?>
-                <td> <?= $attr ?> </td>
+                <?foreach (GameSession::instance()->attributeLabels() as $key=>$label):?>
+                <td> <?= $game->getAttribute($key) ?> </td>
                 <?endforeach?>
                 <td><a href="/match/join?game_id=<?=$game->id?>">Присоединиться</a></td>
             </tr>

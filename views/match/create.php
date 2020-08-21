@@ -6,6 +6,7 @@ use app\models\GameSession;
 use yii\helpers\Html;
 use yii\helpers\VarDumper;
 $this->title = 'Создать игру';
+// VarDumper::dump($game,10,true);
 ?>
 <div>
     <h1><?= Html::encode($this->title) ?></h1>
@@ -19,5 +20,5 @@ $this->title = 'Создать игру';
                 </hero-picker-wrapper>
         </div>
     </form>
-    <a href="/match/left?game_id=<?= $game_id ?>">Покинуть</a>
+    <a href="/match/leave?game_id=<?= $game["id"] ?>">Покинуть</a>
 </div>

@@ -65,20 +65,10 @@ class SiteController extends Controller
     public function actionIndex()
     {
         $this->layout=false;
-        // if (!Yii::$app->user->isGuest) {
-        //     return $this->goHome();
-        // }
-
-        $model = new LoginForm();
-        // if ($model->load(Yii::$app->request->post()) && $model->login()) {
-        //     return $this->goBack();
-        // }
-
-        $model->password = '';
-        // return $this->render('login', [
-        //     'model' => $model,
-        // ]);
-        return $this->render('index',compact("model"));
+        if (!Yii::$app->user->isGuest) {
+            return $this->redirect("/match");
+        }
+        return $this->render('index');
     }
 
     /**
@@ -88,16 +78,12 @@ class SiteController extends Controller
      */
     public function actionLogin()
     {
-        if (!Yii::$app->user->isGuest) {
-            return $this->goHome();
-        }
-
         $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
+        if ($model->load(Yii::$app->request->post(),"") && $model->login()) {
+            return $this->asJson(["redirect"=>"/match"]);
         }
-
         $model->password = '';
+        $this->layout = false;
         return $this->render('login', [
             'model' => $model,
         ]);
@@ -105,7 +91,7 @@ class SiteController extends Controller
     public function actionRegistration()
     {
         $model = new SignUpForm();
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+        if ($model->load(Yii::$app->request->post(),"") && $model->validate()) {
             $user=new User();
             $user->username=$model->username;
             $user->passwordHash=Yii::$app->security->generatePasswordHash($model->password);
@@ -114,8 +100,9 @@ class SiteController extends Controller
 
             $auth=Yii::$app->authManager;
             Yii::$app->user->login($user);
-            return $this->goBack();
+            return $this->asJson(["redirect"=>"/match"]);
         }
+        $this->layout=false;
         return $this->render('registration', [
             'model' => $model,
         ]);

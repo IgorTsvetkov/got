@@ -47,14 +47,13 @@ export default {
   },
   data() {
     return {
-      updatedGame: undefined,
       error: undefined,
       socket:undefined,
+      gameParsed:undefined
     };
   },
   beforeCreate () {
-    this.gameParsed = JSON.parse(this.game);
-    this.socket = this.$socketGet(this.gameParsed.id, "send-to-all");
+
   },
   methods: {
     refreshPageEveryone(e) {
@@ -71,7 +70,7 @@ export default {
           .get("/match/connect?json=true")
           .then((res) => {
             console.log("new data after update");
-            this.updatedGame = res.data;
+            this.gameParsed = res.data;
             // this.$forceUpdate();
           })
           .catch((res) => console.log("Error REFRESH :>> ", res));
@@ -83,15 +82,17 @@ export default {
     },
   },
   created() {
+        this.gameParsed = JSON.parse(this.game);
+    this.socket = this.$socketGet(this.gameParsed.id, "send-to-all");
     //set csrf for all post request
     axios.defaults.headers.common["X-CSRF-TOKEN"] = window.yii.getCsrfToken();
 
   },
   computed: {
-    gameParsed: function () {
-      if (this.updatedGame) return this.updatedGame;
-      return JSON.parse(this.game);
-    },
+    // gameParsed: function () {
+    //   if (this.updatedGame) return this.updatedGame;
+    //   return JSON.parse(this.game);
+    // },
     players: function () {
       const maxPlayers = 6;
       let sorted = this.gameParsed.players.sort((a, b) => a.sort - b.sort);

@@ -8,40 +8,34 @@ use yii\helpers\Html;
 use yii\bootstrap4\ActiveForm;
 
 $this->title = 'Login';
-$this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="site-login">
-    <h1><?= Html::encode($this->title) ?></h1>
-
-    <p>Please fill out the following fields to login:</p>
-
-    <?php $form = ActiveForm::begin([
-        'id' => 'login-form',
-        'layout' => 'horizontal',
-        'fieldConfig' => [
-            'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
-            'labelOptions' => ['class' => 'col-lg-1 control-label'],
-        ],
-    ]); ?>
-
-        <?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
-
-        <?= $form->field($model, 'password')->passwordInput() ?>
-
-        <?= $form->field($model, 'rememberMe')->checkbox([
-            'template' => "<div class=\"col-lg-offset-1 col-lg-3\">{input} {label}</div>\n<div class=\"col-lg-8\">{error}</div>",
-        ]) ?>
-
-        <div class="form-group">
-            <div class="col-lg-offset-1 col-lg-11">
-                <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+<form action="/site/login" method="POST" class="form-signin">
+    <h1 class="h3 mb-3 font-weight-normal text-center">Вход</h1>
+    <div>
+        <input type="hidden" name="<?= Yii::$app->request->csrfParam ?>" value="<?= Yii::$app->request->csrfToken ?>">
+        <label for="inputEmail" class="sr-only">Имя пользователя</label>
+        <!-- <input type="email" id="inputEmail" class="form-control" placeholder="Email" required="" autofocus=""> -->
+        <input placeholder="<?= $model->getAttributeLabel("username") ?>" value="<?= $model->username ?>" type="text" name="username" class="form-control" autofocus required>
+        <? if ($model->errors["username"]) : ?>
+            <div class="error">
+                <?= Html::error($model, "username") ?>
             </div>
-        </div>
-
-    <?php ActiveForm::end(); ?>
-
-    <div class="col-lg-offset-1" style="color:#999;">
-        You may login with <strong>admin/admin</strong> or <strong>demo/demo</strong>.<br>
-        To modify the username/password, please check out the code <code>app\models\User::$users</code>.
+        <? endif; ?>
+        <label for="inputPassword" class="sr-only">Пароль</label>
+        <input id="inputPassword" type="password" placeholder="<?= $model->getAttributeLabel("password") ?>" value="<?= $model->password ?>" type="text" name="password" class="form-control" autofocus required>
+        <? if ($model->errors["password"]) : ?>
+            <div class="text-danger">
+                <?= Html::error($model, "password") ?>
+            </div>
+        <? endif; ?>
     </div>
-</div>
+        <div class="checkbox mb-3 d-flex justify-content-center">
+            <label>
+                <input type="checkbox" value="remember-me"> Запомнить меня
+            </label>
+        </div>
+        <button class="btn btn-md btn-primary btn-block">Войти</button>
+        <div class="text-center">
+            <a href="/"class="dark-link text-black">Назад</a>
+        </div>
+</form>

@@ -87,6 +87,7 @@ class GameSession extends \yii\db\ActiveRecord
         return [
             'id' => 'Id матча',
             'name'=>"Название",
+            'leader.username'=>"Имя пользователя",
             'created_at' => 'Комната создана',
             'started_at' => 'Игра начата',
             'finished_at' => 'Игра закончена',
@@ -102,7 +103,10 @@ class GameSession extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Player::className(), ['game_session_id' => 'id']);
     }
-
+    public function getLeader()
+    {
+        return $this->hasOne(User::className(), ['id' => 'leader_user_id']);
+    }
     /**
      * Gets query for [[Users]].
      *

@@ -28,10 +28,12 @@
       </div>
       <div class="empty-center">
         <div class="w-100 h-100 d-flex bg-warning">
-          <div class="w-50 h-inherit d-flex justify-content-center align-items-center">
+          <div class="w-50 h-inherit d-flex flex-column justify-content-center align-items-center">
             <div v-if="this.player_id==this.gameParsed.turn_player_id">
               <button class="btn btn-primary" @click="move()">Бросить кубик</button>
             </div>
+
+            <a :href="'/match/leave?game_id='+gameParsed.id">Покинуть игру</a>
           </div>
           <div class="w-50 bg-primary d-flex flex-column h-100 p-2">
             <chat 
