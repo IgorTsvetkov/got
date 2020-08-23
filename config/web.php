@@ -54,14 +54,6 @@ $config = [
             'enablePrettyUrl' => true,
             // 'enableStrictParsing' => true,
             'showScriptName' => false,
-            'rules' => [
-                [
-                    'class' => 'yii\rest\UrlRule', 'controller' => 'user',
-                'class' => 'yii\rest\UrlRule', 'controller' => 'property',
-                'class' => 'yii\rest\UrlRule', 'controller' => 'cell'
-            ],
-
-            ],
         ],
     ],
     'params' => $params,

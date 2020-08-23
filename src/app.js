@@ -14,6 +14,7 @@ import HeroPickerComponent from './components/HeroPickerComponent.vue';
 import HeroPickerWrapper from './components/HeroPickerWrapper.vue';
 import StartGameButton from './components/StartGameButton.vue';
 import FormAjax from './components/FormAjax.vue';
+import PropertyCard from './components/PropertyCard.vue';
 
 const app=new Vue({
     el:'#app',
@@ -23,6 +24,7 @@ const app=new Vue({
         HeroPickerComponent,
         HeroPickerWrapper,
         StartGameButton,
+        PropertyCard,
         FormAjax
     }
 })

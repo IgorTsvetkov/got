@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\Cell;
 use app\models\User;
 use app\models\Player;
 use app\models\GameSession;
@@ -47,7 +48,12 @@ class GotController extends \yii\web\Controller
         $player->position %= 40;
         $player->update();
 
-        $nextTurnPlayer = Player::find()->orderBy(["slot" => SORT_ASC])->where([">", "slot", $player->slot])->limit(1)->one();
+        $nextTurnPlayer = Player::find()
+        ->orderBy(["slot" => SORT_ASC])
+        ->where(["game_session_id"=>$player->game_session_id])
+        ->andWhere([">", "slot", $player->slot])
+        ->limit(1)
+        ->one();
         if (empty($nextTurnPlayer))
             $nextTurnPlayer = Player::find()->orderBy(["slot" => SORT_ASC])->limit(1)->one();
         $game = GameSession::findOne($player->game_session_id);

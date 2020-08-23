@@ -19,8 +19,8 @@ use yii\behaviors\BlameableBehavior;
  * @property int|null $money
  *
 
- * @property GameSession[] $gameSessions
- * @property User[] $users
+ * @property GameSession $gameSession
+ * @property User $user
  */
 class Player extends \yii\db\ActiveRecord
 {    
@@ -31,8 +31,10 @@ class Player extends \yii\db\ActiveRecord
         $player->slot=$game->getFirstEmptySlot();
         $player->user_id=$user->id;
         $player->game_session_id=$game->id;
+        $player->money=200000;
         return $player;
     }
+
     function init()
     {
         $this->position=0;
