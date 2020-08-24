@@ -37,7 +37,7 @@ tests/_support/_generated
 #VUE-CLI
 .DS_Store
 node_modules
-/dist
+/git/dist
 
 # local env files
 .env.local
