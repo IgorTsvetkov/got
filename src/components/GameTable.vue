@@ -63,7 +63,7 @@ export default {
           this.$axios.get(e.target.href)
           .then(res => {
               this.socketGlobal.send(res.data);
-            //   window.location.pathname="/match/connect";
+              window.location.pathname="/match/connect";
           })
           .catch(err => {
               console.error(err); 
