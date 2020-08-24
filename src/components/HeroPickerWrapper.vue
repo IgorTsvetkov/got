@@ -18,18 +18,23 @@
           ></hero-picker-component>
         </div>
         <div v-else>
-          <hero-picker-component :slot_index="key"  @slotChanged="refreshPageEveryone"></hero-picker-component>
+          <hero-picker-component :slot_index="key" @slotChanged="refreshPageEveryone"></hero-picker-component>
         </div>
       </div>
     </div>
+    <div class="d-flex">
     <slot></slot>
+    <div class="d-flex justify-content-center align-items-center">
+    <a class="btn btn-danger" :href="'/match/leave?game_id='+gameParsed.id" @click.prevent="leave">Покинуть</a>
+    </div>
+    </div> 
+
     <div v-if="error" class="lead bg-danger text-light border shadow p-20">{{error.message}}</div>
   </div>
 </template>
 
 <script>
 
-import axios from "axios";
 import HeroPickerComponent from "./HeroPickerComponent.vue";
 export default {
   components: {
@@ -40,58 +45,64 @@ export default {
       type: String,
       default: "",
     },
-    current_user_id:{
-      type:String,
-      deault:""
-    }
+    current_user_id: {
+      type: String,
+      deault: "",
+    },
   },
   data() {
     return {
-      updatedGame: undefined,
       error: undefined,
-      socket:undefined,
+      socket: undefined,
+      gameParsed: undefined,
     };
   },
-  beforeCreate () {
-    this.gameParsed = JSON.parse(this.game);
-    this.socket = this.$socketGet(this.gameParsed.id, "send-to-all");
-  },
+  beforeCreate() {},
   methods: {
+    async leave(e){
+      let result= await this.$axios.post(e.target.href);
+      if(result){
+        this.refreshPageEveryone(result.data);
+        window.location.pathname="/match";
+      }
+    },
     refreshPageEveryone(e) {
-      if (e.data.error) {
+      if (e&&e.data&&e.data.error) {
         this.error = e.data.error;
         return;
       }
       this.error = null;
-      this.socket.send({action:"refresh"});
-          this.socket.addMessageCallback((e, res) => {
-      console.log(res);
-      if (res.action=="refresh")
-        axios
-          .get("/match/connect?json=true")
-          .then((res) => {
-            console.log("new data after update");
-            this.updatedGame = res.data;
-            // this.$forceUpdate();
-          })
-          .catch((res) => console.log("Error REFRESH :>> ", res));
-      if(res.action=="start-game")
-        window.location.pathname="/got/game";
-      if (res.data && res.data.users)
-        this.users = this.usersTransform(res.data.users);
-    });
+      this.socket.send({ action: "refresh" });
     },
   },
   created() {
-    //set csrf for all post request
-    axios.defaults.headers.common["X-CSRF-TOKEN"] = window.yii.getCsrfToken();
-
+    this.gameParsed = JSON.parse(this.game);
+    this.socket = this.$socketGet(this.gameParsed.id, "send-local-to-all");
+    this.socket.addMessageCallback((e,parsedData)=>{
+      if(parsedData.action&&parsedData.action==="join"){
+        this.refreshPageEveryone(e);
+      }
+    });
+    this.socket.addMessageCallback((e, res) => {
+        console.log(res);
+        if (res.action == "refresh")
+          this.$axios
+            .get("/match/connect?json=true")
+            .then((res) => {
+              console.log("new data after update");
+              this.gameParsed = res.data;
+              // this.$forceUpdate();
+            })
+            .catch((res) => console.log("Error REFRESH :>> ", res));
+        if (res.data && res.data.users)
+          this.users = this.usersTransform(res.data.users);
+      });
   },
   computed: {
-    gameParsed: function () {
-      if (this.updatedGame) return this.updatedGame;
-      return JSON.parse(this.game);
-    },
+    // gameParsed: function () {
+    //   if (this.updatedGame) return this.updatedGame;
+    //   return JSON.parse(this.game);
+    // },
     players: function () {
       const maxPlayers = 6;
       let sorted = this.gameParsed.players.sort((a, b) => a.sort - b.sort);

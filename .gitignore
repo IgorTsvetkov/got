@@ -37,8 +37,8 @@ tests/_support/_generated
 #VUE-CLI
 .DS_Store
 node_modules
-/git/dist
-
+/dist
+/web/dist
 # local env files
 .env.local
 .env.*.local
@@ -48,3 +48,4 @@ npm-debug.log*
 
 # Editor directories and files
 .vscode
+

@@ -1,6 +1,7 @@
 <?php
 
 use app\assets\AppAsset;
+use yii\helpers\VarDumper;
 
 AppAsset::register($this);
 
@@ -14,7 +15,7 @@ AppAsset::register($this);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="/web/js/main.css">
+    <link rel="stylesheet" href="/web/dist/main.css">
     <?php $this->registerCsrfMetaTags() ?>
     <?php $this->head() ?>
 </head>
@@ -23,12 +24,15 @@ AppAsset::register($this);
     <?php $this->beginBody() ?>
 
     <div id="app">
-        <map-component player_id='<?=$player_id?>' game='<?= json_encode($game) ?>'></map-component>
+        <map-component 
+        player_id='<?=$player_id?>' 
+        game-string='<?= json_encode($game)?>'
+        ></map-component>
     </div>
     <?php $this->endBody() ?>
 
 </body>
-<script src="/web/js/main.js"></script>
+<script src="/web/dist/main.js"></script>
 
 </html>
 <?php $this->endPage() ?>

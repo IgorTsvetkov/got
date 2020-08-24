@@ -3,46 +3,19 @@
 namespace app\controllers;
 
 use Yii;
-use yii\web\Response;
-use yii\rest\ActiveController;
-use yii\data\ActiveDataProvider;
+use app\models\Cell;
+use Error;
+use yii\web\Controller;
 
-class CellController extends ActiveController
+
+class CellController extends Controller
 {
-    public $modelClass="app\models\Cell";
-    public function behaviors(): array
+    public function actionIndex($json=true)
     {
-        $behaviors = parent::behaviors();
-        $behaviors['corsFilter'] = [
-            'class' => \yii\filters\Cors::class,
-            'cors' => [
-                'Origin' => [Yii::$app->request->getOrigin()],
-                'Access-Control-Allow-Credentials' => true,
-            ],
-        ];
-        return $behaviors;
-    }
-    public function actions()
-    {
-        $actions['index'] = [
-
-            'class' => 'yii\rest\IndexAction',
-        
-            'modelClass' => $this->modelClass,
-        
-            'prepareDataProvider' => function () {
-        
-                return new ActiveDataProvider([
-        
-                    'query' => $this->modelClass::find(),
-        
-                    'pagination' => false,
-        
-                ]);
-        
-            },
-        
-        ];
-        return $actions;
+        if($json){
+            $cells=Cell::find()->joinWith(explode(",","property.group,tax,utility,event"))->asArray()->all();
+            return $this->asJson($cells);
+        }
+        throw new Error("unhundled action behavior");
     }
 }

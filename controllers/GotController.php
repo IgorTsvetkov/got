@@ -2,12 +2,14 @@
 
 namespace app\controllers;
 
+use app\models\Cell;
 use app\models\User;
 use app\models\Player;
 use app\models\GameSession;
 use yii\filters\AccessControl;
+use app\controllers\MainController;
 
-class GotController extends \yii\web\Controller
+class GotController extends MainController
 {
     public function behaviors()
     {
@@ -47,12 +49,10 @@ class GotController extends \yii\web\Controller
         $player->position %= 40;
         $player->update();
 
-        $nextTurnPlayer = Player::find()->orderBy(["slot" => SORT_ASC])->where([">", "slot", $player->slot])->limit(1)->one();
-        if (empty($nextTurnPlayer))
-            $nextTurnPlayer = Player::find()->orderBy(["slot" => SORT_ASC])->limit(1)->one();
+        $nextTurnPlayer = $player->getNextTurnPlayer();
         $game = GameSession::findOne($player->game_session_id);
         $game->turn_player_id = $nextTurnPlayer->id;
         $game->update();
-        return $this->asJson(["position" => $player->position, "turn_player_id" => $game->turn_player_id]);
+        return $this->asSocketJson("move",["player_id"=>$player->id,"position" => $player->position, "turn_player_id" => $game->turn_player_id]);
     }
 }

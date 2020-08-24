@@ -35,14 +35,13 @@ class GameSession extends \yii\db\ActiveRecord
         $freeSlots=array_diff($possibleSlot,$filledSlot);
         return array_key_first($freeSlots);
     }
-    public function removeUser($user)
+    public function removeUser($user_id)
     {
-        $junction=UserGameSession::findOne(["user_id"=>$user->id,"game_session_id"=>$this->id]);
+        $junction=UserGameSession::find()->where(["user_id"=>$user_id,"game_session_id"=>$this->id])->limit(1)->one();
+        // var_dump($junction);
         $junction->delete();
-        // $junction->save();
-        $player=Player::find()->where(["user_id"=>$user->id])->orderBy(['game_session_id'=>SORT_DESC])->limit(1)->one();
+        $player=Player::find()->where(["user_id"=>$user_id])->orderBy(['game_session_id'=>SORT_DESC])->limit(1)->one();
         $player->delete();
-        // $player->save();
     }
     public function getIsStarted():bool{
         return $this->started_at!=null?true:false;
@@ -87,6 +86,7 @@ class GameSession extends \yii\db\ActiveRecord
         return [
             'id' => 'Id матча',
             'name'=>"Название",
+            'leader.username'=>"Имя пользователя",
             'created_at' => 'Комната создана',
             'started_at' => 'Игра начата',
             'finished_at' => 'Игра закончена',
@@ -102,7 +102,10 @@ class GameSession extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Player::className(), ['game_session_id' => 'id']);
     }
-
+    public function getLeader()
+    {
+        return $this->hasOne(User::className(), ['id' => 'leader_user_id']);
+    }
     /**
      * Gets query for [[Users]].
      *
@@ -120,5 +123,5 @@ class GameSession extends \yii\db\ActiveRecord
     public function getUserGameSessions()
     {
         return $this->hasMany(UserGameSession::className(), ['game_session_id' => 'id']);
-    }    
+    } 
 }

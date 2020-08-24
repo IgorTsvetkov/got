@@ -67,4 +67,11 @@ class Property extends \yii\db\ActiveRecord
             'homes_inn_cost' => 'Homes Inn Cost',
         ];
     }
+    public function getCell()
+    {
+        return $this->hasOne(Cell::class,["property_id"=>"id"]);
+    }
+    public function getPropertyGameStatuses(){
+        return $this->hasMany(PropertyGameStatus::class,["property_id"=>"id"]);
+    }
 }

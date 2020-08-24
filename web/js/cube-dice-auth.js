@@ -1,12 +1,11 @@
 window.addEventListener("DOMContentLoaded",()=>{
-    let loginBtn=document.getElementById("login");
     login.addEventListener("click",showAuth);
-    // showAuth();
+    registration.addEventListener("click",showAuth);
 });
 function showAuth(e){
     let cube=document.getElementsByClassName("cube")[0];
     cube.classList.toggle("auth-animation");
-    let elementsToHide=document.querySelectorAll(".auth-front,#login-form-wrapper");
+    let elementsToHide=document.querySelectorAll(".auth-front");
     console.log('elementsToHide :>> ', elementsToHide);
     elementsToHide.forEach(el=>el.classList.toggle("d-none"));
 }

@@ -5,6 +5,7 @@ $db = require __DIR__ . '/db.php';
 
 $config = [
     'id' => 'basic',
+    'language'=>'ru-RU',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'aliases' => [
@@ -52,16 +53,7 @@ $config = [
         'db' => $db,
         'urlManager' => [
             'enablePrettyUrl' => true,
-            // 'enableStrictParsing' => true,
             'showScriptName' => false,
-            'rules' => [
-                [
-                    'class' => 'yii\rest\UrlRule', 'controller' => 'user',
-                'class' => 'yii\rest\UrlRule', 'controller' => 'property',
-                'class' => 'yii\rest\UrlRule', 'controller' => 'cell'
-            ],
-
-            ],
         ],
     ],
     'params' => $params,

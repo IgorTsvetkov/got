@@ -20,7 +20,7 @@ AppAsset::register($this);
   <meta charset="<?= Yii::$app->charset ?>">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="/web/js/main.css">
+  <link rel="stylesheet" href="/web/dist/main.css">
 
   <?php $this->registerCsrfMetaTags() ?>
   <title><?= Html::encode($this->title) ?></title>
@@ -75,7 +75,7 @@ AppAsset::register($this);
   </div>
   <?php $this->endBody() ?>
 
-  <script src="/web/js/main.js"></script>
+  <script src="/web/dist/main.js"></script>
 </body>
 
 </html>

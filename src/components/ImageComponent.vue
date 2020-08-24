@@ -1,5 +1,5 @@
 <template>
-    <div class="cell-wrapper f f-column">
+    <div class="cell-wrapper d-flex flex-column justify-content-center ">
         <div v-if="this.price" class="text-center height" :class="[price_bgcolor]">{{this.price}}</div>
         <img :src="this.src" alt="">
     </div>
@@ -31,16 +31,6 @@
 }
 .cell-wrapper img,.cell-center img{
     width: inherit;
-}
-.f{
-    display: flex;
-}
-.f-center{
-    justify-content: center;
-    align-items: center;
-}
-.f-column{
-    flex-direction: column;
 }
 .price{
     background:white;

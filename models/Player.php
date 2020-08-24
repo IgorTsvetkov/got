@@ -19,11 +19,27 @@ use yii\behaviors\BlameableBehavior;
  * @property int|null $money
  *
 
- * @property GameSession[] $gameSessions
- * @property User[] $users
+ * @property GameSession $gameSession
+ * @property User $user
  */
 class Player extends \yii\db\ActiveRecord
-{    
+{
+    public function getNextTurnPlayer()
+    {
+        $nextPlayer=Player::find()
+        ->orderBy(["slot" => SORT_ASC])
+        ->where(["game_session_id"=>$this->game_session_id])
+        ->andWhere([">", "slot", $this->slot])
+        ->limit(1)
+        ->one();
+        if(isset($nextPlayer))
+            return $nextPlayer;        
+        $firstPlayer = Player::find()->orderBy(["slot" => SORT_ASC])
+        ->where(["game_session_id"=>$this->game_session_id])
+        ->limit(1)
+        ->one();
+        return $firstPlayer;
+    }    
     public static function createAndLink(GameSession $game,User $user){
         $game->link("users",$user);
         $player=new Player();
@@ -31,8 +47,10 @@ class Player extends \yii\db\ActiveRecord
         $player->slot=$game->getFirstEmptySlot();
         $player->user_id=$user->id;
         $player->game_session_id=$game->id;
+        $player->money=200000;
         return $player;
     }
+
     function init()
     {
         $this->position=0;

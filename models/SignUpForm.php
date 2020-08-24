@@ -21,4 +21,12 @@ class SignUpForm extends Model{
             ["password","compare"]
         ];
     }
+    public function attributeLabels()
+    {
+        return[
+            "username"=>"Логин",
+            "password"=>"Пароль",
+            "password_repeat"=>"Повторите пароль",
+        ];
+    }
 }
