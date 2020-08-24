@@ -12,7 +12,7 @@ AppAsset::register($this);
 <!DOCTYPE html>
 <html lang="<?= Yii::$app->language ?>">
 
-<link rel="stylesheet" href="/web/js/main.css">
+<link rel="stylesheet" href="/web/dist/main.css">
 
 <head>
     <meta charset="UTF-8">
@@ -118,7 +118,7 @@ AppAsset::register($this);
         </div>
     </div>
 
-    <script src="/web/js/main.js"></script>
+    <script src="/web/dist/main.js"></script>
     <script src="/web/js/cube-dice-auth.js"></script>
 
     <?php $this->endBody() ?>

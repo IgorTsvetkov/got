@@ -38,7 +38,7 @@ tests/_support/_generated
 .DS_Store
 node_modules
 /dist
-
+/web/dist
 # local env files
 .env.local
 .env.*.local
@@ -48,3 +48,4 @@ npm-debug.log*
 
 # Editor directories and files
 .vscode
+
