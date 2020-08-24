@@ -21,10 +21,6 @@ class Cell extends \yii\db\ActiveRecord
     {
         return 'cell';
     }
-    public function extraFields()
-    {
-        return ['property','event','tax','utility'];
-    }
     public function getProperty()
     {
         return $this->hasOne(Property::class,["id"=>"property_id"]);

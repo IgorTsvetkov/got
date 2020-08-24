@@ -1,46 +1,36 @@
 <template>
-  <div class="f f-center">
+  <div class="d-flex align-items-center justify-content-center">
     <div class="grid">
-      <div class="relative f" v-for="(cell,index) in cells" :key="index">
-        <!-- {{gameParsed}} -->
-        <div class="absolute">
-          <div v-for="(player,key) in gameParsed.players" :key="key">
-            <div v-if="cell.position==player.position">
-              <div class="d-flex figurine">
-                <img height="100%" :src="player.hero.src" />
-                <!-- <div class="bg-danger">position:{{player.position}}</div> -->
-              </div>
+      <div v-for="(cell,index) in cells" :key="index">
+        <!-- {{game}} -->
+        <cell :cell="cell" :players="game.players"></cell>
+      </div>
+      <div class="cell-center position-relative">
+        <img src="/web/images/center.jpg" alt />
+        <div
+          class="d-flex justify-content-center align-items-center w-100 h-100 position-absolute top-0"
+        >
+          <div>
+            <div v-for="player in game.players" :key="player.id">
+              <div class="bg-dark text-light lead">{{player.user.username}} : {{ player.money }}$</div>
             </div>
+            <button class="btn btn-light" @click="move()">Бросить кубик</button>
           </div>
         </div>
-        <div class="f f-center-horizontal">
-          <ImageComponent
-            v-if="cell.property"
-            :src="getImage(cell)"
-            :price="cell.property.cost"
-            :price_bgcolor="cell.property.group.color_name"
-          ></ImageComponent>
-          <ImageComponent v-else :src="getImage(cell)"></ImageComponent>
-        </div>
-      </div>
-      <div class="cell-center">
-        <img src="/web/images/center.jpg" alt />
       </div>
       <div class="empty-center">
         <div class="w-100 h-100 d-flex bg-warning">
-          <div class="w-50 h-inherit d-flex flex-column justify-content-center align-items-center">
-            <div v-if="this.player_id==this.gameParsed.turn_player_id">
-              <button class="btn btn-primary" @click="move()">Бросить кубик</button>
+          <div class="w-50 h-inherit d-flex justify-content-center align-items-center">
+            <div v-if="isMyTurn">
+              <div v-if="myCell&&myCell.property">
+                <property-card :id="+myCell.property_id" @propertyChange="onpropertyChange"></property-card>
+              </div>
             </div>
 
-            <a :href="'/match/leave?game_id='+gameParsed.id">Покинуть игру</a>
+            <a :href="'/match/leave?game_id='+game.id">Покинуть игру</a>
           </div>
           <div class="w-50 bg-primary d-flex flex-column h-100 p-2">
-            <chat 
-            :from="getPlayer.user.username" 
-            :from_img="getPlayer.hero.src"
-            :game_id="+gameParsed.id"
-            ></chat>
+            <chat :from="myPlayer.user.username" :from_img="myPlayer.hero.src" :game_id="+game.id"></chat>
           </div>
         </div>
       </div>
@@ -50,13 +40,17 @@
 
 <script>
 import ImageComponent from "./ImageComponent.vue";
-import AuthSocket from "../js/AuthSocket";
+// import CellInfo from "./CellInfo.vue";
+import Cell from "./Cell.vue";
 import Chat from "./Chat.vue";
-import axios from "axios";
+import PropertyCard from "./PropertyCard.vue";
+
+import AuthSocket from "../js/AuthSocket";
+
 export default {
-  components: { ImageComponent, Chat },
+  components: { ImageComponent, Chat, Cell, PropertyCard },
   props: {
-    game: {
+    gameString: {
       type: String,
       default: "",
     },
@@ -67,81 +61,76 @@ export default {
   },
   data() {
     return {
-      cells: [],
       position: 0,
-      gameParsed: undefined,
+      game: undefined,
+      cells: [],
       socket: undefined,
     };
   },
-  beforeMount() {
-    this.gameParsed = JSON.parse(this.game);
-    this.socket = this.$socketGet(this.gameParsed.id, "send-to-all");
+  async beforeMount() {
+    //set csrf for all post request
+    
+
+    this.game = JSON.parse(this.gameString);
+    let result = await this.$axios.get("/cell");
+    if (result) this.cells = result.data;
+    this.socket = this.$socketGet(this.game.id, "send-local-to-all");
     this.socket.addMessageCallback((e, parsedData) => {
       if (parsedData.action && parsedData.action == "move") {
-        let player = this.gameParsed.players.find(
-          (el) => el.id == parsedData.data.player_id
-        );
+        let player = this.findPlayer(parsedData.data.player_id);
+        console.log('parsedData.data.position :>> ', parsedData.data.position);
         player.position = parsedData.data.position;
-        this.gameParsed.turn_player_id = parsedData.data.turn_player_id;
+        this.game.turn_player_id = parsedData.data.turn_player_id;
+        console.log('123:>> ', parsedData.data);
+
+        this.$forceUpdate();
+      }
+      if(parsedData.action && parsedData.action == "nextTurn"){
+        let player = this.findPlayer(parsedData.data.player_id);
+        this.game.turn_player_id = parsedData.data.turn_player_id;
+        this.$forceUpdate();
+      }
+      if (parsedData.action && parsedData.action == "property-change") {
+        let player = this.findPlayer(parsedData.data.player_id);
+        player.money = parsedData.data.money;
         this.$forceUpdate();
       }
     });
   },
-  created() {
-    //set csrf for all post request
-    axios.defaults.headers.common["X-CSRF-TOKEN"] = window.yii.getCsrfToken();
-
-    axios
-      .get("/cells", {
-        params: {
-          expand: "property.group,tax,utility,event",
-        },
-      })
-      .then(({ data }) => {
-        this.cells = data;
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  },
+  created() {},
   methods: {
-    move($player_id) {
-      axios.post(`/got/move?player_id=${this.player_id}`).then((res) => {
-        this.socket.send({
-          action: "move",
-          uid: this.gameParsed.id,
-          data: {
-            position: res.data.position,
-            player_id: this.player_id,
-            turn_player_id: res.data.turn_player_id,
-          },
-        });
-      });
+    onpropertyChange(e) {
+      let data = e.data;
+      data.action = "property-change";
+      this.socket.send(data);
     },
-
-    getImage(cell) {
-      let x = cell.property
-        ? cell.property.src
-        : cell.tax
-        ? cell.tax.src
-        : cell.event
-        ? cell.event.src
-        : cell.utility
-        ? cell.utility.src
-        : "";
-      return x;
+    move($player_id) {
+      this.$axios.post(`/got/move?player_id=${this.player_id}`).then((res) => {
+        console.log('res.data :>> ', res.data);
+        this.socket.send(res.data);
+      });
     },
     findPlayer(id) {
-      return this.gameParsed.players.find((p) => (p.id = id));
+      return this.game.players.find((p) => (p.id = id));
+    },
+    isMyTurn() {
+      return this.player_id == this.game.turn_player_id;
+    },
+    hello() {
+      alert("hello");
     },
   },
   computed: {
-    getPlayer: function () {
-      return this.gameParsed.players.find((p) => p.id == this.player_id);
+    myPlayer: function () {
+      return this.game.players.find((p) => p.id == this.player_id);
     },
-    // turn_player_id: function () {
-    //     return this.gameParsed.turn_player_id;
-    // },
+    myCell: function () {
+      if (this.cells.length > 0) {
+        let cell = this.cells.find((x) => x.position == this.myPlayer.position);
+        return cell;
+      }
+      return undefined;
+    },
   },
 };
 </script>
@@ -191,31 +180,5 @@ body {
 }
 .cell-center img {
   width: inherit;
-}
-/*FIGURINE STYLES*/
-.absolute {
-  position: absolute;
-}
-.relative {
-  position: relative;
-}
-.f {
-  display: flex;
-}
-.f-center {
-  justify-items: center;
-  justify-content: center;
-  align-items: center;
-}
-.f-center-horizontal {
-  align-items: center;
-}
-.figurine {
-  height: 40px;
-  width: 40px;
-  display: flex;
-  width: inherit;
-  flex-wrap: wrap;
-  z-index: 1;
 }
 </style>

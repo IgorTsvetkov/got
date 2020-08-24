@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import axios from "axios";
+
 export default {
   data() {
     return {
@@ -20,7 +20,7 @@ export default {
     async ajaxSubmit(e) {
       let form = e.srcElement;
       let formData=new FormData(form);
-      let result = await axios({
+      let result = await this.$axios({
           method:form.method,
           url: form.action,
           data: formData

@@ -59,7 +59,7 @@ export default {
     };
   },
   beforeMount () {
-    this.socket=this.$socketGet(this.game_id,"send-to-all");
+    this.socket=this.$socketGet(this.game_id,"send-local-to-all");
     this.socket.addMessageCallback((e, parsedData) => {
       if (parsedData.action && parsedData.action == "chat") {
         this.messages.unshift(parsedData.data);

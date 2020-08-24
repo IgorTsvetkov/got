@@ -5,7 +5,7 @@
 </template>
 
 <script>
-    import axios from "axios";
+    
     export default {
         props: {
             action: {
@@ -13,14 +13,14 @@
                 default: ""
             },
             game_id:{
-                type:Number,
+                type:String,
                 default:undefined
             }
         },
         methods: {
             startGame(e) {
                 if(this.action)
-                    axios.post(this.action).then(res=>{
+                    this.$axios.post(this.action).then(res=>{
                         if(res.data.started){
                             this.socket.send({action:"start-game"});
                         }
@@ -32,8 +32,13 @@
                 socket:undefined,
             }
         },
-        beforeCreate () {
-            this.socket=this.$socketGet(this.game_id,"send-to-all");
+        created () {
+            this.socket=this.$socketGet(this.game_id,"send-local-to-all");
+            this.socket.addMessageCallback((e,res)=>{
+                if (res.action == "start-game") 
+                    window.location.pathname = "/got/game";
+
+            })
         },
     }
 </script>

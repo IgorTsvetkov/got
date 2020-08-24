@@ -1,6 +1,7 @@
 <?php
 
 use app\assets\AppAsset;
+use yii\helpers\VarDumper;
 
 AppAsset::register($this);
 
@@ -23,7 +24,10 @@ AppAsset::register($this);
     <?php $this->beginBody() ?>
 
     <div id="app">
-        <map-component player_id='<?=$player_id?>' game='<?= json_encode($game) ?>'></map-component>
+        <map-component 
+        player_id='<?=$player_id?>' 
+        game-string='<?= json_encode($game)?>'
+        ></map-component>
     </div>
     <?php $this->endBody() ?>
 

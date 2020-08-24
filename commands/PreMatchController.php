@@ -39,8 +39,8 @@ class PreMatchController extends SocketController
             $connection->sendEncoded(["message"=>$data->message]);
         });                
     }
-    public function actionSendToAll(){
-        $this->startWebSocket("/send-to-all",function($user,$currentConnection,$data,$worker){   
+    public function actionSendLocalToAll(){
+        $this->startWebSocket("/send-local-to-all",function($user,$currentConnection,$data,$worker){   
             foreach ($worker->connections as $connection) {
                 // var_dump($data->uid);
                 if(isset($connection->uid)&&$connection->uid==$data->uid){
@@ -48,9 +48,14 @@ class PreMatchController extends SocketController
                     var_dump($connection->uid);
                     $connection->sendEncoded($data);
                 }
-                // if($connection->uid=)
-                // var_dump("connections count");
-                // var_dump(count($worker->connections));
+            }
+        });
+    }
+    public function actionSendToAll(){
+        $this->startWebSocket("/send-to-all",function($user,$currentConnection,$data,$worker){   
+            foreach ($worker->connections as $connection) {
+                    var_dump("send-to-all");
+                    $connection->sendEncoded($data);
             }
         });
     }

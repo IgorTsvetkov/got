@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import axios from "axios";
+
 export default {
   props: {
     is_king: {
@@ -69,13 +69,13 @@ export default {
   },
   methods: {
     async changeHero(hero_id){
-      let result = await axios.post(`/player/update-hero?player_id=${this.player_id}&hero_id=${hero_id}`);
+      let result = await this.$axios.post(`/player/update-hero?player_id=${this.player_id}&hero_id=${hero_id}`);
       console.log(result.data);
       console.log('result.data change hero :>> ', result.data);
       this.$emit("heroChanged", result);
     },
     async changeSlot(value) {
-      let result = await axios.post(`/match/change-slot?slot=${value}`);
+      let result = await this.$axios.post(`/match/change-slot?slot=${value}`);
       this.$emit("slotChanged", result);
     },
     toggleHeroes() {
@@ -86,8 +86,8 @@ export default {
 
   },
   created() {
-    axios.defaults.headers.common["X-CSRF-TOKEN"] = window.yii.getCsrfToken();
-    axios.get("/hero").then((res) => {
+    
+    this.$axios.get("/hero").then((res) => {
       //  console.log(res.data)
       this.heroes = res.data;
     });

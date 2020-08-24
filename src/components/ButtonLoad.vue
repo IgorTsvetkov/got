@@ -3,7 +3,7 @@
 </template>
 
 <script>
-    import axios from "axios";
+    
 
     export default {
         props: {
@@ -24,7 +24,7 @@
         methods: {
             async loadHtml(){
                 if(this.action&&this.to){
-                    let result = await axios.get(this.action);
+                    let result = await this.$axios.get(this.action);
                     let toEl=document.querySelector(this.to);
                     this.data=result.data;
                     toEl.innerHTML=result.data;            

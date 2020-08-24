@@ -3,13 +3,12 @@ export default class AuthSocket extends WebSocket {
         super(...args);
         //не уверен что это должно быть здесь, но шо поделать  _(-_-)-/
         this.uid=game_id;
-        if(!this.uid)
-            throw new Error("game_id is null or undefined");
         this._data = {};
         this._authInfo = null;
         this.onmessageAuth = null;
         this._onmessageCallbacks=[];
         this.onbeforeSend = null;
+        if(this.uid)
         this.onopen=function(){
             this.send({uid:this.uid});
         }
@@ -53,6 +52,7 @@ export default class AuthSocket extends WebSocket {
         if (typeof data === "object") {
             this._data = data;
             // this._data.authInfo = await this.getauthInfo();
+            if(this.uid)
             this._data.uid=this.uid;
             // if (await this.isNotGuest()) {
                 if (this.onbeforeSend && typeof (this.onbeforeSend) !== "function")
