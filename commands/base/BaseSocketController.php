@@ -1,14 +1,12 @@
 <?php
-namespace app\helpers;
+namespace app\commands\base;
 
 
-use app\models\UserSocket;
 use yii\console\Controller;
 use app\websockets\MyWorker;
 use app\websockets\MyTcpConnection;
-require_once __DIR__ . '/../vendor/autoload.php';
-
-class SocketController extends Controller
+require_once __DIR__ . '../../../vendor/autoload.php';
+class BaseSocketController extends Controller
 {
     public $socketPath="websocket://127.0.0.1:8989";
     

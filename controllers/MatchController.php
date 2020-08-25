@@ -143,9 +143,9 @@ class MatchController extends \app\controllers\MainController
                 $game->update();
                 return $this->redirect("/site");
             }
-            $game->removeUser($user_id);
             //значит игрок не последний, передаем след пользователю права лидера и удаляем текущего игрока
             $game->leader_user_id=$nextPlayer->user->id;
+            $game->removeUser($user_id);
             $game->update();
             return $this->asSocketJson("leader-change",[""]);
         }   
@@ -171,10 +171,16 @@ class MatchController extends \app\controllers\MainController
     }
     public function actionStart(int $game_id)
     {
-        $user = User::Me();
-        $game = GameSession::findOne($game_id);
-        if ($game->leader_user_id === $user->id) {
-            $game->turn_player_id = $game->players[0]->id;
+        $user_id=Yii::$app->user->id;
+        /** @var Player */
+        $anyPlayer=Player::find()
+        ->where(["game_session_id"=>$game_id])
+        ->with("gameSession")
+        ->limit(1)
+        ->one();
+        $game=$anyPlayer->gameSession;
+        if ($game->leader_user_id ===$user_id ) {
+            $game->turn_player_id =$anyPlayer->id ;
             $game->update();
             $game->touch("started_at");
         }
