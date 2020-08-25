@@ -1,5 +1,9 @@
 <template>
   <div>
+    <div class="d-flex w-100 justify-content-end bg-light">
+        <div class="w-100 d-flex justify-content-center align-items-center"><div class="font-weight-bolder lead">Игра № {{gameParsed.id}}</div></div>
+        <a class="btn btn-danger" :href="'/match/leave?game_id='+gameParsed.id" @click.prevent="leave">&times;</a>
+    </div>
     <div
       class="d-flex flex-row justify-content-center align-items-center flex-wrap text-center lead"
     >
@@ -23,9 +27,8 @@
       </div>
     </div>
     <div class="d-flex">
-    <slot></slot>
+    <slot v-if="this.gameParsed.leader_user_id===this.current_user_id"></slot>
     <div class="d-flex justify-content-center align-items-center">
-    <a class="btn btn-danger" :href="'/match/leave?game_id='+gameParsed.id" @click.prevent="leave">Покинуть</a>
     </div>
     </div> 
 

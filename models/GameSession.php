@@ -26,6 +26,7 @@ use yii\db\Expression;
  */
 class GameSession extends \yii\db\ActiveRecord
 {
+    public const MAX_PLAYERS=6;
     public function getFirstEmptySlot():int{
         $slots=GameSession::find()->where(["game_session.id"=>$this->id])->joinWith(["players"])->select("slot")->asArray()->all();
         $filledSlot=array_map(function($slot){

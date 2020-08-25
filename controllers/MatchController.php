@@ -99,7 +99,9 @@ class MatchController extends \app\controllers\MainController
     }
     public function actionJoin($game_id)
     {
-        $game = GameSession::findOne($game_id);
+        $game = GameSession::find()->where(["id"=>$game_id])->with("players")->limit(1)->one();
+        if(GameSession::MAX_PLAYERS<=count($game->players))
+            return $this->asJson(["error" => ["message" => "Невозможно подключиться! Лобби игры заполнено"]]);
         $user = User::me();
         $player = Player::createAndLink($game, $user);
         $player->save();
@@ -125,34 +127,27 @@ class MatchController extends \app\controllers\MainController
 
     public function actionLeave(int $game_id)
     {
-        $players=Player::find()->where(["game_session_id"=>$game_id])->with(["user","gameSession"])->all();
-        $player=array_pop(array_filter($players,function($player){
-            return $player->user->id===Yii::$app->user->id;
-        }));
-        $user=$player->user;
+        $user_id=Yii::$app->user->id;
+        /** @var Player $player */
+        $player=Player::find()->where(["game_session_id"=>$game_id,"user_id"=>$user_id])->with("gameSession")->limit(1)->one();
         $game=$player->gameSession;
+        
         if ($game->id == $game_id) {
-            $game->removeUser($user->id);
-            if($game->turn_player_id==$player->id){
-                $nextTurnPlayer=$player->getNextTurnPlayer();
-                if(isset($nextTurnPlayer))
-                {
-                    $game->turn_player_id=$nextTurnPlayer->id;
-                    var_dump($nextTurnPlayer->user->id);
-                    $game->leader_user_id=$nextTurnPlayer->user->id;
-                    $game->update();
-                    
-                    // return $this->asSocketJson("next-turn",[""]);
-                }
-            }
-        // if($game->leader_user_id===$user->id){
-        //     $game->leader_user_id=User::find()->with("game")where(""=>)
-        // }
-            $playersCount=count($players)-1;
-            if($playersCount===0){
+            /** @var Player $nextTurnPlayer */
+            $nextPlayer=$player->getNextPlayer();
+            //если текущий игрок последний, завершить игру
+            if($nextPlayer->id===$player->id)
+            {
+                $game->removeUser($user_id);
                 $game->touch("finished_at");
                 $game->update();
+                return $this->redirect("/site");
             }
+            $game->removeUser($user_id);
+            //значит игрок не последний, передаем след пользователю права лидера и удаляем текущего игрока
+            $game->leader_user_id=$nextPlayer->user->id;
+            $game->update();
+            return $this->asSocketJson("leader-change",[""]);
         }   
         return $this->redirect("/site");
     }

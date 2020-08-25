@@ -13,14 +13,14 @@
         </div>
         <div class="overflow-auto d-flex p-1">
           <div v-for="(hero) in heroes" :key="hero.id">
-            <img class="hover-img reverse" width="100px" :src="hero.src" @click="changeHero(hero.id)" />
+            <img :class="{'hover-img':is_current_player}" class="reverse" width="100px" :src="hero.src" @click="changeHero(hero.id)" />
           </div>
         </div>
       </div>
     </div>
     <div @click="changeSlot(slot_index)">
-      <h4 class="h4 bg-dark p-1 text-light lead shadow" v-if="username">
-        {{username}}
+      <h4 :class="{'bg-dark':is_current_player,'bg-secondary':!is_current_player}" class="h4 p-1 text-light lead shadow" v-if="username">
+        {{username}}<span v-if="is_current_player"> [вы]</span>
         <img v-if="is_king" src="/web/images/crown.svg" width="25px" />
       </h4>
       <h4 class="btn btn-secondary w-100 h4 p-1 lead shadow" v-else>Сесть</h4>

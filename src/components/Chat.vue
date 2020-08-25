@@ -6,13 +6,16 @@
         <div class="d-flex justify-content-end">
           <span class="h6 text-secondary font-weight-light py-1">{{message.time}}</span>
         </div>
-        <div>
+        <div v-if="message.from">
           <span class="h6 text-primary p-0 m-0">
             {{message.from}}
             <span class="p-0 m-0" v-if="message.from==from">[Вы]</span>
           </span>
           <img :src="from_img" width="35px" class="text-wrap" />
           :{{ message.message }}
+        </div>
+        <div v-if="!message.from">
+          <span class="text-danger">{{ message.message }}</span>
         </div>
       </div>
     </div>
@@ -46,10 +49,10 @@ export default {
       type: String,
       default: undefined,
     },
-    game_id:{
-      type:Number,
-      default:undefined
-    }
+    game_id: {
+      type: Number,
+      default: undefined,
+    },
   },
   data() {
     return {
@@ -58,11 +61,15 @@ export default {
       messages: [],
     };
   },
-  beforeMount () {
-    this.socket=this.$socketGet(this.game_id,"send-local-to-all");
+  beforeMount() {
+    this.socket = this.$socketGet(this.game_id, "send-local-to-all");
     this.socket.addMessageCallback((e, parsedData) => {
+      console.log("parsedData :>> ", parsedData);
       if (parsedData.action && parsedData.action == "chat") {
         this.messages.unshift(parsedData.data);
+      }
+      if (parsedData.systemMessage) {
+        this.messages.unshift(parsedData.systemMessage);
       }
     });
   },

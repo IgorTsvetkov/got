@@ -44,15 +44,16 @@ class GotController extends MainController
     }
     public function actionMove(int $player_id)
     {
+        $step=1;
         $player = Player::findOne($player_id);
-        $player->position += 1;
+        $player->position += $step;
         $player->position %= 40;
         $player->update();
 
-        $nextTurnPlayer = $player->getNextTurnPlayer();
+        $nextTurnPlayer = $player->getNextPlayer();
         $game = GameSession::findOne($player->game_session_id);
         $game->turn_player_id = $nextTurnPlayer->id;
         $game->update();
-        return $this->asSocketJson("move",["player_id"=>$player->id,"position" => $player->position, "turn_player_id" => $game->turn_player_id]);
+        return $this->asSocketJson("move",["player_id"=>$player->id,"position" => $player->position, "turn_player_id" => $game->turn_player_id,"step"=>$step]);
     }
 }

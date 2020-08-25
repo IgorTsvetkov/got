@@ -48,9 +48,17 @@ export default class AuthSocket extends WebSocket {
         }
         return;
     }
-    send(data = {}) {
+    send(data = {},system_message=null) {
         if (typeof data === "object") {
             this._data = data;
+            if(system_message)
+            {
+                this._data.systemMessage={
+                    from: false,
+                    message: system_message,
+                    time: new Date().toLocaleTimeString(),
+                }
+            }
             // this._data.authInfo = await this.getauthInfo();
             if(this.uid)
             this._data.uid=this.uid;

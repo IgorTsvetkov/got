@@ -161,9 +161,19 @@ function (_WebSocket) {
     key: "send",
     value: function send() {
       var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var system_message = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
       if (_typeof(data) === "object") {
-        this._data = data; // this._data.authInfo = await this.getauthInfo();
+        this._data = data;
+
+        if (system_message) {
+          this._data.systemMessage = {
+            from: false,
+            message: system_message,
+            time: new Date().toLocaleTimeString()
+          };
+        } // this._data.authInfo = await this.getauthInfo();
+
 
         if (this.uid) this._data.uid = this.uid; // if (await this.isNotGuest()) {
 

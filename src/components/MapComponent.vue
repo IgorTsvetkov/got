@@ -14,7 +14,7 @@
             <div v-for="player in game.players" :key="player.id">
               <div class="bg-dark text-light lead">{{player.user.username}} : {{ player.money }}$</div>
             </div>
-            <button class="btn btn-light" @click="move()">Бросить кубик</button>
+            <button v-if="isMyTurn" class="btn btn-light" @click="move()">Бросить кубик</button>
           </div>
         </div>
       </div>
@@ -69,23 +69,22 @@ export default {
   },
   async beforeMount() {
     //set csrf for all post request
-    
 
     this.game = JSON.parse(this.gameString);
+    this.myPlayer=this.game.players.find((p) => p.id == this.player_id);
+
     let result = await this.$axios.get("/cell");
     if (result) this.cells = result.data;
     this.socket = this.$socketGet(this.game.id, "send-local-to-all");
     this.socket.addMessageCallback((e, parsedData) => {
       if (parsedData.action && parsedData.action == "move") {
         let player = this.findPlayer(parsedData.data.player_id);
-        console.log('parsedData.data.position :>> ', parsedData.data.position);
-        player.position = parsedData.data.position;
         this.game.turn_player_id = parsedData.data.turn_player_id;
-        console.log('123:>> ', parsedData.data);
-
+        console.log('player.position :>> ', player.position);
+        player.position = parsedData.data.position;
         this.$forceUpdate();
       }
-      if(parsedData.action && parsedData.action == "nextTurn"){
+      if (parsedData.action && parsedData.action == "nextTurn") {
         let player = this.findPlayer(parsedData.data.player_id);
         this.game.turn_player_id = parsedData.data.turn_player_id;
         this.$forceUpdate();
@@ -102,34 +101,34 @@ export default {
     onpropertyChange(e) {
       let data = e.data;
       data.action = "property-change";
-      this.socket.send(data);
+      console.log("property data :>> ", data);
+      if(data.data.success){
+        let systemChatMessage=`${this.myPlayer.user.username} купил новую собвсвенность`;
+        this.socket.send(data,systemChatMessage);
+      }
     },
-    move($player_id) {
+    move(player_id) {
       this.$axios.post(`/got/move?player_id=${this.player_id}`).then((res) => {
-        console.log('res.data :>> ', res.data);
-        this.socket.send(res.data);
+        let data=res.data.data;
+        let systemChatMessage=`Игрок ${this.myPlayer.user.username} переместил фигурку на ${data.step}`;
+        this.socket.send(res.data,systemChatMessage);
       });
     },
     findPlayer(id) {
       return this.game.players.find((p) => (p.id = id));
     },
-    isMyTurn() {
-      return this.player_id == this.game.turn_player_id;
-    },
-    hello() {
-      alert("hello");
-    },
   },
   computed: {
-    myPlayer: function () {
-      return this.game.players.find((p) => p.id == this.player_id);
-    },
     myCell: function () {
       if (this.cells.length > 0) {
+        console.log('this.myPlayer :>> ', this.myPlayer);
         let cell = this.cells.find((x) => x.position == this.myPlayer.position);
         return cell;
       }
       return undefined;
+    },
+    isMyTurn: function () {
+      return this.player_id == this.game.turn_player_id;
     },
   },
 };

@@ -24,7 +24,7 @@ use yii\behaviors\BlameableBehavior;
  */
 class Player extends \yii\db\ActiveRecord
 {
-    public function getNextTurnPlayer()
+    public function getNextPlayer():?self
     {
         $nextPlayer=Player::find()
         ->orderBy(["slot" => SORT_ASC])
@@ -34,7 +34,8 @@ class Player extends \yii\db\ActiveRecord
         ->one();
         if(isset($nextPlayer))
             return $nextPlayer;        
-        $firstPlayer = Player::find()->orderBy(["slot" => SORT_ASC])
+        $firstPlayer = Player::find()
+        ->orderBy(["slot" => SORT_ASC])
         ->where(["game_session_id"=>$this->game_session_id])
         ->limit(1)
         ->one();

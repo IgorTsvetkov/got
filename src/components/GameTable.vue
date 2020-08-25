@@ -1,5 +1,6 @@
 <template>
   <div>
+    <alert v-for="(error,index) in this.errors" :key="index" type="alert-danger">{{error.message}}</alert>
     <a href="/match/create-lobby" @click.prevent="createLobby">Создать игровое лобби</a>
 
     <table class="table" v-if="games&&games.length>0">
@@ -10,33 +11,38 @@
         </tr>
       </thead>
       <tbody>
-          <tr v-for="game in games" :key="game.id">
-              <td v-for="(col,index) in Object.values(game)" :key="index">
-                  {{col}}
-              </td> 
-              <td><a href="#" @click.prevent="join(game.id)">Присоединиться</a></td>
-          </tr>
+        <tr v-for="game in games" :key="game.id">
+          <td v-for="(col,index) in Object.values(game)" :key="index">{{col}}</td>
+          <td>
+            <a href="#" @click.prevent="join(game.id)">Присоединиться</a>
+          </td>
+        </tr>
       </tbody>
     </table>
   </div>
 </template>
 
 <script>
+import Alert from "./Alert.vue";
 export default {
+  components: {
+    Alert,
+  },
   data() {
     return {
       games: undefined,
-      socketGlobal:undefined,
+      socketGlobal: undefined,
+      errors:[],
     };
   },
   created() {
-    this.socketGlobal=this.$socketGet("","send-to-all");
-    this.socketGlobal.addMessageCallback((e,parsedData)=>{
-        if(parsedData&&parsedData.action==="create-lobby"){
-            console.log('parsedData :>> ', parsedData);
-            console.log('this.games[0] :>> ', this.games[0]);
-        }
-            this.games.push(parsedData.data.game);
+    this.socketGlobal = this.$socketGet("", "send-to-all");
+    this.socketGlobal.addMessageCallback((e, parsedData) => {
+      if (parsedData && parsedData.action === "create-lobby") {
+        console.log("parsedData :>> ", parsedData);
+        console.log("this.games[0] :>> ", this.games[0]);
+        this.games.unshift(parsedData.data.game);
+      }
     });
     this.$axios
       .get("/match?json=true")
@@ -49,26 +55,28 @@ export default {
       });
   },
   methods: {
-      async join(game_id) {
-          let socket=this.$socketGet(game_id,"send-local-to-all");
-          let result= await this.$axios.post("/match/join?game_id="+game_id);
-              console.log('"hello" :>> ', "hello");
-          if(result){
-              socket.send(result.data);
-              window.location.pathname="/match/connect";
-          }
-            
-      },
-      async createLobby(e){
-          this.$axios.get(e.target.href)
-          .then(res => {
-              this.socketGlobal.send(res.data);
-              window.location.pathname="/match/connect";
-          })
-          .catch(err => {
-              console.error(err); 
-          })
+    async join(game_id) {
+      let socket = this.$socketGet(game_id, "send-local-to-all");
+      let result = await this.$axios.post("/match/join?game_id=" + game_id);
+      console.log('result :>> ', result);
+      if (result) {
+        if(result.data.error)
+          this.errors.push(result.data.error);
+        socket.send(result.data);
+        window.location.pathname = "/match/connect";
       }
+    },
+    async createLobby(e) {
+      this.$axios
+        .get(e.target.href)
+        .then((res) => {
+          this.socketGlobal.send(res.data);
+          window.location.pathname = "/match/connect";
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    },
   },
 };
 </script>
