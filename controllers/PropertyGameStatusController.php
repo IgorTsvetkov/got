@@ -10,6 +10,8 @@ use app\models\GameSession;
 use yii\filters\VerbFilter;
 use app\models\UserGameSession;
 use app\models\PropertyGameStatus;
+use app\models\RentState;
+use Exception;
 
 class PropertyGameStatusController extends \yii\web\Controller
 {
@@ -26,12 +28,15 @@ class PropertyGameStatusController extends \yii\web\Controller
     }
     public function actionCreate($property_id)
     {
+        
+        /** @var Player */
         $player = Player::find()
             ->orderBy(["id" => SORT_DESC])
             ->where(["user_id" => Yii::$app->user->id])
             ->with("gameSession")
             ->limit(1)
             ->one();
+        /** @var PropertyGameStatus */
         $isBought = PropertyGameStatus::find()
             ->where(["property_id" => $property_id])
             ->andWhere(["game_session_id" => $player->game_session_id])
@@ -48,9 +53,9 @@ class PropertyGameStatusController extends \yii\web\Controller
             &&
             $player->position == $property->cell->position
         ) {
-            if ($player->money < $property->cost)
+            if($player->canPay($property->cost))
                 return $this->asJson(["error" => ["message" => "недостаточно средств"]]); //TO DO Аукцион
-            $player->money -= $property->cost;
+            $player->pay($property->cost);
             $player->update(false);
 
             $model = new PropertyGameStatus();
@@ -58,8 +63,35 @@ class PropertyGameStatusController extends \yii\web\Controller
             $model->game_session_id = $player->game_session_id;
             $model->player_id = $player->id;
             $model->save(false);
-            return $this->asJson(["success" => true, "data" => ["player_id"=>$player->id,"money" => $player->money]]);
+            /** @var GameSession */
+            $game=$player->gameSession;
+            $game->is_action_done=1;
+            $game->update();
+            return $this->asJson(["success" => true, "data" => ["is_action_done"=>$game->is_action_done,"player_id"=>$player->id,"money" => $player->money]]);
         }
         return $this->asJson(["error" => ["message" => "в данный момент вы не можете купить это место"]]);
+    }
+    public function actionImprove($property_id)
+    {
+        $user_id=Yii::$app->user->id;
+        $player=Player::find()->where(["user_id"=>$user_id])->orderBy(["id"=>SORT_DESC])->limit(1)->one();
+        $propertyGameStatus=PropertyGameStatus::find()->where(["player_id"=>$player->id],["property_id"=>$property_id])->with("property")->limit(1)->one();
+        if($propertyGameStatus->levelUp())
+        {
+            /** @var Property */
+            $property=$propertyGameStatus->property;
+            $cost=$property->getAttribute($property->rentState->name);
+            if($player->canPay($cost)){
+                $player->pay($cost);
+                $player->update();
+            }
+            $data=[
+                "money"=>$player->money,
+                "propertyGameStatus"=>$propertyGameStatus,
+            ];
+            return $this->json($propertyGameStatus);
+        }
+        throw new Exception("Как ты здесь оказался?");
+        // return ResponseHelper::Error("Вы больше не можете улучшать ");
     }
 }

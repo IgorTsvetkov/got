@@ -14,7 +14,11 @@
             <div v-for="player in game.players" :key="player.id">
               <div class="bg-dark text-light lead">{{player.user.username}} : {{ player.money }}$</div>
             </div>
-            <button v-if="isMyTurn" class="btn btn-light" @click="move()">Бросить кубик</button>
+            <div v-if="isMyTurn">
+              {{game.is_dice_roll}}
+            <button v-if="!game.is_dice_rolled" class="btn btn-light" @click="move()">Бросить кубик</button>
+            <button  v-if="game.is_dice_rolled" class="btn btn-light" @click="endTurn()">Закончить ход</button>
+            </div>
           </div>
         </div>
       </div>
@@ -23,7 +27,7 @@
           <div class="w-50 h-inherit d-flex justify-content-center align-items-center">
             <div v-if="isMyTurn">
               <div v-if="myCell&&myCell.property">
-                <property-card :id="+myCell.property_id" @propertyChange="onpropertyChange"></property-card>
+                <property-card :is_action_done="isActionDone" :id="+myCell.property_id" @propertyChange="onpropertyChange"></property-card>
               </div>
             </div>
 
@@ -71,7 +75,7 @@ export default {
     //set csrf for all post request
 
     this.game = JSON.parse(this.gameString);
-    this.myPlayer=this.game.players.find((p) => p.id == this.player_id);
+    this.myPlayer = this.game.players.find((p) => p.id == this.player_id);
 
     let result = await this.$axios.get("/cell");
     if (result) this.cells = result.data;
@@ -79,14 +83,15 @@ export default {
     this.socket.addMessageCallback((e, parsedData) => {
       if (parsedData.action && parsedData.action == "move") {
         let player = this.findPlayer(parsedData.data.player_id);
-        this.game.turn_player_id = parsedData.data.turn_player_id;
-        console.log('player.position :>> ', player.position);
         player.position = parsedData.data.position;
+        this.game.is_dice_rolled=parsedData.data.is_dice_rolled;
         this.$forceUpdate();
       }
-      if (parsedData.action && parsedData.action == "nextTurn") {
+      if (parsedData.action && parsedData.action == "end-turn") {
         let player = this.findPlayer(parsedData.data.player_id);
         this.game.turn_player_id = parsedData.data.turn_player_id;
+        this.game.is_dice_rolled=parsedData.data.is_dice_rolled;
+        this.game.is_action_done=parsedData.data.is_action_done;
         this.$forceUpdate();
       }
       if (parsedData.action && parsedData.action == "property-change") {
@@ -102,17 +107,31 @@ export default {
       let data = e.data;
       data.action = "property-change";
       console.log("property data :>> ", data);
-      if(data.data.success){
-        let systemChatMessage=`${this.myPlayer.user.username} купил новую собвсвенность`;
-        this.socket.send(data,systemChatMessage);
+      if (data.data.success) {
+        let systemChatMessage = `${this.myPlayer.user.username} купил новую собвсвенность`;
+        this.socket.send(data, systemChatMessage);
       }
     },
-    move(player_id) {
-      this.$axios.post(`/got/move?player_id=${this.player_id}`).then((res) => {
-        let data=res.data.data;
-        let systemChatMessage=`Игрок ${this.myPlayer.user.username} переместил фигурку на ${data.step}`;
-        this.socket.send(res.data,systemChatMessage);
-      });
+    async move(player_id) {
+      let result = await this.$axios.post(
+        `/got/move?player_id=${this.player_id}`
+      );
+      if (result) {
+        let data = result.data.data;
+        let systemChatMessage = `Игрок ${this.myPlayer.user.username} переместил фигурку на ${data.step}`;
+        this.socket.send(result.data, systemChatMessage);
+      }
+    },
+    async endTurn(player_id) {      
+      let result1 = await this.$axios.post(
+        `/got/end-turn?player_id=${this.player_id}`
+      );
+      if (result1) {
+          let data = result1.data.data;
+          let nextPlayer = this.findPlayer(data.turn_player_id);
+          let systemChatMessage = `Игрок ${this.myPlayer.user.username} передал ход игроку ${nextPlayer.user.username}`;
+          this.socket.send(result1.data, systemChatMessage);
+      }
     },
     findPlayer(id) {
       return this.game.players.find((p) => (p.id = id));
@@ -121,7 +140,7 @@ export default {
   computed: {
     myCell: function () {
       if (this.cells.length > 0) {
-        console.log('this.myPlayer :>> ', this.myPlayer);
+        console.log("this.myPlayer :>> ", this.myPlayer);
         let cell = this.cells.find((x) => x.position == this.myPlayer.position);
         return cell;
       }
@@ -130,6 +149,9 @@ export default {
     isMyTurn: function () {
       return this.player_id == this.game.turn_player_id;
     },
+    isActionDone:function() {
+      return Boolean(this.game.isActionDone);
+    }
   },
 };
 </script>

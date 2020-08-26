@@ -23,7 +23,6 @@ class m200823_143732_create_rent_state_table extends Migration
             ["rent_home2"],
             ["rent_home3"],
             ["rent_home4"],
-            ["rent_home5"],
             ["rent_inn"],
         ]);
     }

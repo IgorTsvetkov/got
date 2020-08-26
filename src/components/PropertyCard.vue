@@ -1,70 +1,71 @@
 <template>
-  <div v-if="property" class="d-flex flex-column shadow p-4 lead bg-warning" style="width:300px">
+  <div
+    v-if="property"
+    class="d-flex flex-column shadow p-4 lead bg-dark text-light"
+    style="width:300px"
+  >
     <div
       class="d-flex flex-column justify-content-between justify-content-center px-2"
       v-if="isBought"
     >
       <div class="d-flex justify-content-center align-items-center bg-primary text-light px-2 py-1">
-        <figurine :hero="property.propertyGameStatuses[0].player.hero"></figurine>
-        <span class="mx-1">{{property.propertyGameStatuses[0].player.user.username}}</span>
+        <figurine :hero="propertyGameStatus.player.hero"></figurine>
+        <span class="mx-1">{{propertyGameStatus.player.user.username}}</span>
       </div>
     </div>
     <div class="h3 font-weight-light p-2 text-center">
       <div class="text-capitalize">{{property.name}}</div>
     </div>
-    <div class="text-center">Рента:{{property.rent}}</div>
+    <div v-for="rent in this.rents" :key="rent.label">
+      <property-rent-field
+        :class="{'bg-warning text-dark':isActiveRent(rent.fieldName)}"
+        class="px-2"
+        :label="rent.label"
+        :cost="+rent.cost"
+      />
+    </div>
 
-    <div class="d-flex justify-content-between">
-      <div>Рента с домом</div>
-      <div>{{property.rent_home1}}</div>
-    </div>
-    <div class="d-flex justify-content-between">
-      <div>Рента с 2 домами</div>
-      <div>{{property.rent_home2}}</div>
-    </div>
-    <div class="d-flex justify-content-between">
-      <div>Рента с 3 домами</div>
-      <div>{{property.rent_home3}}</div>
-    </div>
-    <div class="d-flex justify-content-between">
-      <div>Рента с 4 домами</div>
-      <div>{{property.rent_home4}}</div>
-    </div>
-    <div class="d-flex justify-content-between">
-      <div>Рента с постоялым двором</div>
-      <div>{{property.rent_inn}}</div>
-    </div>
     <hr />
-    <div v-if="!isBought">
-      <button class="btn btn-success text-light w-100 shadow" @click="buy">
+    <div v-if="!is_action_done">
+      <button v-if="!isBought" class="btn btn-success text-light w-100 shadow" @click="buy">
         <span class="h4 py-3">Купить {{property.cost}}</span>
+      </button>
+      <button v-if="isBought" class="btn btn-success text-light w-100 shadow" @click="improve">
+        <span class="h4 py-3">Улучшить {{property.homes_inn_cost}}</span>
       </button>
     </div>
 
     <hr />
+
     <!-- <p>Если игроку принадлежит <span class="font-weight-bold">все</span> имущество одной цветовой группы, рента <span class="font-weight-bold">удваивается</span></p> -->
   </div>
 </template>
 <script>
-
 import Figurine from "./Figurine.vue";
+import PropertyRentField from "./PropertyRentField.vue";
 export default {
   components: {
     Figurine,
+    PropertyRentField,
   },
   props: {
     id: {
       type: Number,
       default: undefined,
     },
+    is_action_done: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
       property: undefined,
+      propertyGameStatus: undefined,
+      rents: undefined,
     };
   },
   async beforeMount() {
-    
     await this.getProperty(this.id);
   },
   created() {},
@@ -73,6 +74,35 @@ export default {
       let result = await this.$axios.get("/property/view?id=" + id);
       if (result) {
         this.property = result.data;
+        this.propertyGameStatus = this.property.propertyGameStatus;
+        this.rents = [
+          { fieldName: "rent", label: "Рента", cost: this.property.rent },
+          {
+            fieldName: "rent_home1",
+            label: "Рента c 1 домом",
+            cost: this.property.rent_home1,
+          },
+          {
+            fieldName: "rent_home2",
+            label: "Рента c 2 домами",
+            cost: this.property.rent_home2,
+          },
+          {
+            fieldName: "rent_home3",
+            label: "Рента c 3 домами",
+            cost: this.property.rent_home3,
+          },
+          {
+            fieldName: "rent_home4",
+            label: "Рента c 4 домами",
+            cost: this.property.rent_home4,
+          },
+          {
+            fieldName: "rent_inn",
+            label: "Рента c постоялым двором",
+            cost: this.property.rent_inn,
+          },
+        ];
       }
     },
     async buy() {
@@ -81,15 +111,34 @@ export default {
       );
       if (result) {
         {
-          this.$emit("propertyChange",result);
+          this.$emit("propertyChange", result);
           await this.getProperty(this.id);
         }
       }
     },
+    improve(){
+      let result = await this.$axios.post(
+        "/property-game-status/create?property_id=" + this.id
+      );
+      if(result){
+        if(result.error)
+          throw new Error("Impove axios error in PropertyCard");
+        this.$emit("propertyChange", result);
+      }
+    },
+    isActiveRent(name) {
+      if (
+        this.propertyGameStatus &&
+        this.propertyGameStatus.rentState &&
+        this.propertyGameStatus.rentState.name == name
+      )
+        return true;
+      return false;
+    },
   },
   computed: {
     isBought() {
-      return this.property.propertyGameStatuses.length > 0;
+      return this.propertyGameStatus;
     },
   },
   watch: {
