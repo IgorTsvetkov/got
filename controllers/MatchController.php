@@ -4,12 +4,14 @@ namespace app\controllers;
 
 use Yii;
 use app\models\User;
-use app\models\GameSession;
 use app\models\Player;
-use yii\filters\AccessControl;
+use yii\web\Controller;
 use yii\helpers\VarDumper;
+use app\models\GameSession;
+use yii\filters\AccessControl;
+use app\helpers\ResponseHelper;
 
-class MatchController extends \app\controllers\MainController
+class MatchController extends Controller
 {
     public function behaviors()
     {
@@ -64,7 +66,7 @@ class MatchController extends \app\controllers\MainController
             }])
             ->groupBy("game_session.id")
             ->all();
-            return $this->asJson($games);
+            return ResponseHelper::Success($games);
         }
             
         return $this->render('index');
@@ -95,19 +97,18 @@ class MatchController extends \app\controllers\MainController
         ->orderBy(["id"=>SORT_DESC])
         ->one();
 
-        return $this->asSocketJson("create-lobby",["game"=>$game]);
+        return ResponseHelper::Socket("create-lobby",["game"=>$game]);
     }
     public function actionJoin($game_id)
     {
         $game = GameSession::find()->where(["id"=>$game_id])->with("players")->limit(1)->one();
         if(GameSession::MAX_PLAYERS<=count($game->players))
-            return $this->asJson(["error" => ["message" => "Невозможно подключиться! Лобби игры заполнено"]]);
+            return ResponseHelper::Error("Невозможно подключиться! Лобби игры заполнено");
         $user = User::me();
         $player = Player::createAndLink($game, $user);
         $player->save();
 
-        // return $this->redirect("/match/connect");
-        return $this->asSocketJson("join",$player);
+        return ResponseHelper::Socket("join",$player);
     }
     public function actionConnect($json = false)
     {
@@ -121,7 +122,7 @@ class MatchController extends \app\controllers\MainController
             return $this->redirect("/got/game");
         }
         if ($json)
-            return $this->asJson($game);
+            return ResponseHelper::Success($game);
         return $this->render('create', compact("game"));
     }
 
@@ -147,7 +148,7 @@ class MatchController extends \app\controllers\MainController
             $game->leader_user_id=$nextPlayer->user->id;
             $game->removeUser($user_id);
             $game->update();
-            return $this->asSocketJson("leader-change",[""]);
+            return ResponseHelper::Socket("leader-change",[""]);
         }   
         return $this->redirect("/site");
     }
@@ -167,7 +168,7 @@ class MatchController extends \app\controllers\MainController
             $data = ["status" => "success"];
         }
         // return $this->redirect("/match/connect-json");
-        return $this->asJson($data);
+        return ResponseHelper::Success($data);
     }
     public function actionStart(int $game_id)
     {
@@ -184,6 +185,6 @@ class MatchController extends \app\controllers\MainController
             $game->update();
             $game->touch("started_at");
         }
-        return $this->asJson(["started" => true]);
+        return ResponseHelper::Success(["started" => true]);
     }
 }

@@ -70,8 +70,7 @@ export default {
   methods: {
     async changeHero(hero_id){
       let result = await this.$axios.post(`/player/update-hero?player_id=${this.player_id}&hero_id=${hero_id}`);
-      console.log(result.data);
-      console.log('result.data change hero :>> ', result.data);
+      // if(result)
       this.$emit("heroChanged", result);
     },
     async changeSlot(value) {

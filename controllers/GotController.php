@@ -5,11 +5,12 @@ namespace app\controllers;
 use app\models\Cell;
 use app\models\User;
 use app\models\Player;
+use yii\web\Controller;
 use app\models\GameSession;
 use yii\filters\AccessControl;
-use app\controllers\MainController;
+use app\helpers\ResponseHelper;
 
-class GotController extends MainController
+class GotController extends Controller
 {
     public function behaviors()
     {
@@ -54,6 +55,6 @@ class GotController extends MainController
         $game = GameSession::findOne($player->game_session_id);
         $game->turn_player_id = $nextTurnPlayer->id;
         $game->update();
-        return $this->asSocketJson("move",["player_id"=>$player->id,"position" => $player->position, "turn_player_id" => $game->turn_player_id,"step"=>$step]);
+        return ResponseHelper::Socket("move",["player_id"=>$player->id,"position" => $player->position, "turn_player_id" => $game->turn_player_id,"step"=>$step]);
     }
 }

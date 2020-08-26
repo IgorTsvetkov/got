@@ -3,9 +3,10 @@
 namespace app\controllers;
 
 use Yii;
-use app\models\Cell;
 use Error;
+use app\models\Cell;
 use yii\web\Controller;
+use app\helpers\ResponseHelper;
 
 
 class CellController extends Controller
@@ -14,7 +15,7 @@ class CellController extends Controller
     {
         if($json){
             $cells=Cell::find()->joinWith(explode(",","property.group,tax,utility,event"))->asArray()->all();
-            return $this->asJson($cells);
+            return ResponseHelper::Success($cells);
         }
         throw new Error("unhundled action behavior");
     }

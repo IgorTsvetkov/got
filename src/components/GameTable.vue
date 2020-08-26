@@ -60,8 +60,10 @@ export default {
       let result = await this.$axios.post("/match/join?game_id=" + game_id);
       console.log('result :>> ', result);
       if (result) {
-        if(result.data.error)
+        if(result.data.error){
           this.errors.push(result.data.error);
+          return;
+        }
         socket.send(result.data);
         window.location.pathname = "/match/connect";
       }

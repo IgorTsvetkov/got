@@ -6,6 +6,7 @@ use Yii;
 use yii\web\Controller;
 use app\models\Property;
 use yii\filters\VerbFilter;
+use app\helpers\ResponseHelper;
 use app\models\UserGameSession;
 
 class PropertyController extends Controller
@@ -41,6 +42,6 @@ class PropertyController extends Controller
         ->limit(1)
         ->asArray()
         ->one();
-        return $this->asJson($property);
+        return ResponseHelper::Success($property);
     }
 }

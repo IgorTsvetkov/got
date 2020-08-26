@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use Yii;
 use app\models\Player;
+use app\helpers\ResponseHelper;
 
 class PlayerController extends \yii\web\Controller
 {
@@ -14,7 +15,7 @@ class PlayerController extends \yii\web\Controller
         {
             $player->hero_id=$hero_id;
             $player->update();
-            return $this->asJson(["status"=>"success"]);
+            return ResponseHelper::Success(["status"=>"success"]);
         }
         return $this->asJson(["error"=>["message"=>"Вы не можете выбрать этого персонажа"],"player_id"=>$player->id,"user_id_app"=>Yii::$app->user->id]);
     }
