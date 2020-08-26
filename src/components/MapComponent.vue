@@ -16,8 +16,16 @@
             </div>
             <div v-if="isMyTurn">
               {{game.is_dice_roll}}
-            <button v-if="!game.is_dice_rolled" class="btn btn-light" @click="move()">Бросить кубик</button>
-            <button  v-if="game.is_dice_rolled" class="btn btn-light" @click="endTurn()">Закончить ход</button>
+              <button
+                v-if="!game.is_dice_rolled"
+                class="btn btn-light"
+                @click="move()"
+              >Бросить кубик</button>
+              <button
+                v-if="game.is_dice_rolled"
+                class="btn btn-light"
+                @click="endTurn()"
+              >Закончить ход</button>
             </div>
           </div>
         </div>
@@ -27,7 +35,11 @@
           <div class="w-50 h-inherit d-flex justify-content-center align-items-center">
             <div v-if="isMyTurn">
               <div v-if="myCell&&myCell.property">
-                <property-card :is_action_done="isActionDone" :id="+myCell.property_id" @propertyChange="onpropertyChange"></property-card>
+                <property-card
+                  :is_action_done="Boolean(this.game.is_action_done)"
+                  :id="+myCell.property_id"
+                  @propertyChange="onpropertyChange"
+                ></property-card>
               </div>
             </div>
 
@@ -84,19 +96,26 @@ export default {
       if (parsedData.action && parsedData.action == "move") {
         let player = this.findPlayer(parsedData.data.player_id);
         player.position = parsedData.data.position;
-        this.game.is_dice_rolled=parsedData.data.is_dice_rolled;
+        this.game.is_dice_rolled = parsedData.data.is_dice_rolled;
         this.$forceUpdate();
       }
       if (parsedData.action && parsedData.action == "end-turn") {
         let player = this.findPlayer(parsedData.data.player_id);
         this.game.turn_player_id = parsedData.data.turn_player_id;
-        this.game.is_dice_rolled=parsedData.data.is_dice_rolled;
+        this.game.is_dice_rolled = parsedData.data.is_dice_rolled;
+        this.game.is_action_done = parsedData.data.is_action_done;
+        this.$forceUpdate();
+      }
+      if (parsedData.action && parsedData.action == "property-bought") {
+        let player = this.findPlayer(parsedData.data.player_id);
+        player.money = parsedData.data.money;
         this.game.is_action_done=parsedData.data.is_action_done;
         this.$forceUpdate();
       }
-      if (parsedData.action && parsedData.action == "property-change") {
+      if (parsedData.action && parsedData.action == "property-improve") {
         let player = this.findPlayer(parsedData.data.player_id);
         player.money = parsedData.data.money;
+        this.game.is_action_done=parsedData.data.is_action_done;
         this.$forceUpdate();
       }
     });
@@ -104,13 +123,23 @@ export default {
   created() {},
   methods: {
     onpropertyChange(e) {
-      let data = e.data;
-      data.action = "property-change";
-      console.log("property data :>> ", data);
-      if (data.data.success) {
-        let systemChatMessage = `${this.myPlayer.user.username} купил новую собвсвенность`;
-        this.socket.send(data, systemChatMessage);
+      // let data = e.data;
+      // data.action = "property-change";
+      // console.log("property data :>> ", data);
+      // if (data.data.success) {
+      //   let systemChatMessage = `${this.myPlayer.user.username} купил новую собсвенность`;
+      //   this.socket.send(data, systemChatMessage);
+      // }
+
+      let result = e.data;
+        console.log("property result :>> ", result);
+      if (this.$response.hasError(result)){
+        let message=this.$response.getErrorMessage(result);
+        this.socket.send({},message);
+        return;
       }
+      let systemChatMessage = `${this.myPlayer.user.username} купил новую собсвенность`;
+      this.socket.send(result, systemChatMessage);
     },
     async move(player_id) {
       let result = await this.$axios.post(
@@ -122,15 +151,15 @@ export default {
         this.socket.send(result.data, systemChatMessage);
       }
     },
-    async endTurn(player_id) {      
+    async endTurn(player_id) {
       let result1 = await this.$axios.post(
         `/got/end-turn?player_id=${this.player_id}`
       );
       if (result1) {
-          let data = result1.data.data;
-          let nextPlayer = this.findPlayer(data.turn_player_id);
-          let systemChatMessage = `Игрок ${this.myPlayer.user.username} передал ход игроку ${nextPlayer.user.username}`;
-          this.socket.send(result1.data, systemChatMessage);
+        let data = result1.data.data;
+        let nextPlayer = this.findPlayer(data.turn_player_id);
+        let systemChatMessage = `Игрок ${this.myPlayer.user.username} передал ход игроку ${nextPlayer.user.username}`;
+        this.socket.send(result1.data, systemChatMessage);
       }
     },
     findPlayer(id) {
@@ -149,9 +178,6 @@ export default {
     isMyTurn: function () {
       return this.player_id == this.game.turn_player_id;
     },
-    isActionDone:function() {
-      return Boolean(this.game.isActionDone);
-    }
   },
 };
 </script>

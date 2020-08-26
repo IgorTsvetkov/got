@@ -24,6 +24,8 @@ use yii\behaviors\BlameableBehavior;
  */
 class Player extends \yii\db\ActiveRecord
 {
+    public const COUNT_POSITION=40;
+
     public function canPay($cost){
         if($this->money<$cost)
             return false;
@@ -31,6 +33,11 @@ class Player extends \yii\db\ActiveRecord
     }
     public function pay($cost){
         return $this->money-=$cost;
+    }
+    public function move($value){
+        $this->position += $value;
+        $this->position %= self::COUNT_POSITION;
+        $this->update();
     }
     public function getNextPlayer():?self
     {

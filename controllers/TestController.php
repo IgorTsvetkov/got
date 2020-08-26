@@ -2,12 +2,20 @@
 
 namespace app\controllers;
 
-use yii\filters\AccessControl;
+use Yii;
+use yii\rest\ActiveController;
+use yii\web\Controller;
+use yii\web\Response;
 
-class TestController extends \yii\web\Controller
+class UtilityController extends Controller
 {
-    public function actionIndex()
+    public function actionTest()
     {
-        return $this->render('index');
+        $response=Yii::$app->response;
+        $response->format=Response::FORMAT_JSON;
+        
+        $response->data=Yii::$app->user->identity;
+
+        return $response;
     }
 }

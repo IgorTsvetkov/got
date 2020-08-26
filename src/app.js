@@ -11,6 +11,8 @@ Vue.prototype.$socketGet=function(game_id,action){
       this.$socketStorage.set(action,new AuthSocket(game_id,"ws://127.0.0.1:8989/"+action));
    return this.socket=this.$socketStorage.get(action);
   }
+import Response from "./js/Response";
+Vue.prototype.$response=new Response();
 import HelloWorldComponent from './components/HelloWorldComponent.vue';
 import MapComponent from './components/MapComponent.vue';
 import HeroPickerComponent from './components/HeroPickerComponent.vue';

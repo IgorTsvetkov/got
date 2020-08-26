@@ -9,8 +9,11 @@ use app\models\GameSession;
 
 class User extends ActiveRecord implements \yii\web\IdentityInterface
 {
-    public static function Me(){
-        return self::findOne(Yii::$app->user->id);
+    public static function Hello(){
+        return "helllo world!";
+    }
+    public static function Me():?self{
+        return Yii::$app->user->identity;
     }
     public function getLastGame(){
         return $this->hasOne(GameSession::class,["id"=>"game_session_id"])

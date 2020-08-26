@@ -109,21 +109,20 @@ export default {
       let result = await this.$axios.post(
         "/property-game-status/create?property_id=" + this.id
       );
-      if (result) {
+      if(result) {
         {
-          this.$emit("propertyChange", result);
+          this.$emit("propertyChange",result);
           await this.getProperty(this.id);
         }
       }
     },
-    improve(){
+    async improve(){
       let result = await this.$axios.post(
         "/property-game-status/create?property_id=" + this.id
       );
       if(result){
-        if(result.error)
-          throw new Error("Impove axios error in PropertyCard");
         this.$emit("propertyChange", result);
+        await this.getProperty(this.id);
       }
     },
     isActiveRent(name) {

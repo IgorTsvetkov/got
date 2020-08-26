@@ -22,7 +22,7 @@ class PropertyGameStatus extends \yii\db\ActiveRecord
 
     public function levelUp():bool{
         if($this->rent_status_id<self::MAXRENTLEVEL){
-            $this->rent_status_id++;
+            $this->rent_status_id+=1;
             $this->update();
             return true;
         }

@@ -29,7 +29,8 @@ class TestController extends Controller
 {
     function actionTest()
     {
-        $x=null;
-        echo ++$x;
+        $user=Yii::$app->user->getIdentity();
+
+        var_dump($user);
     }
 }

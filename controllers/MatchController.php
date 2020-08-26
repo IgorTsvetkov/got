@@ -36,7 +36,7 @@ class MatchController extends Controller
         $actions = ["index", "create-lobby", "join"];
         if (in_array($action->id, $actions)) {
             if (Yii::$app->user->isGuest)
-                return $this->redirect("/site/login");
+                return $this->redirect("/");
             $user = User::me();
             $lastGame = $user->getLastGame()->one();
             if ($lastGame && ($lastGame->isStarted === false||$lastGame->isFinished === false)) {

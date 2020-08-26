@@ -9,6 +9,7 @@ use app\models\Property;
 use app\models\GameSession;
 use yii\filters\VerbFilter;
 use app\helpers\ResponseHelper;
+use app\helpers\YesNo;
 use app\models\UserGameSession;
 use app\models\PropertyGameStatus;
 use app\models\RentState;
@@ -54,8 +55,8 @@ class PropertyGameStatusController extends \yii\web\Controller
             &&
             $player->position == $property->cell->position
         ) {
-            if($player->canPay($property->cost))
-            return ResponseHelper::Error("недостаточно средств"); //TO DO Аукцион//TO DO Аукцион
+            if($player->canPay($property->cost)===false)
+                return ResponseHelper::Error("недостаточно средств"); //TO DO Аукцион//TO DO Аукцион
             $player->pay($property->cost);
             $player->update(false);
 
@@ -66,17 +67,22 @@ class PropertyGameStatusController extends \yii\web\Controller
             $model->save(false);
             /** @var GameSession */
             $game=$player->gameSession;
-            $game->is_action_done=1;
+            $game->is_action_done=YesNo::YES;
             $game->update();
-            return ResponseHelper::Success(["success" => true, "data" => ["is_action_done"=>$game->is_action_done,"player_id"=>$player->id,"money" => $player->money]]);
+            return ResponseHelper::Socket("property-bought",["is_action_done"=>$game->is_action_done,"player_id"=>$player->id,"money" => $player->money]);
         }
+        throw new Exception("в данный момент вы не можете купить это место");
         return ResponseHelper::Error("в данный момент вы не можете купить это место");
     }
     public function actionImprove($property_id)
     {
         $user_id=Yii::$app->user->id;
         $player=Player::find()->where(["user_id"=>$user_id])->orderBy(["id"=>SORT_DESC])->limit(1)->one();
-        $propertyGameStatus=PropertyGameStatus::find()->where(["player_id"=>$player->id],["property_id"=>$property_id])->with("property")->limit(1)->one();
+        $propertyGameStatus=PropertyGameStatus::find()
+        ->where(["player_id"=>$player->id],["property_id"=>$property_id])
+        ->with(["property","gameSession"])
+        ->limit(1)
+        ->one();
         if($propertyGameStatus->levelUp())
         {
             /** @var Property */
@@ -86,11 +92,15 @@ class PropertyGameStatusController extends \yii\web\Controller
                 $player->pay($cost);
                 $player->update();
             }
+            $game=$propertyGameStatus->gameSession;
+            $game->is_action_done=YesNo::YES;
+            $game->update();
             $data=[
                 "money"=>$player->money,
-                "propertyGameStatus"=>$propertyGameStatus,
+                "is_action_done"=>$game->is_action_done
+                // "propertyGameStatus"=>$propertyGameStatus,
             ];
-            return $this->json($propertyGameStatus);
+            return ResponseHelper::Socket("property-improve",$data);
         }
         throw new Exception("Как ты здесь оказался?");
         // return ResponseHelper::Error("Вы больше не можете улучшать ");
