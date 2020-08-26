@@ -3,6 +3,8 @@
 namespace app\models;
 
 use Yii;
+use app\models\RentState;
+use phpDocumentor\Reflection\Types\Boolean;
 
 /**
  * This is the model class for table "property_player".
@@ -15,6 +17,17 @@ use Yii;
  */
 class PropertyGameStatus extends \yii\db\ActiveRecord
 {
+    //equal rent_state table row count
+    public const MAXRENTLEVEL=6;
+
+    public function levelUp():bool{
+        if($this->rent_status_id<self::MAXRENTLEVEL){
+            $this->rent_status_id++;
+            $this->update();
+            return true;
+        }
+        return false;
+    }
     /**
      * {@inheritdoc}
      */
@@ -53,5 +66,9 @@ class PropertyGameStatus extends \yii\db\ActiveRecord
     public function getPlayer()
     {
         return $this->hasOne(Player::class,["id"=>"player_id"]);
+    }
+    public function getRentState()
+    {
+        return $this->hasOne(RentState::class,["id"=>"rent_state_id"]);
     }
 }

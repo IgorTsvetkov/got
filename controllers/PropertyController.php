@@ -37,11 +37,13 @@ class PropertyController extends Controller
             $query->where(["game_session_id"=>$game_session_id])->limit(1);
             $query->with(["player.user"=>function($query){
                 $query->select("username");
-            },"player.hero"]);
-        },])
+            },"player.hero","rentState"]);
+        }])
         ->limit(1)
         ->asArray()
         ->one();
+        $property["propertyGameStatus"]=$property["propertyGameStatuses"][0];
+        unset($property["propertyGameStatuses"]);
         return ResponseHelper::Success($property);
     }
 }

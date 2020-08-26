@@ -24,6 +24,14 @@ use yii\behaviors\BlameableBehavior;
  */
 class Player extends \yii\db\ActiveRecord
 {
+    public function canPay($cost){
+        if($this->money<$cost)
+            return false;
+        return true;
+    }
+    public function pay($cost){
+        return $this->money-=$cost;
+    }
     public function getNextPlayer():?self
     {
         $nextPlayer=Player::find()
