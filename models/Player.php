@@ -131,4 +131,13 @@ class Player extends \yii\db\ActiveRecord
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
+    public function getPropertyGameStatuses(){
+        return $this->hasMany(PropertyGameStatus::class,["player_id"=>"id"]);
+    }
+    public function getGameProperties(){
+        return $this->hasMany(Property::class,["id"=>"property_id"])->via("propertyGameStatuses");
+    }
+    public function getPropertyCells(){
+        return $this->hasMany(Cell::class,["property_id"=>"id"])->via("gameProperties");
+    }
 }

@@ -10,6 +10,7 @@ use Yii;
  * @property int $id
  * @property string|null $name
  * @property string|null $src
+ * @property string|null $color
  */
 class Hero extends \yii\db\ActiveRecord
 {

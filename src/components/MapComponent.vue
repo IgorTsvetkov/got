@@ -3,12 +3,18 @@
     <div class="grid position-relative">
       <div class="position-absolute absolute-right-0">
         <match-menu>
-        <a :href="'/match/leave?game_id='+game.id">Покинуть</a>
+          <a :href="'/match/leave?game_id='+game.id">Покинуть</a>
         </match-menu>
-        </div>
-      <div v-for="(cell,index) in cells" :key="index">
+      </div>
+      <div v-for="cell in cells" :key="cell.position">
         <!-- {{game}} -->
-        <cell :cell="cell" :players="game.players"></cell>
+        <cell :playerOwner="playerOwner(cell.position)" :cell="cell">
+          <div v-for="(player,key) in game.players" :key="key">
+            <div v-if="player.position==cell.position">
+              <figurine :hero="player.hero"></figurine>
+            </div>
+          </div>
+        </cell>
       </div>
       <div class="cell-center position-relative">
         <img src="/web/images/center.jpg" alt />
@@ -23,12 +29,14 @@
               <button
                 v-if="!game.is_dice_rolled"
                 class="btn btn-light"
-                @click="move()" @keypress.enter="move()"
+                @click="move()"
+                @keypress.enter="move()"
               >Бросить кубик</button>
               <button
                 v-if="game.is_dice_rolled"
                 class="btn btn-light"
-                @click="endTurn()" @keypress.enter="endTurn()"
+                @click="endTurn()"
+                @keypress.enter="endTurn()"
               >Закончить ход</button>
             </div>
           </div>
@@ -60,6 +68,7 @@
 import ImageComponent from "./ImageComponent.vue";
 // import CellInfo from "./CellInfo.vue";
 import Cell from "./Cell.vue";
+import Figurine from "./Figurine.vue";
 import Chat from "./Chat.vue";
 import PropertyCard from "./PropertyCard.vue";
 import MatchMenu from "./MatchMenu.vue";
@@ -67,7 +76,7 @@ import MatchMenu from "./MatchMenu.vue";
 import AuthSocket from "../js/AuthSocket";
 
 export default {
-  components: { ImageComponent, Chat, Cell, MatchMenu,PropertyCard },
+  components: { ImageComponent, Chat, Cell, MatchMenu, PropertyCard, Figurine },
   props: {
     gameString: {
       type: String,
@@ -91,7 +100,7 @@ export default {
 
     this.game = JSON.parse(this.gameString);
     this.myPlayer = this.game.players.find((p) => p.id == this.player_id);
-    let result = await this.$axios.get("/cell?game_id="+this.game.id);
+    let result = await this.$axios.get("/cell?game_id=" + this.game.id);
     if (result) this.cells = result.data;
     this.socket = this.$socketGet(this.game.id, "send-local-to-all");
     this.socket.addMessageCallback((e, parsedData) => {
@@ -111,14 +120,15 @@ export default {
       if (parsedData.action && parsedData.action == "property-bought") {
         let player = this.findPlayer(parsedData.data.player_id);
         player.money = parsedData.data.money;
-        this.game.is_action_done=parsedData.data.is_action_done;
+        player.propertyCells.push({position:player.position});
+        this.game.is_action_done = parsedData.data.is_action_done;
         this.$forceUpdate();
       }
       if (parsedData.action && parsedData.action == "property-improve") {
         let player = this.findPlayer(parsedData.data.player_id);
-        console.log('parsedData.data :>> ', parsedData.data);
+        console.log("parsedData.data :>> ", parsedData.data);
         player.money = parsedData.data.money;
-        this.game.is_action_done=parsedData.data.is_action_done;
+        this.game.is_action_done = parsedData.data.is_action_done;
         this.$forceUpdate();
       }
     });
@@ -134,15 +144,14 @@ export default {
       // }
 
       let result = e.data;
-        console.log("property result :>> ", result);
-      if (this.$response.hasError(result)){
-        let message=this.$response.getErrorMessage(result);
-        this.socket.send({},message);
+      console.log("property result :>> ", result);
+      if (this.$response.hasError(result)) {
+        let message = this.$response.getErrorMessage(result);
+        this.socket.send({}, message);
         return;
       }
       let systemChatMessage = `${this.myPlayer.user.username} купил новую собсвенность`;
       this.socket.send(result, systemChatMessage);
-      
     },
     async move(player_id) {
       let result = await this.$axios.post(
@@ -168,6 +177,9 @@ export default {
     findPlayer(id) {
       return this.game.players.find((p) => (p.id = id));
     },
+    playerOwner(position){
+      return this.game.players.find(p=>p.propertyCells&&p.propertyCells.find(cell=>cell.position==position));
+    }
   },
   computed: {
     myCell: function () {
@@ -231,8 +243,7 @@ body {
 .cell-center img {
   width: inherit;
 }
-.absolute-right-0{
-  right:0px;
-
+.absolute-right-0 {
+  right: 0px;
 }
 </style>

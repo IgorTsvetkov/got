@@ -38,7 +38,9 @@ class GotController extends Controller
             $query->select("id,username");
         };
         $game = $user->getLastGame()
-        ->joinWith(["players", "players.hero", "players.user" => $userSafeQuery])
+        ->joinWith(["players", "players.hero", "players.user" => $userSafeQuery,"players.propertyCells"=>function($q){
+            $q->select("id,property_id,position");
+        }])
         ->andWhere(["finished_at"=>null])
         ->asArray()
         ->one();

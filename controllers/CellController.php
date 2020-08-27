@@ -21,7 +21,10 @@ class CellController extends Controller
             //         $q->with(["player.hero"]);
             //     }]);
             // };
-            $cells=Cell::find()->joinWith(["property.group","tax","utility","event","property.playerProperty"])
+            $playerOwnerQuery=function(Query $q){
+                $q->with("playerOwner.hero");
+            };
+            $cells=Cell::find()->joinWith(["property.group","tax","utility","event","property"=>$playerOwnerQuery])
             ->asArray()
             ->all();
             return ResponseHelper::Success($cells);

@@ -1,11 +1,7 @@
 <template>
   <div class="h-100">
-    <div class="position-absolute h-100">
-      <div v-for="(player,key) in players" :key="key">
-        <div v-if="cell.position==player.position">
-          <figurine :hero="player.hero"></figurine>
-        </div>
-      </div>
+    <div class="position-absolute h-100 d-flex">
+      <slot></slot>
     </div>
     <div class="d-flex justify-content-center h-100">
       <property-cell
@@ -13,32 +9,31 @@
         :src="getImage(cell)"
         :price="+cell.property.cost"
         :price_bgcolor="cell.property.group.color_name"
+        :playerOwner="playerOwner"
       />
       <image-component v-else :src="getImage(cell)" />
     </div>
   </div>
-        <!-- :property_game_status="cell.property.propertyGameStatuses[0].player.userusername" -->
+  <!-- :property_game_status="cell.property.propertyGameStatuses[0].player.userusername" -->
 </template>
 
 <script>
 import ImageComponent from "./ImageComponent.vue";
 import PropertyCell from "./PropertyCell.vue";
-import Figurine from "./Figurine.vue";
 export default {
   components: {
     ImageComponent,
     PropertyCell,
-    Figurine,
   },
   props: {
     cell: {
       type: Object,
       default: {},
     },
-    players: {
-      type: Array,
-      default: [],
-    },
+    playerOwner:{
+      type:Object,
+      default:undefined
+    }
   },
   methods: {
     getImage(cell) {
@@ -53,6 +48,13 @@ export default {
         : "";
       return x;
     },
+  },
+  computed: {
+    // playerOwner() {
+    //   if (this.cell && this.cell.property && this.cell.property.playerOwner)
+    //     return this.cell.property.playerOwner;
+    //   return null;
+    // },
   },
 };
 </script>

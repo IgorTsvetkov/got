@@ -75,7 +75,7 @@ class Property extends \yii\db\ActiveRecord
     public function getPropertyGameStatuses(){
         return $this->hasMany(PropertyGameStatus::class,["property_id"=>"id"]);
     }
-    public function getPlayerProperty(){
+    public function getPlayerOwner(){
         return $this->hasOne(Player::class,["id"=>"player_id"])->via("propertyGameStatuses");
     }
 }
