@@ -14,6 +14,7 @@ use app\models\UserGameSession;
 use app\models\PropertyGameStatus;
 use app\models\RentState;
 use Exception;
+use yii\helpers\VarDumper;
 
 class PropertyGameStatusController extends \yii\web\Controller
 {
@@ -44,10 +45,10 @@ class PropertyGameStatusController extends \yii\web\Controller
             ->andWhere(["game_session_id" => $player->game_session_id])
             ->exists();
         if ($isBought)
-            ResponseHelper::Error("уже куплено");
+            return ResponseHelper::Error("уже куплено");
         //это этот игрок?
         if ($player->user->id !== Yii::$app->user->id)
-            ResponseHelper::Error("вы не можете использовать данные другого пользователя");
+            return ResponseHelper::Error("вы не можете использовать данные другого пользователя");
         $property = Property::find()->where(["id" => $property_id])->with("cell")->limit(1)->one();
         // можно купить только в свой ход и только если игрок стоит на клетке с property
         if (
@@ -56,11 +57,12 @@ class PropertyGameStatusController extends \yii\web\Controller
             $player->position == $property->cell->position
         ) {
             if($player->canPay($property->cost)===false)
-                return ResponseHelper::Error("недостаточно средств"); //TO DO Аукцион//TO DO Аукцион
+                return ResponseHelper::Error("недостаточно средств"); //TO DO Аукцион
             $player->pay($property->cost);
             $player->update(false);
 
             $model = new PropertyGameStatus();
+            $model->rent_state_id=1;
             $model->property_id = $property_id;
             $model->game_session_id = $player->game_session_id;
             $model->player_id = $player->id;
@@ -79,7 +81,7 @@ class PropertyGameStatusController extends \yii\web\Controller
         $user_id=Yii::$app->user->id;
         $player=Player::find()->where(["user_id"=>$user_id])->orderBy(["id"=>SORT_DESC])->limit(1)->one();
         $propertyGameStatus=PropertyGameStatus::find()
-        ->where(["player_id"=>$player->id],["property_id"=>$property_id])
+        ->where(["player_id"=>$player->id,"property_id"=>$property_id])
         ->with(["property","gameSession"])
         ->limit(1)
         ->one();
@@ -87,7 +89,7 @@ class PropertyGameStatusController extends \yii\web\Controller
         {
             /** @var Property */
             $property=$propertyGameStatus->property;
-            $cost=$property->getAttribute($property->rentState->name);
+            $cost=$property->getAttribute($propertyGameStatus->rentState->name);
             if($player->canPay($cost)){
                 $player->pay($cost);
                 $player->update();
@@ -96,6 +98,7 @@ class PropertyGameStatusController extends \yii\web\Controller
             $game->is_action_done=YesNo::YES;
             $game->update();
             $data=[
+                "player_id"=>$player->id,
                 "money"=>$player->money,
                 "is_action_done"=>$game->is_action_done
                 // "propertyGameStatus"=>$propertyGameStatus,

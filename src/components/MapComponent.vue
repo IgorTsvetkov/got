@@ -1,6 +1,11 @@
 <template>
   <div class="d-flex align-items-center justify-content-center">
-    <div class="grid">
+    <div class="grid position-relative">
+      <div class="position-absolute absolute-right-0">
+        <match-menu>
+        <a :href="'/match/leave?game_id='+game.id">Покинуть</a>
+        </match-menu>
+        </div>
       <div v-for="(cell,index) in cells" :key="index">
         <!-- {{game}} -->
         <cell :cell="cell" :players="game.players"></cell>
@@ -15,16 +20,15 @@
               <div class="bg-dark text-light lead">{{player.user.username}} : {{ player.money }}$</div>
             </div>
             <div v-if="isMyTurn">
-              {{game.is_dice_roll}}
               <button
                 v-if="!game.is_dice_rolled"
                 class="btn btn-light"
-                @click="move()"
+                @click="move()" @keypress.enter="move()"
               >Бросить кубик</button>
               <button
                 v-if="game.is_dice_rolled"
                 class="btn btn-light"
-                @click="endTurn()"
+                @click="endTurn()" @keypress.enter="endTurn()"
               >Закончить ход</button>
             </div>
           </div>
@@ -34,16 +38,14 @@
         <div class="w-100 h-100 d-flex bg-warning">
           <div class="w-50 h-inherit d-flex justify-content-center align-items-center">
             <div v-if="isMyTurn">
-              <div v-if="myCell&&myCell.property">
+              <div v-if="myCell&&myCell.property&&game.is_dice_rolled">
                 <property-card
-                  :is_action_done="Boolean(this.game.is_action_done)"
+                  :is_action_done="Boolean(+this.game.is_action_done)"
                   :id="+myCell.property_id"
                   @propertyChange="onpropertyChange"
                 ></property-card>
               </div>
             </div>
-
-            <a :href="'/match/leave?game_id='+game.id">Покинуть игру</a>
           </div>
           <div class="w-50 bg-primary d-flex flex-column h-100 p-2">
             <chat :from="myPlayer.user.username" :from_img="myPlayer.hero.src" :game_id="+game.id"></chat>
@@ -60,11 +62,12 @@ import ImageComponent from "./ImageComponent.vue";
 import Cell from "./Cell.vue";
 import Chat from "./Chat.vue";
 import PropertyCard from "./PropertyCard.vue";
+import MatchMenu from "./MatchMenu.vue";
 
 import AuthSocket from "../js/AuthSocket";
 
 export default {
-  components: { ImageComponent, Chat, Cell, PropertyCard },
+  components: { ImageComponent, Chat, Cell, MatchMenu,PropertyCard },
   props: {
     gameString: {
       type: String,
@@ -88,8 +91,7 @@ export default {
 
     this.game = JSON.parse(this.gameString);
     this.myPlayer = this.game.players.find((p) => p.id == this.player_id);
-
-    let result = await this.$axios.get("/cell");
+    let result = await this.$axios.get("/cell?game_id="+this.game.id);
     if (result) this.cells = result.data;
     this.socket = this.$socketGet(this.game.id, "send-local-to-all");
     this.socket.addMessageCallback((e, parsedData) => {
@@ -114,13 +116,13 @@ export default {
       }
       if (parsedData.action && parsedData.action == "property-improve") {
         let player = this.findPlayer(parsedData.data.player_id);
+        console.log('parsedData.data :>> ', parsedData.data);
         player.money = parsedData.data.money;
         this.game.is_action_done=parsedData.data.is_action_done;
         this.$forceUpdate();
       }
     });
   },
-  created() {},
   methods: {
     onpropertyChange(e) {
       // let data = e.data;
@@ -140,6 +142,7 @@ export default {
       }
       let systemChatMessage = `${this.myPlayer.user.username} купил новую собсвенность`;
       this.socket.send(result, systemChatMessage);
+      
     },
     async move(player_id) {
       let result = await this.$axios.post(
@@ -227,5 +230,9 @@ body {
 }
 .cell-center img {
   width: inherit;
+}
+.absolute-right-0{
+  right:0px;
+
 }
 </style>

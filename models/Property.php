@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use app\models\Player;
 use app\models\PropertyGroup;
 use Codeception\Lib\Generator\Group;
 
@@ -73,5 +74,8 @@ class Property extends \yii\db\ActiveRecord
     }
     public function getPropertyGameStatuses(){
         return $this->hasMany(PropertyGameStatus::class,["property_id"=>"id"]);
+    }
+    public function getPlayerProperty(){
+        return $this->hasOne(Player::class,["id"=>"player_id"])->via("propertyGameStatuses");
     }
 }

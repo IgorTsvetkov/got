@@ -109,6 +109,9 @@ class GameSession extends \yii\db\ActiveRecord
     {
         return $this->hasOne(User::className(), ['id' => 'leader_user_id']);
     }
+    public function getPropertyGameStatuses(){
+        return $this->hasMany(PropertyGameStatus::className(),["game_session_id"=>"id"]);
+    }
     /**
      * Gets query for [[Users]].
      *

@@ -21,8 +21,8 @@ class PropertyGameStatus extends \yii\db\ActiveRecord
     public const MAXRENTLEVEL=6;
 
     public function levelUp():bool{
-        if($this->rent_status_id<self::MAXRENTLEVEL){
-            $this->rent_status_id+=1;
+        if($this->rent_state_id<self::MAXRENTLEVEL){
+            $this->rent_state_id+=1;
             $this->update();
             return true;
         }
@@ -66,6 +66,10 @@ class PropertyGameStatus extends \yii\db\ActiveRecord
     public function getPlayer()
     {
         return $this->hasOne(Player::class,["id"=>"player_id"]);
+    }
+    public function getGameSession()
+    {
+        return $this->hasOne(GameSession::class,["id"=>"game_session_id"]);
     }
     public function getRentState()
     {

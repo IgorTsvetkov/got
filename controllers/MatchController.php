@@ -39,36 +39,45 @@ class MatchController extends Controller
                 return $this->redirect("/");
             $user = User::me();
             $lastGame = $user->getLastGame()->one();
-            if ($lastGame && ($lastGame->isStarted === false||$lastGame->isFinished === false)) {
+            if ($lastGame && ($lastGame->isStarted === false || $lastGame->isFinished === false)) {
                 return $this->redirect("/match/connect");
             }
         }
         return parent::beforeAction($action);
     }
-    public function actionIndex($json=false)
+    public function actionIndex($json = false)
     {
-        $user=User::me();
-        $lastGame=$user->getLastGame()->one();
-        if($lastGame && !$lastGame->isFinished)
+        $user = User::me();
+        Yii::debug($user);
+        $lastGame = $user->getLastGame()->one();
+        if ($lastGame && !$lastGame->isFinished)
             $this->redirect("/match/connect");
-        if($json){
+        if ($json) {
             $games = GameSession::find()
-            ->select("game_session.id,game_session.name,user.username,COUNT(player.id) as count,game_session.created_at,game_session.started_at,game_session.finished_at")
-            ->where(["started_at" => null,"finished_at"=>null])
-            ->orderBy(["created_at" => SORT_DESC])
-            ->joinWith(
-                [
-                    "leader"=>function($query){
-                $query->select("id,username");
-            },
-            "players"=>function($query){
-                $query->select("id,game_session_id");
-            }])
-            ->groupBy("game_session.id")
-            ->all();
+                ->select("game_session.id,
+            game_session.name,
+            user.username,
+            COUNT(player.id) as count,
+            game_session.created_at,
+            game_session.started_at,
+            game_session.finished_at")
+                ->where(["started_at" => null, "finished_at" => null])
+                ->orderBy(["created_at" => SORT_DESC])
+                ->joinWith(
+                    [
+                        "leader" => function ($query) {
+                            $query->select("id,username");
+                        },
+                        "players" => function ($query) {
+                            $query->select("id,game_session_id");
+                        },
+                    ]
+                )
+                ->groupBy("game_session.id")
+                ->all();
             return ResponseHelper::Success($games);
         }
-            
+
         return $this->render('index');
     }
     public function actionCreateLobby()
@@ -79,41 +88,49 @@ class MatchController extends Controller
         $game->save();
         $player = Player::createAndLink($game, $user);
         $player->save();
-        
+
         //дублируется запрос, но здесь только одно поле
         $game = GameSession::find()
-        ->select("game_session.id,game_session.name,user.username,COUNT(player.id) as count,game_session.created_at,game_session.started_at,game_session.finished_at")
-        ->where(["started_at" => null,"finished_at"=>null])
-        ->orderBy(["created_at" => SORT_DESC])
-        ->joinWith(
-            [
-                "leader"=>function($query){
-            $query->select("id,username");
-        },
-        "players"=>function($query){
-            $query->select("id,game_session_id");
-        }])
-        ->groupBy("game_session.id")
-        ->orderBy(["id"=>SORT_DESC])
-        ->one();
+            ->select("game_session.id,
+        game_session.name,
+        user.username,
+        COUNT(player.id) as count,
+        game_session.created_at,
+        game_session.started_at,
+        game_session.finished_at")
+            ->where(["started_at" => null, "finished_at" => null])
+            ->orderBy(["created_at" => SORT_DESC])
+            ->joinWith(
+                [
+                    "leader" => function ($query) {
+                        $query->select("id,username");
+                    },
+                    "players" => function ($query) {
+                        $query->select("id,game_session_id");
+                    },
+                ]
+            )
+            ->groupBy("game_session.id")
+            ->orderBy(["id" => SORT_DESC])
+            ->one();
 
-        return ResponseHelper::Socket("create-lobby",["game"=>$game]);
+        return ResponseHelper::Socket("create-lobby", ["game" => $game]);
     }
     public function actionJoin($game_id)
     {
-        $game = GameSession::find()->where(["id"=>$game_id])->with("players")->limit(1)->one();
-        if(GameSession::MAX_PLAYERS<=count($game->players))
+        $game = GameSession::find()->where(["id" => $game_id])->with("players")->limit(1)->one();
+        if (GameSession::MAX_PLAYERS <= count($game->players))
             return ResponseHelper::Error("Невозможно подключиться! Лобби игры заполнено");
         $user = User::me();
         $player = Player::createAndLink($game, $user);
         $player->save();
 
-        return ResponseHelper::Socket("join",$player);
+        return ResponseHelper::Socket("join", $player);
     }
     public function actionConnect($json = false)
     {
         $user = User::Me();
-        $game = $user->getLastGame()->joinWith(["players","players.hero", "players.user" => function ($query) {
+        $game = $user->getLastGame()->joinWith(["players", "players.hero", "players.user" => function ($query) {
             $query->select(["id", "username"]);
         }])
             ->asArray()
@@ -128,28 +145,27 @@ class MatchController extends Controller
 
     public function actionLeave(int $game_id)
     {
-        $user_id=Yii::$app->user->id;
+        $user_id = Yii::$app->user->id;
         /** @var Player $player */
-        $player=Player::find()->where(["game_session_id"=>$game_id,"user_id"=>$user_id])->with("gameSession")->limit(1)->one();
-        $game=$player->gameSession;
-        
+        $player = Player::find()->where(["game_session_id" => $game_id, "user_id" => $user_id])->with("gameSession")->limit(1)->one();
+        $game = $player->gameSession;
+
         if ($game->id == $game_id) {
             /** @var Player $nextTurnPlayer */
-            $nextPlayer=$player->getNextPlayer();
+            $nextPlayer = $player->getNextPlayer();
             //если текущий игрок последний, завершить игру
-            if($nextPlayer->id===$player->id)
-            {
+            if ($nextPlayer->id === $player->id) {
                 $game->removeUser($user_id);
                 $game->touch("finished_at");
                 $game->update();
                 return $this->redirect("/site");
             }
             //значит игрок не последний, передаем след пользователю права лидера и удаляем текущего игрока
-            $game->leader_user_id=$nextPlayer->user->id;
+            $game->leader_user_id = $nextPlayer->user->id;
             $game->removeUser($user_id);
             $game->update();
-            return ResponseHelper::Socket("leader-change",[""]);
-        }   
+            return ResponseHelper::Socket("leader-change", [""]);
+        }
         return $this->redirect("/site");
     }
     public function actionChangeSlot(int $slot)
@@ -172,16 +188,16 @@ class MatchController extends Controller
     }
     public function actionStart(int $game_id)
     {
-        $user_id=Yii::$app->user->id;
+        $user_id = Yii::$app->user->id;
         /** @var Player */
-        $anyPlayer=Player::find()
-        ->where(["game_session_id"=>$game_id])
-        ->with("gameSession")
-        ->limit(1)
-        ->one();
-        $game=$anyPlayer->gameSession;
-        if ($game->leader_user_id ===$user_id ) {
-            $game->turn_player_id =$anyPlayer->id ;
+        $anyPlayer = Player::find()
+            ->where(["game_session_id" => $game_id])
+            ->with("gameSession")
+            ->limit(1)
+            ->one();
+        $game = $anyPlayer->gameSession;
+        if ($game->leader_user_id === $user_id) {
+            $game->turn_player_id = $anyPlayer->id;
             $game->update();
             $game->touch("started_at");
         }

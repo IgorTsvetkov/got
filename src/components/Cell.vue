@@ -8,23 +8,26 @@
       </div>
     </div>
     <div class="d-flex justify-content-center h-100">
-      <ImageComponent
+      <property-cell
         v-if="cell.property"
         :src="getImage(cell)"
         :price="+cell.property.cost"
         :price_bgcolor="cell.property.group.color_name"
-      ></ImageComponent>
-      <ImageComponent v-else :src="getImage(cell)"></ImageComponent>
+      />
+      <image-component v-else :src="getImage(cell)" />
     </div>
   </div>
+        <!-- :property_game_status="cell.property.propertyGameStatuses[0].player.userusername" -->
 </template>
 
 <script>
 import ImageComponent from "./ImageComponent.vue";
+import PropertyCell from "./PropertyCell.vue";
 import Figurine from "./Figurine.vue";
 export default {
   components: {
     ImageComponent,
+    PropertyCell,
     Figurine,
   },
   props: {

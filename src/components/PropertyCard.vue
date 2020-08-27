@@ -30,7 +30,7 @@
       <button v-if="!isBought" class="btn btn-success text-light w-100 shadow" @click="buy">
         <span class="h4 py-3">Купить {{property.cost}}</span>
       </button>
-      <button v-if="isBought" class="btn btn-success text-light w-100 shadow" @click="improve">
+      <button v-if="isBought&&!isActiveRent('rent_inn')" class="btn btn-success text-light w-100 shadow" @click="improve">
         <span class="h4 py-3">Улучшить {{property.homes_inn_cost}}</span>
       </button>
     </div>
@@ -118,7 +118,7 @@ export default {
     },
     async improve(){
       let result = await this.$axios.post(
-        "/property-game-status/create?property_id=" + this.id
+        "/property-game-status/improve?property_id=" + this.id
       );
       if(result){
         this.$emit("propertyChange", result);
