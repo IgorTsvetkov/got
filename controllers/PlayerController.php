@@ -47,6 +47,6 @@ class PlayerController extends \yii\web\Controller
         $rent_cost=$property->getAttribute($rent_state_name);
         if($player_from->canPay($rent_cost))
             $player_from->payTo($player_to,$rent_cost);
-        var_dump("not do")
+        var_dump("not do");
     }
 }
