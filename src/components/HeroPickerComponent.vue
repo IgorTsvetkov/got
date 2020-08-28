@@ -9,7 +9,7 @@
       >
         <div class="d-flex align-content-center justify-content-center bg-primary text-light">
           <h4 class="w-100 lead m-0 line-height-2">Выбор персонажа</h4>
-          <button class="btn btn-danger sticky-top rounded-0" @click="toggleHeroes">&times;</button>
+          <button class="btn btn-danger sticky-top rounded-0" @click="hideHeroesPicker">&times;</button>
         </div>
         <div class="overflow-auto d-flex p-1">
           <div v-for="(hero) in heroes" :key="hero.id">
@@ -70,7 +70,7 @@ export default {
   methods: {
     async changeHero(hero_id){
       let result = await this.$axios.post(`/player/update-hero?player_id=${this.player_id}&hero_id=${hero_id}`);
-      // if(result)
+      this.hideHeroesPicker();
       this.$emit("heroChanged", result);
     },
     async changeSlot(value) {
@@ -82,6 +82,11 @@ export default {
         this.heroesPicker = !this.heroesPicker;
       }
     },
+    hideHeroesPicker(){
+      if (this.is_current_player) {
+        this.heroesPicker = false;
+      }
+    }
 
   },
   created() {

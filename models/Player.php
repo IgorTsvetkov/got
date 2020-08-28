@@ -34,6 +34,12 @@ class Player extends \yii\db\ActiveRecord
     public function pay($cost){
         return $this->money-=$cost;
     }
+    public function payTo($player_to,$cost=0){
+        $this->money-=$cost;
+        $player_to->money+=$cost;
+        $this->update();
+        $player_to->update();
+    }
     public function move($value){
         $this->position += $value;
         $this->position %= self::COUNT_POSITION;
@@ -139,5 +145,11 @@ class Player extends \yii\db\ActiveRecord
     }
     public function getPropertyCells(){
         return $this->hasMany(Cell::class,["property_id"=>"id"])->via("gameProperties");
+    }
+    public function getPositionCell(){
+        return $this->hasOne(Cell::class,["position"=>"position"]);
+    }
+    public function get(){
+        return $this->hasOne(Cell::class,["position"=>"position"]);
     }
 }

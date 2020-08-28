@@ -22,7 +22,7 @@ export default {
     price: {
       type: Number,
       default: undefined,
-    },
+    },  
     price_bgcolor: {
       type: String,
       default: "bgblack",

@@ -1,8 +1,10 @@
 <template>
   <div>
     <div class="d-flex w-100 justify-content-end bg-light">
-        <div class="w-100 d-flex justify-content-center align-items-center"><div class="font-weight-bolder lead">Игра № {{gameParsed.id}}</div></div>
-        <a class="btn btn-danger" :href="'/match/leave?game_id='+gameParsed.id" @click.prevent="leave">&times;</a>
+      <div class="w-100 d-flex justify-content-center align-items-center">
+        <div class="font-weight-bolder lead">Игра № {{gameParsed.id}}</div>
+      </div>
+      <leave-match-button @leave="refreshPageEveryone" :game_id="gameParsed.id"/>
     </div>
     <div
       class="d-flex flex-row justify-content-center align-items-center flex-wrap text-center lead"
@@ -27,21 +29,30 @@
       </div>
     </div>
     <div class="d-flex">
-    <slot v-if="this.gameParsed.leader_user_id===this.current_user_id"></slot>
-    <div class="d-flex justify-content-center align-items-center">
+      <div v-if="gameParsed.leader_user_id===this.current_user_id">
+        <start-game-button
+          class="w-100"
+          :game_id="gameParsed.id"
+          :action="'/match/start?game_id='+gameParsed.id"
+          @startGame="onstartgame"
+        >Начать игру</start-game-button>
+      </div>
+      <div class="d-flex justify-content-center align-items-center"></div>
     </div>
-    </div> 
 
     <div v-if="error" class="lead bg-danger text-light border shadow p-20">{{error.message}}</div>
   </div>
 </template>
 
 <script>
-
 import HeroPickerComponent from "./HeroPickerComponent.vue";
+import StartGameButton from "./StartGameButton.vue";
+import LeaveMatchButton from './LeaveMatchButton.vue';
 export default {
   components: {
     HeroPickerComponent,
+    StartGameButton,
+    LeaveMatchButton
   },
   props: {
     game: {
@@ -60,52 +71,74 @@ export default {
       gameParsed: undefined,
     };
   },
-  beforeCreate() {},
-  methods: {
-    async leave(e){
-      let result= await this.$axios.post(e.target.href);
-      if(result){
-        this.refreshPageEveryone(result.data);
-        window.location.pathname="/match";
+  created() {
+    this.gameParsed = JSON.parse(this.game);
+    this.socket = this.$socketGet(this.gameParsed.id, "send-local-to-all");
+
+    this.socket.addMessageCallback((e, parsedData) => {
+      if (parsedData.action && parsedData.action === "join") {
+        this.refreshPageEveryone(e);
       }
-    },
+    });
+    //new
+        this.socket.addMessageCallback((e, result) => {
+      if (this.$response.getAction(result) === "refresh") {
+        this.refreshPageEveryone(e);
+        this.$axios
+          .get("/match/connect?json=true")
+          .then((res) => {
+            console.log("new data after update");
+            this.gameParsed = res.data;
+            // this.$forceUpdate();
+          })
+          .catch((res) => console.log("Error REFRESH :>> ", res));  
+      }
+    });
+    //old
+    this.socket.addMessageCallback((e, res) => {
+      console.log(res);
+      if (res.action == "refresh")
+        this.$axios
+          .get("/match/connect?json=true")
+          .then((res) => {
+            console.log("new data after update");
+            this.gameParsed = res.data;
+            // this.$forceUpdate(); 
+          })
+          .catch((res) => console.log("Error REFRESH :>> ", res));
+    });
+    this.socket.addMessageCallback((e, res) => {
+      console.log("res 123123 :>> ", res);
+      if (res.data && this.$response.getAction(res) == "start-game")
+        window.location.pathname = "/got/game";
+    });
+  },
+    methods: {
+      
+    // async leave(e) {
+    //   let result = await this.$axios.post(e.target.href);
+    //   if (result) {
+    //     this.refreshPageEveryone(result.data);
+    //     window.location.pathname = "/match";
+    //     return;
+    //   }
+    // },
     refreshPageEveryone(e) {
-      if (e&&e.data&&e.data.error) {
+      if (e && e.data && e.data.error) {
         this.error = e.data.error;
         return;
       }
       this.error = null;
       this.socket.send({ action: "refresh" });
     },
-  },
-  created() {
-    this.gameParsed = JSON.parse(this.game);
-    this.socket = this.$socketGet(this.gameParsed.id, "send-local-to-all");
-    this.socket.addMessageCallback((e,parsedData)=>{
-      if(parsedData.action&&parsedData.action==="join"){
-        this.refreshPageEveryone(e);
+    onstartgame(result) {
+      if (!this.$response.hasError(result)) {
+        console.log("result NO ERORR START :>> ", result);
+        this.socket.send(result);
       }
-    });
-    this.socket.addMessageCallback((e, res) => {
-        console.log(res);
-        if (res.action == "refresh")
-          this.$axios
-            .get("/match/connect?json=true")
-            .then((res) => {
-              console.log("new data after update");
-              this.gameParsed = res.data;
-              // this.$forceUpdate();
-            })
-            .catch((res) => console.log("Error REFRESH :>> ", res));
-        if (res.data && res.data.users)
-          this.users = this.usersTransform(res.data.users);
-      });
+    },
   },
   computed: {
-    // gameParsed: function () {
-    //   if (this.updatedGame) return this.updatedGame;
-    //   return JSON.parse(this.game);
-    // },
     players: function () {
       const maxPlayers = 6;
       let sorted = this.gameParsed.players.sort((a, b) => a.sort - b.sort);

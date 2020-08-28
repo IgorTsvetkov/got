@@ -24,7 +24,8 @@ class SocketController extends BaseSocketController
     public function actionSendLocalToAll(){
         $this->startWebSocket("/send-local-to-all",function($user,$currentConnection,$data,$worker){   
             foreach ($worker->connections as $connection) {
-                if(isset($connection->uid)&&$connection->uid==$data->uid){
+                if(isset($data)&&isset($data->uid)&&$connection->uid==$data->uid){
+                    echo "uid".$connection->uid."\n";
                     $connection->sendEncoded($data);
                 }
             }
@@ -32,6 +33,7 @@ class SocketController extends BaseSocketController
     }
     public function actionSendToAll(){
         $this->startWebSocket("/send-to-all",function($user,$currentConnection,$data,$worker){   
+            echo "send-to-all";
             foreach ($worker->connections as $connection) {
                     $connection->sendEncoded($data);
             }

@@ -26,13 +26,26 @@
     </div>
 
     <hr />
-    <div v-if="!is_action_done">
+    <div v-if="!is_action_done&&isPlayerOnCell">
       <button v-if="!isBought" class="btn btn-success text-light w-100 shadow" @click="buy">
         <span class="h4 py-3">Купить {{property.cost}}</span>
       </button>
-      <button v-if="isBought&&!isActiveRent('rent_inn')" class="btn btn-success text-light w-100 shadow" @click="improve">
-        <span class="h4 py-3">Улучшить {{property.homes_inn_cost}}</span>
-      </button>
+      <div v-else>
+        <div v-if="isPlayerOwner">
+          <button
+            v-if="!isActiveRent('rent_inn')"
+            class="btn btn-success text-light w-100 shadow"
+            @click="improve"
+          >
+            <span class="h4 py-3">Улучшить {{property.homes_inn_cost}}</span>
+          </button>
+        </div>
+        <div else>
+          <button class="btn btn-danger text-light w-100 shadow" @click="payRent">
+            <span class="h4 py-3">Заплатить ренту</span>
+          </button>
+        </div>
+      </div>
     </div>
 
     <hr />
@@ -56,6 +69,14 @@ export default {
     is_action_done: {
       type: Boolean,
       default: false,
+    },
+    myPlayer: {
+      type: Object,
+      default: undefined,
+    },
+    position: {
+      type: Number,
+      default: undefined,
     },
   },
   data() {
@@ -109,19 +130,28 @@ export default {
       let result = await this.$axios.post(
         "/property-game-status/create?property_id=" + this.id
       );
-      if(result) {
+      if (result) {
         {
-          this.$emit("propertyChange",result);
+          this.$emit("propertyBuy", result);
           await this.getProperty(this.id);
         }
       }
     },
-    async improve(){
+    async improve() {
       let result = await this.$axios.post(
         "/property-game-status/improve?property_id=" + this.id
       );
-      if(result){
-        this.$emit("propertyChange", result);
+      if (result) {
+        this.$emit("propertyImprove", result);
+        await this.getProperty(this.id);
+      }
+    },
+    async payRent() {
+      let result = await this.$axios.post(
+        "/player/pay-rent"
+      );
+      if (result) {
+        this.$emit("propertyImprove", result);
         await this.getProperty(this.id);
       }
     },
@@ -138,6 +168,12 @@ export default {
   computed: {
     isBought() {
       return this.propertyGameStatus;
+    },
+    isPlayerOnCell() {
+      return this.position == this.myPlayer.position;
+    },
+    isPlayerOwner() {
+      return this.myPlayer.id === this.propertyGameStatus.player_id;
     },
   },
   watch: {

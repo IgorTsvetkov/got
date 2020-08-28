@@ -3,7 +3,7 @@
     <div class="grid position-relative">
       <div class="position-absolute absolute-right-0">
         <match-menu>
-          <a :href="'/match/leave?game_id='+game.id">Покинуть</a>
+          <leave-match-button :game_id="game.id">Покинуть</leave-match-button>
         </match-menu>
       </div>
       <div v-for="cell in cells" :key="cell.position">
@@ -27,13 +27,13 @@
             </div>
             <div v-if="isMyTurn">
               <button
-                v-if="!game.is_dice_rolled"
+                v-if="!Boolean(+game.is_dice_rolled)"
                 class="btn btn-light"
                 @click="move()"
                 @keypress.enter="move()"
               >Бросить кубик</button>
               <button
-                v-if="game.is_dice_rolled"
+                v-else
                 class="btn btn-light"
                 @click="endTurn()"
                 @keypress.enter="endTurn()"
@@ -50,7 +50,10 @@
                 <property-card
                   :is_action_done="Boolean(+this.game.is_action_done)"
                   :id="+myCell.property_id"
-                  @propertyChange="onpropertyChange"
+                  @propertyBuy="onpropertyBuy"
+                  @propertyImprove="onpropertyImprove"
+                  :myPlayer="myPlayer"
+                  :position="myCell.position"
                 ></property-card>
               </div>
             </div>
@@ -66,7 +69,7 @@
 
 <script>
 import ImageComponent from "./ImageComponent.vue";
-// import CellInfo from "./CellInfo.vue";
+import LeaveMatchButton from './LeaveMatchButton.vue';
 import Cell from "./Cell.vue";
 import Figurine from "./Figurine.vue";
 import Chat from "./Chat.vue";
@@ -76,7 +79,7 @@ import MatchMenu from "./MatchMenu.vue";
 import AuthSocket from "../js/AuthSocket";
 
 export default {
-  components: { ImageComponent, Chat, Cell, MatchMenu, PropertyCard, Figurine },
+  components: { ImageComponent, Chat, Cell, MatchMenu, PropertyCard, Figurine,LeaveMatchButton },
   props: {
     gameString: {
       type: String,
@@ -97,7 +100,6 @@ export default {
   },
   async beforeMount() {
     //set csrf for all post request
-
     this.game = JSON.parse(this.gameString);
     this.myPlayer = this.game.players.find((p) => p.id == this.player_id);
     let result = await this.$axios.get("/cell?game_id=" + this.game.id);
@@ -119,6 +121,8 @@ export default {
       }
       if (parsedData.action && parsedData.action == "property-bought") {
         let player = this.findPlayer(parsedData.data.player_id);
+        console.log('parsedData property-bought :>> ', parsedData);
+        console.log('player property-bought :>> ', player);
         player.money = parsedData.data.money;
         player.propertyCells.push({position:player.position});
         this.game.is_action_done = parsedData.data.is_action_done;
@@ -134,24 +138,25 @@ export default {
     });
   },
   methods: {
-    onpropertyChange(e) {
-      // let data = e.data;
-      // data.action = "property-change";
-      // console.log("property data :>> ", data);
-      // if (data.data.success) {
-      //   let systemChatMessage = `${this.myPlayer.user.username} купил новую собсвенность`;
-      //   this.socket.send(data, systemChatMessage);
-      // }
-
-      let result = e.data;
-      console.log("property result :>> ", result);
+    onpropertyBuy(result) {
       if (this.$response.hasError(result)) {
+      console.log("property result :>> ", result);
         let message = this.$response.getErrorMessage(result);
         this.socket.send({}, message);
         return;
       }
-      let systemChatMessage = `${this.myPlayer.user.username} купил новую собсвенность`;
-      this.socket.send(result, systemChatMessage);
+      let systemChatMessage = `${this.myPlayer.user.username} купил новую собственность`;
+      this.socket.send(result.data, systemChatMessage);
+    },
+    onpropertyImprove(result) {
+      if (this.$response.hasError(result)) {
+      console.log("property result :>> ", result);
+        let message = this.$response.getErrorMessage(result);
+        this.socket.send({}, message);
+        return;
+      }
+      let systemChatMessage = `${this.myPlayer.user.username} улучшил собственность`;
+      this.socket.send(result.data, systemChatMessage);
     },
     async move(player_id) {
       let result = await this.$axios.post(
@@ -170,12 +175,16 @@ export default {
       if (result1) {
         let data = result1.data.data;
         let nextPlayer = this.findPlayer(data.turn_player_id);
+        this.game.turn_player_id=nextPlayer.turn_player_id;
+        console.log('this.player_id :>> ', this.player_id);
+        console.log('data.turn_player_id', data.turn_player_id);
+        console.log('nextPlayer.turn_player_id', nextPlayer.turn_player_id);
         let systemChatMessage = `Игрок ${this.myPlayer.user.username} передал ход игроку ${nextPlayer.user.username}`;
         this.socket.send(result1.data, systemChatMessage);
       }
     },
     findPlayer(id) {
-      return this.game.players.find((p) => (p.id = id));
+      return this.game.players.find((p) => (p.id == id));
     },
     playerOwner(position){
       return this.game.players.find(p=>p.propertyCells&&p.propertyCells.find(cell=>cell.position==position));

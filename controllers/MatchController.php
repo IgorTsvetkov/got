@@ -158,7 +158,7 @@ class MatchController extends Controller
                 $game->removeUser($user_id);
                 $game->touch("finished_at");
                 $game->update();
-                return $this->redirect("/site");
+                return ResponseHelper::Redirect("/site");
             }
             //значит игрок не последний, передаем след пользователю права лидера и удаляем текущего игрока
             $game->leader_user_id = $nextPlayer->user->id;
@@ -166,7 +166,7 @@ class MatchController extends Controller
             $game->update();
             return ResponseHelper::Socket("leader-change", [""]);
         }
-        return $this->redirect("/site");
+        return ResponseHelper::Redirect("/site");
     }
     public function actionChangeSlot(int $slot)
     {
@@ -201,6 +201,6 @@ class MatchController extends Controller
             $game->update();
             $game->touch("started_at");
         }
-        return ResponseHelper::Success(["started" => true]);
+        return ResponseHelper::Socket("start-game");
     }
 }

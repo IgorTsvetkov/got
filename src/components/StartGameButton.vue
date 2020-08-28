@@ -18,27 +18,13 @@
             }
         },
         methods: {
-            startGame(e) {
-                if(this.action)
-                    this.$axios.post(this.action).then(res=>{
-                        if(res.data.started){
-                            this.socket.send({action:"start-game"});
-                        }
-                    });
-            }
-        },
-        data() {
-            return {
-                socket:undefined,
-            }
-        },
-        created () {
-            this.socket=this.$socketGet(this.game_id,"send-local-to-all");
-            this.socket.addMessageCallback((e,res)=>{
-                if (res.action == "start-game") 
-                    window.location.pathname = "/got/game";
+            async startGame(e) {
+                if(this.action){
+                    let result=await this.$axios.post(this.action);
+                    this.$emit("startGame",result);
+                }
 
-            })
+            }
         },
     }
 </script>
