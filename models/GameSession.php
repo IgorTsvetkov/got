@@ -130,5 +130,4 @@ class GameSession extends \yii\db\ActiveRecord
     {
         return $this->hasMany(UserGameSession::className(), ['game_session_id' => 'id']);
     } 
-    public 
 }

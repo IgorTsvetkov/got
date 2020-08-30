@@ -52,6 +52,7 @@
                   :id="+myCell.property_id"
                   @propertyBuy="onpropertyBuy"
                   @propertyImprove="onpropertyImprove"
+                  @propertyPayRent="onpropertyPayRent"
                   :myPlayer="myPlayer"
                   :position="myCell.position"
                 ></property-card>
@@ -69,7 +70,7 @@
 
 <script>
 import ImageComponent from "./ImageComponent.vue";
-import LeaveMatchButton from './LeaveMatchButton.vue';
+import LeaveMatchButton from "./LeaveMatchButton.vue";
 import Cell from "./Cell.vue";
 import Figurine from "./Figurine.vue";
 import Chat from "./Chat.vue";
@@ -77,9 +78,18 @@ import PropertyCard from "./PropertyCard.vue";
 import MatchMenu from "./MatchMenu.vue";
 
 import AuthSocket from "../js/AuthSocket";
+import {updateModel,updateModelInArrayAll} from "../js/modelHelper";
 
 export default {
-  components: { ImageComponent, Chat, Cell, MatchMenu, PropertyCard, Figurine,LeaveMatchButton },
+  components: {
+    ImageComponent,
+    Chat,
+    Cell,
+    MatchMenu,
+    PropertyCard,
+    Figurine,
+    LeaveMatchButton,
+  },
   props: {
     gameString: {
       type: String,
@@ -121,10 +131,10 @@ export default {
       }
       if (parsedData.action && parsedData.action == "property-bought") {
         let player = this.findPlayer(parsedData.data.player_id);
-        console.log('parsedData property-bought :>> ', parsedData);
-        console.log('player property-bought :>> ', player);
+        console.log("parsedData property-bought :>> ", parsedData);
+        console.log("player property-bought :>> ", player);
         player.money = parsedData.data.money;
-        player.propertyCells.push({position:player.position});
+        player.propertyCells.push({ position: player.position });
         this.game.is_action_done = parsedData.data.is_action_done;
         this.$forceUpdate();
       }
@@ -135,12 +145,19 @@ export default {
         this.game.is_action_done = parsedData.data.is_action_done;
         this.$forceUpdate();
       }
+      if (parsedData.action && parsedData.action == "property-pay-rent") {
+        let players=parsedData.data.players;
+        let game=parsedData.data.game;
+        updateModel(this.game,game);
+        updateModelAll(this.game.players,players);
+        this.$forceUpdate();
+      }
     });
   },
   methods: {
     onpropertyBuy(result) {
       if (this.$response.hasError(result)) {
-      console.log("property result :>> ", result);
+        console.log("property result :>> ", result);
         let message = this.$response.getErrorMessage(result);
         this.socket.send({}, message);
         return;
@@ -150,12 +167,22 @@ export default {
     },
     onpropertyImprove(result) {
       if (this.$response.hasError(result)) {
-      console.log("property result :>> ", result);
+        console.log("property result :>> ", result);
         let message = this.$response.getErrorMessage(result);
         this.socket.send({}, message);
         return;
       }
       let systemChatMessage = `${this.myPlayer.user.username} улучшил собственность`;
+      this.socket.send(result.data, systemChatMessage);
+    },
+    onpropertyPayRent(result) {
+      if (this.$response.hasError(result)) {
+        console.log("property result :>> ", result);
+        let message = this.$response.getErrorMessage(result);
+        this.socket.send({}, message);
+        return;
+      }
+      let systemChatMessage = `${this.myPlayer.user.username} заплатил ренту`;
       this.socket.send(result.data, systemChatMessage);
     },
     async move(player_id) {
@@ -175,20 +202,24 @@ export default {
       if (result1) {
         let data = result1.data.data;
         let nextPlayer = this.findPlayer(data.turn_player_id);
-        this.game.turn_player_id=nextPlayer.turn_player_id;
-        console.log('this.player_id :>> ', this.player_id);
-        console.log('data.turn_player_id', data.turn_player_id);
-        console.log('nextPlayer.turn_player_id', nextPlayer.turn_player_id);
+        this.game.turn_player_id = nextPlayer.turn_player_id;
+        console.log("this.player_id :>> ", this.player_id);
+        console.log("data.turn_player_id", data.turn_player_id);
+        console.log("nextPlayer.turn_player_id", nextPlayer.turn_player_id);
         let systemChatMessage = `Игрок ${this.myPlayer.user.username} передал ход игроку ${nextPlayer.user.username}`;
         this.socket.send(result1.data, systemChatMessage);
       }
     },
     findPlayer(id) {
-      return this.game.players.find((p) => (p.id == id));
+      return this.game.players.find((p) => p.id == id);
     },
-    playerOwner(position){
-      return this.game.players.find(p=>p.propertyCells&&p.propertyCells.find(cell=>cell.position==position));
-    }
+    playerOwner(position) {
+      return this.game.players.find(
+        (p) =>
+          p.propertyCells &&
+          p.propertyCells.find((cell) => cell.position == position)
+      );
+    },
   },
   computed: {
     myCell: function () {

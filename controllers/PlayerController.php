@@ -9,6 +9,7 @@ use app\models\Player;
 use app\models\Property;
 use app\models\GameSession;
 use app\helpers\ResponseHelper;
+use app\helpers\YesNo;
 use app\models\PropertyGameStatus;
 
 class PlayerController extends \yii\web\Controller
@@ -31,7 +32,7 @@ class PlayerController extends \yii\web\Controller
         /** @var PropertyGameStatus */
         $propertyGameStatus = PropertyGameStatus::find()
             ->where(["property_id" => $property_id, "player_id" => $player_to_id])
-            ->with(["property.cell", "rent_state"])
+            ->with(["property.cell", "rentState", "gameSession"])
             ->limit(1)
             ->one();
         //Проверка против злоумышленников
@@ -41,12 +42,24 @@ class PlayerController extends \yii\web\Controller
             $propertyGameStatus->property->cell->position !== $player_from->position
         )
             throw new Exception("This user has no such player");
-        $rent_state_name=$propertyGameStatus->rentState->name;
+        $rent_state_name = $propertyGameStatus->rentState->name;
         /** @var Property */
-        $property=$propertyGameStatus->property;
-        $rent_cost=$property->getAttribute($rent_state_name);
-        if($player_from->canPay($rent_cost))
-            $player_from->payTo($player_to,$rent_cost);
-        var_dump("not do");
+        $property = $propertyGameStatus->property;
+        $rent_cost = $property->getAttribute($rent_state_name);
+        if (!$player_from->canPay($rent_cost))
+            throw new Exception("have no money");
+        $player_from->payTo($player_to, $rent_cost);
+
+        /** @var GameSession */
+        $game=$propertyGameStatus->gameSession;
+        $game->is_action_done=YesNo::YES;
+        $game->update(false);
+
+        $players = [$player_from->getAttributes(), $player_to->getAttributes()];
+        $data = [
+            "players" => $players,
+            "game" => $propertyGameStatus->gameSession->getAttributes(),
+        ];
+        return ResponseHelper::Socket("property-pay-rent", $data);
     }
 }

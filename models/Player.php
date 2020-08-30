@@ -25,7 +25,6 @@ use yii\behaviors\BlameableBehavior;
 class Player extends \yii\db\ActiveRecord
 {
     public const COUNT_POSITION=40;
-
     public function canPay($cost){
         if($this->money<$cost)
             return false;

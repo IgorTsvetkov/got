@@ -1,5 +1,7 @@
 <?php
-/* @var $this yii\web\View */
+
+use yii\helpers\VarDumper;
+
+VarDumper::dump($game,10,true);
 ?>
 <h1>test/index</h1>
-<property-card></property-card>

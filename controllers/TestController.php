@@ -3,19 +3,15 @@
 namespace app\controllers;
 
 use Yii;
-use yii\rest\ActiveController;
+use app\models\User;
 use yii\web\Controller;
-use yii\web\Response;
 
-class UtilityController extends Controller
+class TestController extends Controller
 {
-    public function actionTest()
+    public function actionIndex()
     {
-        $response=Yii::$app->response;
-        $response->format=Response::FORMAT_JSON;
-        
-        $response->data=Yii::$app->user->identity;
-
-        return $response;
+        $user=User::me();
+        // $game=$user->getAttributes();
+        return $this->render("index",compact("game"));
     }
 }

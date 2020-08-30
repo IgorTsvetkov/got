@@ -148,11 +148,12 @@ export default {
     },
     async payRent() {
       let result = await this.$axios.post(
-        "/player/pay-rent"
+        "/player/pay-rent?player_from_id="+this.myPlayer.id
+        +"&&player_to_id="+this.propertyGameStatus.player_id
+        +"&&property_id="+this.property.id
       );
       if (result) {
-        this.$emit("propertyImprove", result);
-        await this.getProperty(this.id);
+        this.$emit("propertyPayRent", result);
       }
     },
     isActiveRent(name) {
