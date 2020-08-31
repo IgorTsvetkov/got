@@ -21,7 +21,7 @@ use app\commands\base\BaseSocketController;
  */
 class SocketController extends BaseSocketController
 {  
-    public function actionSendLocalToAll(){
+    public function actionGame(){
         $this->startWebSocket("/send-local-to-all",function($user,$currentConnection,$data,$worker){   
             foreach ($worker->connections as $connection) {
                 if(isset($data)&&isset($data->uid)&&$connection->uid==$data->uid){
@@ -31,16 +31,12 @@ class SocketController extends BaseSocketController
             }
         });
     }
-    public function actionSendToAll(){
+    public function actionAll(){
         $this->startWebSocket("/send-to-all",function($user,$currentConnection,$data,$worker){   
             echo "send-to-all";
             foreach ($worker->connections as $connection) {
                     $connection->sendEncoded($data);
             }
         });
-    }
-    public function actionAll(){
-        $this->actionSendToAll();
-        $this->actionSendLocalToAll();
     }
 }

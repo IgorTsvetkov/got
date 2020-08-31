@@ -3,7 +3,9 @@
 namespace app\models;
 
 use Yii;
+use app\helpers\YesNo;
 use app\models\RentState;
+use yii\helpers\VarDumper;
 use phpDocumentor\Reflection\Types\Boolean;
 
 /**
@@ -15,11 +17,30 @@ use phpDocumentor\Reflection\Types\Boolean;
  * @property int|null $player_id
  * @property int|null $game_session_id
  * @property int|null $group_id
+ * @property bool|null $is_group_full
  */
 class PropertyGameStatus extends \yii\db\ActiveRecord
 {
     //equal rent_state table row count
     public const MAXRENTLEVEL=6;
+
+    public static function markGroupImprovable($group_id){
+        self::updateAll(["is_group_full"=>YesNo::YES],["in","group_id",$group_id]);
+    }
+    public static function isMonopoly(int $group_id,int $game_session_id):bool{
+        $counts=self::find()
+        ->select(["COUNT(*) as count","count_max"])
+        ->where(["group_id"=>$group_id])
+        ->andWhere(["game_session_id"=>$game_session_id])
+        ->joinWith("group")
+        ->groupBy("group_id")
+        ->having("COUNT(DISTINCT player_id)=1")
+        ->asArray()
+        ->limit(1)
+        ->one();
+
+        return $counts["count"]===$counts["count_max"];
+    }
 
     public function levelUp():bool{
         if($this->rent_state_id<self::MAXRENTLEVEL){

@@ -41,4 +41,7 @@ class PropertyGroup extends \yii\db\ActiveRecord
             'color_name' => 'Color Name',
         ];
     }
+    public function getPropertyGameStatuses(){
+        return $this->hasMany(PropertyGameStatus::class,["group_id"=>"id"]);
+    }
 }

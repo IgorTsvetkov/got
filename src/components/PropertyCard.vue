@@ -5,20 +5,21 @@
     style="width:300px"
   >
     <div
-      class="d-flex flex-column justify-content-between justify-content-center px-2"
+      class="d-flex flex-column justify-content-between justify-content-center p-0 m-0"
       v-if="isBought"
     >
-      <div class="d-flex justify-content-center align-items-center bg-primary text-light px-2 py-1">
-        <figurine :hero="propertyGameStatus.player.hero"></figurine>
-        <span class="mx-1">{{propertyGameStatus.player.user.username}}</span>
+      <div class="d-flex justify-content-between w-100 m-0 p-2">
+        <div class="h3 font-weight-light">
+          <div class="text-capitalize m-0 p-0">{{property.name}}</div>
+        </div>
+        <div class="d-flex justify-content-center align-items-center text-light">
+          <figurine :hero="propertyGameStatus.player.hero"></figurine>
+        </div>
       </div>
-    </div>
-    <div class="h3 font-weight-light p-2 text-center">
-      <div class="text-capitalize">{{property.name}}</div>
     </div>
     <div v-for="rent in this.rents" :key="rent.label">
       <property-rent-field
-        :class="{'bg-warning text-dark':isActiveRent(rent.fieldName)}"
+        :class="{'bg-warning text-dark shadow':isActiveRent(rent.fieldName)}"
         class="px-2"
         :label="rent.label"
         :cost="+rent.cost"
@@ -33,12 +34,15 @@
       <div v-else>
         <div v-if="isPlayerOwner">
           <button
-            v-if="!isActiveRent('rent_inn')"
+            v-if="!isMaxLevel()&&propertyGameStatus.is_group_full"
             class="btn btn-success text-light w-100 shadow"
             @click="improve"
           >
             <span class="h4 py-3">Улучшить {{property.homes_inn_cost}}</span>
           </button>
+          <span v-show="!propertyGameStatus.is_group_full" class="small">
+            <a>Купите <span class="font-weight-bold text-warning">все</span> имущество одной цветовой группы, для улучшения</a>
+          </span>
         </div>
         <div v-if="!isPlayerOwner">
           <button class="btn btn-danger text-light w-100 shadow" @click="payRent">
@@ -47,10 +51,6 @@
         </div>
       </div>
     </div>
-
-    <hr />
-
-    <!-- <p>Если игроку принадлежит <span class="font-weight-bold">все</span> имущество одной цветовой группы, рента <span class="font-weight-bold">удваивается</span></p> -->
   </div>
 </template>
 <script>
@@ -148,9 +148,12 @@ export default {
     },
     async payRent() {
       let result = await this.$axios.post(
-        "/player/pay-rent?player_from_id="+this.myPlayer.id
-        +"&&player_to_id="+this.propertyGameStatus.player_id
-        +"&&property_id="+this.property.id
+        "/player/pay-rent?player_from_id=" +
+          this.myPlayer.id +
+          "&&player_to_id=" +
+          this.propertyGameStatus.player_id +
+          "&&property_id=" +
+          this.property.id
       );
       if (result) {
         this.$emit("propertyPayRent", result);
@@ -165,6 +168,9 @@ export default {
         return true;
       return false;
     },
+    isMaxLevel() {
+      return !this.isActiveRent("rent_inn");
+    },
   },
   computed: {
     isBought() {
@@ -176,9 +182,7 @@ export default {
     isPlayerOwner() {
       return this.myPlayer.id === this.propertyGameStatus.player_id;
     },
-    ownFullGroup(){
-      
-    }
+    ownFullGroup() {},
   },
   watch: {
     async id(newValue, oldValue) {

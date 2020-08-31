@@ -12,6 +12,7 @@ use app\helpers\ResponseHelper;
 use app\helpers\YesNo;
 use app\models\UserGameSession;
 use app\models\PropertyGameStatus;
+use app\models\PropertyGroup;
 use app\models\RentState;
 use Exception;
 use yii\helpers\VarDumper;
@@ -62,16 +63,6 @@ class PropertyGameStatusController extends \yii\web\Controller
         $player->pay($property->cost);
         $player->update(false);
 
-        $counts=PropertyGameStatus::find()
-        ->select(["COUNT(*) as count","count_max"])
-        ->where(["group_id"=>$property->group_id])
-        ->with("group")
-        ->groupBy("group_id")
-        ->asArray()
-        ->limit(1)
-        ->one();
-        
-
 
         $model = new PropertyGameStatus();
         $model->rent_state_id=1;
@@ -79,11 +70,14 @@ class PropertyGameStatusController extends \yii\web\Controller
         $model->game_session_id = $player->game_session_id;
         $model->player_id = $player->id;
         $model->group_id=$property->group_id;
-        if(++$counts["count"]==$counts["count_max"])
-        $model->isASdasdaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa=YesNo::YES;
-
-
         $model->save(false);
+
+        $group_id=$property->group_id;
+        $game_session_id=$player->game_session_id;
+        $isMonopoly=PropertyGameStatus::isMonopoly($group_id,$game_session_id);
+        if($isMonopoly)
+            PropertyGameStatus::markGroupImprovable($group_id);
+
         /** @var GameSession */
         $game=$player->gameSession;
         $game->is_action_done=YesNo::YES;
