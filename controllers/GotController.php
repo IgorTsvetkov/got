@@ -10,6 +10,7 @@ use app\models\GameSession;
 use yii\filters\AccessControl;
 use app\helpers\ResponseHelper;
 use app\helpers\YesNo;
+use Exception;
 
 class GotController extends Controller
 {
@@ -49,18 +50,21 @@ class GotController extends Controller
         $player = $user->getLastPlayer();
         $player_id = $player->id;
         $this->layout = false;
-        return $this->render('index', compact("game", "player_id"));
+        return $this->render('index', compact('game', 'player_id'));
     }
     public function actionMove(int $player_id)
     {
         $step=1;
         /** @var Player */
         $player = Player::find()->where(["id"=>$player_id])->with("gameSession")->limit(1)->one();
+        $game=$player->gameSession;
+        if($game->is_dice_rolled===YesNo::YES)
+        throw new Exception("вы не можете преместиться дважды за один ход");
         $player->move($step);
 
-        $game=$player->gameSession;
         $game->is_dice_rolled=YesNo::YES;
         $game->update();
+        
         return ResponseHelper::Socket("move",["is_dice_rolled"=>$game->is_dice_rolled,"player_id"=>$player->id,"position" => $player->position,"step"=>$step]);
     }
     public function actionEndTurn($player_id)
@@ -74,11 +78,6 @@ class GotController extends Controller
         $game->is_dice_rolled = YesNO::NO;
         $game->is_action_done = YesNo::NO;
         $game->update();
-        // $data=["game"=>[
-        //     "is_action_done"=>$game->is_action_done,
-        //     "is_dice_rolled"=>$game->is_dice_rolled,
-        //     "turn_player_id" => $game->turn_player_id
-        // ]];
         $data=[
             "is_action_done"=>$game->is_action_done,
             "is_dice_rolled"=>$game->is_dice_rolled,

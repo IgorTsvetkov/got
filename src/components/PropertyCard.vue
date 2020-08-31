@@ -40,7 +40,7 @@
             <span class="h4 py-3">Улучшить {{property.homes_inn_cost}}</span>
           </button>
         </div>
-        <div else>
+        <div v-if="!isPlayerOwner">
           <button class="btn btn-danger text-light w-100 shadow" @click="payRent">
             <span class="h4 py-3">Заплатить ренту</span>
           </button>

@@ -54,7 +54,7 @@
                   @propertyImprove="onpropertyImprove"
                   @propertyPayRent="onpropertyPayRent"
                   :myPlayer="myPlayer"
-                  :position="myCell.position"
+                  :position="+myCell.position"
                 ></property-card>
               </div>
             </div>
@@ -116,6 +116,7 @@ export default {
     if (result) this.cells = result.data;
     this.socket = this.$socketGet(this.game.id, "send-local-to-all");
     this.socket.addMessageCallback((e, parsedData) => {
+      debugger
       if (parsedData.action && parsedData.action == "move") {
         let player = this.findPlayer(parsedData.data.player_id);
         player.position = parsedData.data.position;
@@ -149,7 +150,7 @@ export default {
         let players=parsedData.data.players;
         let game=parsedData.data.game;
         updateModel(this.game,game);
-        updateModelAll(this.game.players,players);
+        updateModelInArrayAll(this.game.players,players);
         this.$forceUpdate();
       }
     });
