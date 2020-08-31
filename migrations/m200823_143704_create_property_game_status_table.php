@@ -18,6 +18,8 @@ class m200823_143704_create_property_game_status_table extends Migration
             'property_id' => $this->integer(),
             'player_id'=>$this->integer(),
             'game_session_id' => $this->integer(),
+            'group_id'=>$this->integer(),
+            'group_full'=>$this->boolean()
         ]);
     }
 

@@ -25,4 +25,12 @@ export default class Helper {
         if (result.data)
             window.location.pathname=result.data.redirect.url;
     }
+    handleGameError(result,socket){
+        if (this.hasError(result)) {
+            let message = this.getErrorMessage(result);
+            socket.send({}, message);
+            return true;
+          }
+          return false;
+    }
 }

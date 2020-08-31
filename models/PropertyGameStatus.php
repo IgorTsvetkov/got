@@ -14,6 +14,7 @@ use phpDocumentor\Reflection\Types\Boolean;
  * @property int|null $property_id
  * @property int|null $player_id
  * @property int|null $game_session_id
+ * @property int|null $group_id
  */
 class PropertyGameStatus extends \yii\db\ActiveRecord
 {
@@ -74,5 +75,9 @@ class PropertyGameStatus extends \yii\db\ActiveRecord
     public function getRentState()
     {
         return $this->hasOne(RentState::class,["id"=>"rent_state_id"]);
+    }
+    public function getGroup()
+    {
+        return $this->hasOne(PropertyGroup::class,["id"=>"group_id"]);
     }
 }

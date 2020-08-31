@@ -21,6 +21,7 @@ use Codeception\Lib\Generator\Group;
  * @property int|null $rent_home4
  * @property int|null $rent_inn
  * @property int|null $homes_inn_cost
+ * @property int|null $group_id
  */
 class Property extends \yii\db\ActiveRecord
 {

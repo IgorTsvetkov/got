@@ -2,11 +2,11 @@
   <div class="d-flex align-items-center justify-content-center">
     <div class="grid position-relative">
       <div class="position-absolute absolute-right-0">
-        <match-menu>
+        <match-menu class="z-index-10">
           <leave-match-button :game_id="game.id">Покинуть</leave-match-button>
         </match-menu>
       </div>
-      <div v-for="cell in cells" :key="cell.position">
+      <div class="not-draggable" v-for="cell in cells" :key="cell.position">
         <!-- {{game}} -->
         <cell :playerOwner="playerOwner(cell.position)" :cell="cell">
           <div v-for="(player,key) in game.players" :key="key">
@@ -60,7 +60,12 @@
             </div>
           </div>
           <div class="w-50 bg-primary d-flex flex-column h-100 p-2">
-            <chat :from="myPlayer.user.username" :from_img="myPlayer.hero.src" :game_id="+game.id"></chat>
+            <chat
+              :from="myPlayer.user.username"
+              :from_img="myPlayer.hero.src"
+              :game_id="+game.id"
+              :color="myPlayer.hero.color"
+            ></chat>
           </div>
         </div>
       </div>
@@ -78,7 +83,7 @@ import PropertyCard from "./PropertyCard.vue";
 import MatchMenu from "./MatchMenu.vue";
 
 import AuthSocket from "../js/AuthSocket";
-import {updateModel,updateModelInArrayAll} from "../js/modelHelper";
+import { updateModel, updateModelInArrayAll } from "../js/modelHelper";
 
 export default {
   components: {
@@ -116,75 +121,76 @@ export default {
     if (result) this.cells = result.data;
     this.socket = this.$socketGet(this.game.id, "send-local-to-all");
     this.socket.addMessageCallback((e, parsedData) => {
-      debugger
-      if (parsedData.action && parsedData.action == "move") {
-        let player = this.findPlayer(parsedData.data.player_id);
-        player.position = parsedData.data.position;
-        this.game.is_dice_rolled = parsedData.data.is_dice_rolled;
-        this.$forceUpdate();
+      let action = this.$response.getAction(parsedData);
+      if (!action) return;
+      let data = parsedData.data.data;
+      let player;
+      switch (action) {
+        case "property-pay-rent":
+          updateModel(this.game, data.game);
+          updateModelInArrayAll(this.game.players, data.players);
+          break;
+        case "move":
+        case "property-improve":
+          player = this.findPlayer(data.player.id);
+          updateModel(player, data.player);
+          updateModel(this.game, data.game);
+          break;
+        case "property-bought":
+          player = this.findPlayer(data.player.id);
+          updateModel(player, data.player);
+          player.propertyCells.push({ position: player.position });
+          updateModel(this.game, data.game);
+          break;
+        case "end-turn":
+          updateModel(this.game, data.game);
+          break;
+        default:
+          throw new Error("can't handle this socket action");
+          break;
       }
-      if (parsedData.action && parsedData.action == "end-turn") {
-        let player = this.findPlayer(parsedData.data.player_id);
-        this.game.turn_player_id = parsedData.data.turn_player_id;
-        this.game.is_dice_rolled = parsedData.data.is_dice_rolled;
-        this.game.is_action_done = parsedData.data.is_action_done;
-        this.$forceUpdate();
-      }
-      if (parsedData.action && parsedData.action == "property-bought") {
-        let player = this.findPlayer(parsedData.data.player_id);
-        console.log("parsedData property-bought :>> ", parsedData);
-        console.log("player property-bought :>> ", player);
-        player.money = parsedData.data.money;
-        player.propertyCells.push({ position: player.position });
-        this.game.is_action_done = parsedData.data.is_action_done;
-        this.$forceUpdate();
-      }
-      if (parsedData.action && parsedData.action == "property-improve") {
-        let player = this.findPlayer(parsedData.data.player_id);
-        console.log("parsedData.data :>> ", parsedData.data);
-        player.money = parsedData.data.money;
-        this.game.is_action_done = parsedData.data.is_action_done;
-        this.$forceUpdate();
-      }
-      if (parsedData.action && parsedData.action == "property-pay-rent") {
-        let players=parsedData.data.players;
-        let game=parsedData.data.game;
-        updateModel(this.game,game);
-        updateModelInArrayAll(this.game.players,players);
-        this.$forceUpdate();
-      }
+      // this.$forceUpdate();
     });
   },
   methods: {
     onpropertyBuy(result) {
-      if (this.$response.hasError(result)) {
-        console.log("property result :>> ", result);
-        let message = this.$response.getErrorMessage(result);
-        this.socket.send({}, message);
-        return;
-      }
-      let systemChatMessage = `${this.myPlayer.user.username} купил новую собственность`;
-      this.socket.send(result.data, systemChatMessage);
+      if (this.$response.handleGameError(result, this.socket)) return;
+      let property = result.data.data.property;
+      console.log("property :>> ", property);
+      let systemChatMessage = `
+      <span style="color:${this.myPlayer.hero.color}">${this.myPlayer.user.username}</span>
+      <img src="${this.myPlayer.hero.src}" width="35px" class="text-wrap" /> 
+      купил новую собственность 
+      <span class="text-capitalize px-1 ${property.color}">${property.name}</span>`;
+
+      this.socket.send(result, systemChatMessage);
     },
     onpropertyImprove(result) {
-      if (this.$response.hasError(result)) {
-        console.log("property result :>> ", result);
-        let message = this.$response.getErrorMessage(result);
-        this.socket.send({}, message);
-        return;
-      }
-      let systemChatMessage = `${this.myPlayer.user.username} улучшил собственность`;
-      this.socket.send(result.data, systemChatMessage);
+      if (this.$response.handleGameError(result, this.socket)) return;
+      let property = result.data.data.property;
+
+      let systemChatMessage = `
+      <span style="color:${this.myPlayer.hero.color}">${this.myPlayer.user.username}</span>
+      <img src="${this.myPlayer.hero.src}" width="35px" class="text-wrap" />
+      улучшил собственность
+      <span class="text-capitalize ${property.color}">${property.name}</span>
+      `;
+
+      this.socket.send(result, systemChatMessage);
     },
     onpropertyPayRent(result) {
-      if (this.$response.hasError(result)) {
-        console.log("property result :>> ", result);
-        let message = this.$response.getErrorMessage(result);
-        this.socket.send({}, message);
-        return;
-      }
-      let systemChatMessage = `${this.myPlayer.user.username} заплатил ренту`;
-      this.socket.send(result.data, systemChatMessage);
+      if (this.$response.handleGameError(result, this.socket)) return;
+      let data = result.data.data;
+
+      let player_to = this.findPlayer(data.player_to_id);
+
+      let systemChatMessage = `<span style="color:${this.myPlayer.hero.color}">${this.myPlayer.user.username}</span>
+      <img src="${this.myPlayer.hero.src}" width="35px" class="text-wrap" /> заплатил <span class="text-success">${data.cost}</span>
+      игроку
+      <span style="color:${player_to.hero.color}">${player_to.user.username}</span>
+      <img src="${player_to.hero.src}" width="35px" class="text-wrap" /> 
+      `;
+      this.socket.send(result, systemChatMessage);
     },
     async move(player_id) {
       let result = await this.$axios.post(
@@ -192,23 +198,46 @@ export default {
       );
       if (result) {
         let data = result.data.data;
-        let systemChatMessage = `Игрок ${this.myPlayer.user.username} переместил фигурку на ${data.step}`;
-        this.socket.send(result.data, systemChatMessage);
+        let systemChatMessage = `<span style="color:${
+          this.myPlayer.hero.color
+        }">${this.myPlayer.user.username}</span>        
+         переместил <img src="${
+           this.myPlayer.hero.src
+         }" width="35px" class="text-wrap" /> на ${this.getStep(data.step)}`;
+        this.socket.send(result, systemChatMessage);
       }
     },
+    getStep(step) {
+      let name;
+      switch (step) {
+        case 1:
+          name = "клетку";
+          break;
+        case (2, 3, 4):
+          name = "клетки";
+          break;
+        default:
+          "клеток";
+          break;
+      }
+      return step + " " + name;
+    },
     async endTurn(player_id) {
-      let result1 = await this.$axios.post(
+      let result = await this.$axios.post(
         `/got/end-turn?player_id=${this.player_id}`
       );
-      if (result1) {
-        let data = result1.data.data;
-        let nextPlayer = this.findPlayer(data.turn_player_id);
-        this.game.turn_player_id = nextPlayer.turn_player_id;
-        console.log("this.player_id :>> ", this.player_id);
-        console.log("data.turn_player_id", data.turn_player_id);
-        console.log("nextPlayer.turn_player_id", nextPlayer.turn_player_id);
-        let systemChatMessage = `Игрок ${this.myPlayer.user.username} передал ход игроку ${nextPlayer.user.username}`;
-        this.socket.send(result1.data, systemChatMessage);
+      if (result) {
+        let data = result.data.data;
+        let nextPlayer = this.findPlayer(data.game.turn_player_id);
+        // debugger
+        let systemChatMessage = `
+        <span style="color:${this.myPlayer.hero.color}">${this.myPlayer.user.username}</span>
+        <img src="${this.myPlayer.hero.src}" width="35px" class="text-wrap" /> 
+        передал ход
+        <span style="color:${nextPlayer.hero.color}">${nextPlayer.user.username}</span>
+         <img src="${nextPlayer.hero.src}" width="35px" class="text-wrap" /> 
+        `;
+        this.socket.send(result, systemChatMessage);
       }
     },
     findPlayer(id) {

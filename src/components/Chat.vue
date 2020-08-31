@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="draggable">
     <div class="bg-light text-dark h-vh w-100 d-flex flex-column-reverse overflow-auto">
       <hr />
       <div class="pl-1" v-for="message in messages" :key="message.id">
@@ -7,15 +7,15 @@
           <span class="h6 text-secondary font-weight-light py-1">{{message.time}}</span>
         </div>
         <div v-if="message.from">
-          <span class="h6 text-primary p-0 m-0">
+          <span :style="{color:'color'}" class="h6 p-0 m-0">
             {{message.from}}
             <span class="p-0 m-0" v-if="message.from==from">[Вы]</span>
           </span>
-          <img :src="from_img" width="35px" class="text-wrap" />
+          <img :src="message.from_img" width="35px" class="text-wrap" />
           :{{ message.message }}
         </div>
         <div v-if="!message.from">
-          <span class="text-danger">{{ message.message }}</span>
+          <span v-html="message.message"></span>
         </div>
       </div>
     </div>
@@ -32,6 +32,7 @@
           value="Отправить"
           type="button"
           @click="sendMessage"
+          :disabled="message.length==0"
         />
       </div>
     </div>
@@ -53,6 +54,10 @@ export default {
       type: Number,
       default: undefined,
     },
+    color:{
+      type:String,
+      default:"#000000"
+    }
   },
   data() {
     return {
@@ -79,6 +84,7 @@ export default {
         data: {
           from: this.from,
           message: this.message,
+          from_img:this.from_img,
           time: new Date().toLocaleTimeString(),
         },
       });

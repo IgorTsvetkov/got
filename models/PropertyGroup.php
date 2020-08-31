@@ -9,6 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property string|null $color_name
+ * @property int $count_max
  */
 class PropertyGroup extends \yii\db\ActiveRecord
 {

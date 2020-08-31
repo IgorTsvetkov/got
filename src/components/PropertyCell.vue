@@ -1,12 +1,15 @@
 <template>
-  <div class="cell-wrapper d-flex flex-column justify-content-center">
-    <div v-if="this.price" class="text-center height" :class="[price_bgcolor]">{{this.price}}</div>
+  <div class="cell-wrapper d-flex flex-column justify-content-center" >
+    <div v-if="this.price" class="text-center height" :class="[price_bgcolor]">
+      <span>{{this.price}}</span>      
+    </div>
     <div class="w-inherit position-relative">
       <div 
         v-if="playerOwner"
         :style="{'background':playerOwner.hero.color}"
         class="position-absolute opacity-4 w-100 h-100"
       ></div>
+      <div v-if="playerOwner&&playerOwner" class="w-100 h-100 opacity-8 d-flex position-absolute justify-content-center align-items-center text-light">{{playerOwner.user.username}}</div>
       <img class="property-img" :src="this.src" alt />
     </div>
   </div>
@@ -47,56 +50,7 @@ export default {
 .cell-center img {
   width: inherit;
 }
-.price {
-  background: white;
-  text-align: center;
-  font-size: 0.8em;
-}
-.bgblack {
-  background: black;
-}
-.bgred {
-  background: red;
-}
-.text-center {
-  text-align: center;
-}
-.red {
-  background: red;
-  color: white;
-}
-.yellow {
-  background: rgb(255, 234, 46);
-  color: black;
-}
-.green {
-  background: green;
-  color: white;
-}
-.dark_purple {
-  background: purple;
-  color: white;
-}
-.brown {
-  background: brown;
-  color: white;
-}
-.dark_blue {
-  background: darkcyan;
-  color: white;
-}
-.light_blue {
-  background: cyan;
-  color: black;
-}
-.orange {
-  background: rgb(255, 90, 31);
-  color: white;
-}
-.green {
-  background: green;
-  color: white;
-}
+
 .height {
   /* font-size: 1.3em; */
   font-size: 1.2vw;

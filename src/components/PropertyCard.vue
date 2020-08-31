@@ -176,6 +176,9 @@ export default {
     isPlayerOwner() {
       return this.myPlayer.id === this.propertyGameStatus.player_id;
     },
+    ownFullGroup(){
+      
+    }
   },
   watch: {
     async id(newValue, oldValue) {

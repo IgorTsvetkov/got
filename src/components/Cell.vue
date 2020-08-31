@@ -1,6 +1,6 @@
 <template>
-  <div class="h-100">
-    <div class="position-absolute h-100 d-flex">
+  <div class="h-100 position-relative">
+    <div class="position-absolute h-100 w-100 d-flex align-items-center justify-content-center">
       <slot></slot>
     </div>
     <div class="d-flex justify-content-center h-100">

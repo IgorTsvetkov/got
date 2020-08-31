@@ -128,3 +128,67 @@ opacity: 0.8;
 .top-0{
     top:0;
 }
+.price {
+    background: white;
+    text-align: center;
+    font-size: 0.8em;
+  }
+  .bgblack {
+    background: black;
+  }
+  .bgred {
+    background: red;
+  }
+  .text-center {
+    text-align: center;
+  }
+  .red {
+    background: red;
+    color: white;
+  }
+  .yellow {
+    background: rgb(255, 234, 46);
+    color: black;
+  }
+  .green {
+    background: green;
+    color: white;
+  }
+  .dark_purple {
+    background: purple;
+    color: white;
+  }
+  .brown {
+    background: brown;
+    color: white;
+  }
+  .dark_blue {
+    background: darkcyan;
+    color: white;
+  }
+  .light_blue {
+    background: cyan;
+    color: black;
+  }
+  .orange {
+    background: rgb(255, 90, 31);
+    color: white;
+  }
+  .green {
+    background: green;
+    color: white;
+  }
+  .not-draggable,.not-draggable>*,.not-draggable *{
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+  }
+  .draggable,.draggable>*,.draggable *{
+    user-select:initial!important;
+    -moz-user-select: initial!important;
+    -webkit-user-drag: initial!important;
+    -webkit-user-select: initial!important;
+    -ms-user-select: initial!important;
+  }
