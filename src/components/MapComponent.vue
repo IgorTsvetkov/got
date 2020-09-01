@@ -45,8 +45,8 @@
       <div class="empty-center">
         <div class="w-100 h-100 d-flex bg-warning">
           <div class="w-50 h-inherit d-flex justify-content-center align-items-center">
-            <div v-if="isMyTurn">
-              <div v-if="myCell&&myCell.property&&game.is_dice_rolled">
+            <div class="w-100 h-100 d-flex align-items-center justify-content-center" v-if="isMyTurn&&myCell&&game.is_dice_rolled">
+              <div v-if="myCell.property">
                 <property-card
                   :is_action_done="Boolean(+this.game.is_action_done)"
                   :id="+myCell.property_id"
@@ -56,6 +56,10 @@
                   :myPlayer="myPlayer"
                   :position="+myCell.position"
                 ></property-card>
+              </div>
+              <div class="w-100 h-100" v-if="myCell.event">
+                <event-card class="w-100 h-100" :event="myCell.event"
+                ></event-card>
               </div>
             </div>
           </div>
@@ -81,6 +85,7 @@ import Figurine from "./Figurine.vue";
 import Chat from "./Chat.vue";
 import PropertyCard from "./PropertyCard.vue";
 import MatchMenu from "./MatchMenu.vue";
+import EventCard from './EventCard.vue';
 
 import AuthSocket from "../js/AuthSocket";
 import { updateModel, updateModelInArrayAll } from "../js/modelHelper";
@@ -94,6 +99,7 @@ export default {
     PropertyCard,
     Figurine,
     LeaveMatchButton,
+    EventCard
   },
   props: {
     gameString: {

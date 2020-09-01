@@ -41,7 +41,10 @@
             <span class="h4 py-3">Улучшить {{property.homes_inn_cost}}</span>
           </button>
           <span v-show="!propertyGameStatus.is_group_full" class="small">
-            <a>Купите <span class="font-weight-bold text-warning">все</span> имущество одной цветовой группы, для улучшения</a>
+            <a>
+              Купите
+              <span class="font-weight-bold text-warning">все</span> имущество одной цветовой группы, для улучшения
+            </a>
           </span>
         </div>
         <div v-if="!isPlayerOwner">
@@ -97,28 +100,38 @@ export default {
         this.property = result.data;
         this.propertyGameStatus = this.property.propertyGameStatus;
         this.rents = [
-          { fieldName: "rent", label: "Рента", cost: this.property.rent },
           {
+            level: 1,
+            fieldName: "rent",
+            label: "Рента",
+            cost: this.property.rent,
+          },
+          {
+            level:2,
             fieldName: "rent_home1",
             label: "Рента c 1 домом",
             cost: this.property.rent_home1,
           },
           {
+            level:3,
             fieldName: "rent_home2",
             label: "Рента c 2 домами",
             cost: this.property.rent_home2,
           },
           {
+            level:4,
             fieldName: "rent_home3",
             label: "Рента c 3 домами",
             cost: this.property.rent_home3,
           },
           {
+            level:5,
             fieldName: "rent_home4",
             label: "Рента c 4 домами",
             cost: this.property.rent_home4,
           },
           {
+            level:6,
             fieldName: "rent_inn",
             label: "Рента c постоялым двором",
             cost: this.property.rent_inn,
@@ -169,7 +182,7 @@ export default {
       return false;
     },
     isMaxLevel() {
-      return !this.isActiveRent("rent_inn");
+      return this.isActiveRent("rent_inn");
     },
   },
   computed: {

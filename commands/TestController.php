@@ -8,12 +8,10 @@
 
 namespace app\commands;
 
-use Yii;
-use app\models\Cell;
-use app\models\GameSession;
-use app\models\UserSocket;
+use yii\db\Query;
+use app\models\Player;
+use app\models\RentState;
 use yii\console\Controller;
-use app\websockets\MyWorker;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 /**
@@ -29,8 +27,16 @@ class TestController extends Controller
 {
     function actionTest()
     {
-        $user=Yii::$app->user->getIdentity();
+        $players=Player::find()
+        ->select(["COUNT(pgs.rent_state_id) as count,pgs.rent_state_id,rent_state.name"])
+        ->where(["player.id"=>1])
+        ->joinWith(["propertyGameStatuses as pgs"])
+        ->where([">","rent_state_id",1])
+        ->groupBy("pgs.rent_state_id")
+        ->join("LEFT JOIN","rent_state","rent_state.id=pgs.rent_state_id1")
+        ->asArray()
+        ->all();
 
-        var_dump($user);
+        var_dump($players);
     }
 }

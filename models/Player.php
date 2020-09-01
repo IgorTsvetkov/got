@@ -148,7 +148,4 @@ class Player extends \yii\db\ActiveRecord
     public function getPositionCell(){
         return $this->hasOne(Cell::class,["position"=>"position"]);
     }
-    public function get(){
-        return $this->hasOne(Cell::class,["position"=>"position"]);
-    }
 }

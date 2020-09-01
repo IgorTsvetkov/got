@@ -2,9 +2,21 @@
 
 namespace app\controllers;
 
-use yii\rest\ActiveController;
+use Exception;
+use yii\web\Controller;
 
-class EventController extends ActiveController
+class EventController extends Controller
 {
-    public $modelClass="app\models\Event";
+    public function actionGetRandom($event_id)
+    {
+        switch ($event_id) {
+            case '3':
+                return $this->redirect("events/spider/getRandom");
+                break;
+            
+            default:
+                throw new Exception("Unhandled type of a card event");
+                break;
+        }
+    }
 }

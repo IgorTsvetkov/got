@@ -36,7 +36,7 @@ const app=new Vue({
         FormAjaxWrapper,
         ButtonLoad,
         GameTable,
-        PropertyCard,
+        PropertyCard
         // FormAjax
     }
 })
