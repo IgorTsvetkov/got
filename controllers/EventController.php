@@ -7,10 +7,10 @@ use yii\web\Controller;
 
 class EventController extends Controller
 {
-    public function actionGetRandom($event_id)
+    public function actionRandom($type)
     {
-        switch ($event_id) {
-            case '3':
+        switch ($type) {
+            case 'spyder':
                 return $this->redirect("events/spider/getRandom");
                 break;
             

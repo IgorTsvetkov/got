@@ -8,8 +8,10 @@
 
 namespace app\commands;
 
+use app\helpers\SpiderEventHelper;
 use yii\db\Query;
 use app\models\Player;
+use app\models\PropertyGameStatus;
 use app\models\RentState;
 use yii\console\Controller;
 
@@ -27,16 +29,7 @@ class TestController extends Controller
 {
     function actionTest()
     {
-        $players=Player::find()
-        ->select(["COUNT(pgs.rent_state_id) as count,pgs.rent_state_id,rent_state.name"])
-        ->where(["player.id"=>1])
-        ->joinWith(["propertyGameStatuses as pgs"])
-        ->where([">","rent_state_id",1])
-        ->groupBy("pgs.rent_state_id")
-        ->join("LEFT JOIN","rent_state","rent_state.id=pgs.rent_state_id1")
-        ->asArray()
-        ->all();
-
-        var_dump($players);
+        $damage_cost=SpiderEventHelper::calculateWildfireDamageCost(4);
+        var_dump($damage_cost);
     }
 }

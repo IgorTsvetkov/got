@@ -27,8 +27,9 @@ class PlayerController extends \yii\web\Controller
     public function actionPayRent(int $player_from_id, int $player_to_id, int $property_id)
     {
         $user = User::me();
-        $player_from = Player::findOne($player_from_id);
-        $player_to = Player::findOne($player_to_id);
+
+        list($player_from, $player_to) = Player::findAll([$player_from_id, $player_to_id]);
+
         /** @var PropertyGameStatus */
         $propertyGameStatus = PropertyGameStatus::find()
             ->where(["property_id" => $property_id, "player_id" => $player_to_id])
@@ -51,16 +52,16 @@ class PlayerController extends \yii\web\Controller
         $player_from->payTo($player_to, $rent_cost);
 
         /** @var GameSession */
-        $game=$propertyGameStatus->gameSession;
-        $game->is_action_done=YesNo::YES;
+        $game = $propertyGameStatus->gameSession;
+        $game->is_action_done = YesNo::YES;
         $game->update(false);
 
         $players = [$player_from->getAttributes(), $player_to->getAttributes()];
         $data = [
             "players" => $players,
             "game" => $propertyGameStatus->gameSession->getAttributes(),
-            "player_to_id"=>$player_to->id,
-            "cost"=>$rent_cost
+            "player_to_id" => $player_to->id,
+            "cost" => $rent_cost
         ];
         return ResponseHelper::Socket("property-pay-rent", $data);
     }

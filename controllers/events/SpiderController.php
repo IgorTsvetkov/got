@@ -8,4 +8,7 @@ class SpiderController extends \yii\web\Controller
     {
         var_dump("hello");
     }
+    public function takeMoney(){
+        $
+    }
 }
