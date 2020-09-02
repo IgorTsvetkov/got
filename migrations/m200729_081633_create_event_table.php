@@ -30,7 +30,7 @@ class m200729_081633_create_event_table extends Migration
         ]);
         $this->insert('{{%event}}',[
             "id"=>3,
-            "name"=>"spider",#vertical
+            "name"=>"spyder",#vertical
             "src"=>"/web/images/cells/12.jpg",
         ]);
         $this->insert('{{%event}}',[
@@ -40,7 +40,7 @@ class m200729_081633_create_event_table extends Migration
         ]);
         $this->insert('{{%event}}',[
             "id"=>5,
-            "name"=>"spider",#horizontal
+            "name"=>"spyder",#horizontal
             "src"=>"/web/images/cells/20.jpg",
         ]);
         $this->insert('{{%event}}',[

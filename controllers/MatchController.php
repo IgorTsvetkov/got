@@ -129,7 +129,7 @@ class MatchController extends Controller
     }
     public function actionConnect($json = false)
     {
-        $user = User::Me();
+        $user = User::me();
         $game = $user->getLastGame()->joinWith(["players", "players.hero", "players.user" => function ($query) {
             $query->select(["id", "username"]);
         }])
@@ -152,7 +152,7 @@ class MatchController extends Controller
 
         if ($game->id == $game_id) {
             /** @var Player $nextTurnPlayer */
-            $nextPlayer = $player->getNextPlayer();
+            $nextPlayer = $player->getNextTurnPlayer();
             //если текущий игрок последний, завершить игру
             if ($nextPlayer->id === $player->id) {
                 $game->removeUser($user_id);
@@ -170,7 +170,7 @@ class MatchController extends Controller
     }
     public function actionChangeSlot(int $slot)
     {
-        $user = User::Me();
+        $user = User::me();
         $game = $user->getLastGame()->one();
         $data = null;
         if ($game->IsStarted) {

@@ -61,7 +61,7 @@ class PropertyGameStatusController extends \yii\web\Controller
         if($player->canPay($property->cost)===false)
             return ResponseHelper::Error("недостаточно средств"); //TO DO Аукцион
         $player->pay($property->cost);
-        $player->update(false);
+
 
 
         $model = new PropertyGameStatus();

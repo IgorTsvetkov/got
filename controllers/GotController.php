@@ -34,7 +34,7 @@ class GotController extends Controller
     }
     public function actionGame()
     {
-        $user = User::Me();
+        $user = User::me();
         $userSafeQuery = function ($query) {
             $query->select("id,username");
         };
@@ -74,7 +74,7 @@ class GotController extends Controller
     public function actionEndTurn($player_id)
     {
         $player = Player::find()->where(["id" => $player_id])->with("gameSession")->limit(1)->one();
-        $nextTurnPlayer = $player->getNextPlayer();
+        $nextTurnPlayer = $player->getNextTurnPlayer();
         /** @var GameSession */
         $game = $player->gameSession;
         $game->turn_player_id = $nextTurnPlayer->id;

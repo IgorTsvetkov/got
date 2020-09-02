@@ -8,12 +8,13 @@
 
 namespace app\commands;
 
-use app\helpers\SpiderEventHelper;
 use yii\db\Query;
 use app\models\Player;
-use app\models\PropertyGameStatus;
+use app\models\Property;
 use app\models\RentState;
 use yii\console\Controller;
+use app\helpers\spyderEventHelper;
+use app\models\PropertyGameStatus;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 /**
@@ -29,7 +30,7 @@ class TestController extends Controller
 {
     function actionTest()
     {
-        $damage_cost=SpiderEventHelper::calculateWildfireDamageCost(4);
-        var_dump($damage_cost);
+        list($position)=Property::find()->select("cell.position as position")->where(["name"=>"king's landing"])->joinWith("cell")->column("position");
+        var_dump($position);
     }
 }

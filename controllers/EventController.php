@@ -11,7 +11,7 @@ class EventController extends Controller
     {
         switch ($type) {
             case 'spyder':
-                return $this->redirect("events/spider/getRandom");
+                return $this->redirect("events/spyder/getRandom");
                 break;
             
             default:
