@@ -9,6 +9,7 @@ use yii\web\Controller;
 use app\models\GameSession;
 use yii\filters\AccessControl;
 use app\helpers\ResponseHelper;
+use app\helpers\TurnStageHelper;
 use app\helpers\YesNo;
 use Exception;
 
@@ -58,11 +59,11 @@ class GotController extends Controller
         /** @var Player */
         $player = Player::find()->where(["id" => $player_id])->with("gameSession")->limit(1)->one();
         $game = $player->gameSession;
-        if ($game->is_dice_rolled === YesNo::YES)
+        if ($game->turn_stage >=TurnStageHelper::DICE_ROLLED)
             throw new Exception("вы не можете преместиться дважды за один ход");
         $player->move($step);
 
-        $game->is_dice_rolled = YesNo::YES;
+        $game->turn_stage = TurnStageHelper::DICE_ROLLED;
         $game->update();
         $data = [
             "player" => $player,
@@ -79,8 +80,7 @@ class GotController extends Controller
         $game = $player->gameSession;
         $game->turn_player_id = $nextTurnPlayer->id;
         //сброс настроек для следующего игрока
-        $game->is_dice_rolled = YesNO::NO;
-        $game->is_action_done = YesNo::NO;
+        $game->turn_stage = TurnStageHelper::BEGIN;
         
         $game->update();
         $data = ["game" => $game];

@@ -27,7 +27,7 @@
             </div>
             <div v-if="isMyTurn">
               <button
-                v-if="!Boolean(+game.is_dice_rolled)"
+                v-if="!(canFinishTurn)"
                 class="btn btn-light"
                 @click="move()"
                 @keypress.enter="move()"
@@ -45,10 +45,10 @@
       <div class="empty-center">
         <div class="w-100 h-100 d-flex bg-warning">
           <div class="w-50 h-inherit d-flex justify-content-center align-items-center">
-            <div class="w-100 h-100 d-flex align-items-center justify-content-center" v-if="isMyTurn&&myCell&&game.is_dice_rolled">
+            <div class="w-100 h-100 d-flex align-items-center justify-content-center" v-if="isMyTurn&&myCell&&(canFinishTurn)">
               <div v-if="myCell.property">
                 <property-card
-                  :is_action_done="Boolean(+this.game.is_action_done)"
+                  :is_turn_finished="this.$turnStages['finishedAction']==this.game.turn_stage"
                   :id="+myCell.property_id"
                   @propertyBuy="onpropertyBuy"
                   @propertyImprove="onpropertyImprove"
@@ -269,6 +269,9 @@ export default {
     isMyTurn: function () {
       return this.player_id == this.game.turn_player_id;
     },
+    canFinishTurn:function(){
+      return +this.game.turn_stage>=this.$turnStages['canFinish'];
+    }
   },
 };
 </script>

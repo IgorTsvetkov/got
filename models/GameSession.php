@@ -14,8 +14,6 @@ use yii\db\Expression;
  * @property int $id
  * @property string|null $name
  * @property int|null $turn_stage
- * @property bool|null $is_dice_rolled
- * @property bool|null $is_action_done
  * @property int|null $leader_user_id
  * @property int|null $turn_player_id
  * @property string|null $created_at
@@ -30,8 +28,10 @@ use yii\db\Expression;
 class GameSession extends \yii\db\ActiveRecord
 {
     public const MAX_PLAYERS=2;
-    public const TURN_STAGE_MOVED=20;
-    public const TURN_STAGE_ACTION_FINISHED=30;
+    public const BEGIN=null;
+    public const TURN_ROLLED=200;
+    public const TURN_ROLLED_EVENT=250;
+    public const TURN_STAGE_ACTION_FINISHED=300;
     public function getFirstEmptySlot():int{
         $slots=GameSession::find()->where(["game_session.id"=>$this->id])->joinWith(["players"])->select("slot")->asArray()->all();
         $filledSlot=array_map(function($slot){

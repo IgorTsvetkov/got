@@ -9,6 +9,7 @@ use app\models\Property;
 use app\models\GameSession;
 use yii\filters\VerbFilter;
 use app\helpers\ResponseHelper;
+use app\helpers\TurnStageHelper;
 use app\helpers\YesNo;
 use app\models\UserGameSession;
 use app\models\PropertyGameStatus;
@@ -80,7 +81,7 @@ class PropertyGameStatusController extends \yii\web\Controller
 
         /** @var GameSession */
         $game=$player->gameSession;
-        $game->is_action_done=YesNo::YES;
+        $game->turn_stage=TurnStageHelper::FINISHED;
         $game->update();
         $data=[
             "player"=>$player,
@@ -110,7 +111,7 @@ class PropertyGameStatusController extends \yii\web\Controller
                 $player->update();
             }
             $game=$propertyGameStatus->gameSession;
-            $game->is_action_done=YesNo::YES;
+            $game->turn_stage=TurnStageHelper::FINISHED;
             $game->update();
             /** @var Property */
             $property=$propertyGameStatus->property;

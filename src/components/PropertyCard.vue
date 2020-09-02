@@ -27,7 +27,7 @@
     </div>
 
     <hr />
-    <div v-if="!is_action_done&&isPlayerOnCell">
+    <div v-if="!is_turn_finished&&isPlayerOnCell">
       <button v-if="!isBought" class="btn btn-success text-light w-100 shadow" @click="buy">
         <span class="h4 py-3">Купить {{property.cost}}</span>
       </button>
@@ -69,7 +69,7 @@ export default {
       type: Number,
       default: undefined,
     },
-    is_action_done: {
+    is_turn_finished: {
       type: Boolean,
       default: false,
     },

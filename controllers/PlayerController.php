@@ -9,6 +9,7 @@ use app\models\Player;
 use app\models\Property;
 use app\models\GameSession;
 use app\helpers\ResponseHelper;
+use app\helpers\TurnStageHelper;
 use app\helpers\YesNo;
 use app\models\PropertyGameStatus;
 
@@ -53,7 +54,7 @@ class PlayerController extends \yii\web\Controller
 
         /** @var GameSession */
         $game = $propertyGameStatus->gameSession;
-        $game->is_action_done = YesNo::YES;
+        $game->turn_stage = TurnStageHelper::FINISHED;
         $game->update(false);
 
         $players = [$player_from->getAttributes(), $player_to->getAttributes()];

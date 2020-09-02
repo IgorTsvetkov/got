@@ -3,7 +3,7 @@
     --length:400px;
 }
 .cube-wrapper{
-    perspective: 0px;
+    perspective: 800px;
     background: url("/web/images/bg_start.jpg");
     background-size: cover;
     background-position-y: center;

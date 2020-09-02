@@ -1,6 +1,6 @@
 <template>
   <div class="w-100 h-100 d-flex align-items-center justify-content-center">
-    <div class="event-card-wrapper"  @click="getEventEvent">
+    <div class="event-card-wrapper"  @click="getEventRandom">
       <div class="event-card-external btn btn-dark rounded" :class="{'rotate':isRotated}">
         <div class="event-card-inner bg-secondary position-relative">
           <div class="card-front">
