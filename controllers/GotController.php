@@ -81,6 +81,7 @@ class GotController extends Controller
         //сброс настроек для следующего игрока
         $game->is_dice_rolled = YesNO::NO;
         $game->is_action_done = YesNo::NO;
+        
         $game->update();
         $data = ["game" => $game];
         return ResponseHelper::Socket("end-turn", $data);
