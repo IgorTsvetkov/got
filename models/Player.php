@@ -29,9 +29,13 @@ class Player extends \yii\db\ActiveRecord
     public const COUNT_POSITION=40;
     public const PREVIOUS_SLOT=111;
     public const NEXT_SLOT=112;
-    public function me():?self
+    public static function meOne():?self
     {
-        return Player::find()->where(["user_id"=>Yii::$app->user->id])->orderBy(['id'=>SORT_DESC])->limit(1)->one();
+        return self::me()->one();
+    }
+    public static function me()
+    {
+        return Player::find()->where(["user_id"=>Yii::$app->user->id])->orderBy(['id'=>SORT_DESC])->limit(1);
     }
     public function teleportToProperty($propertyName){
         list($position)=Property::find()->select("cell.position as position")->where(["name"=>$propertyName])->joinWith("cell")->column("position");

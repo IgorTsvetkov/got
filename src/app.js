@@ -18,7 +18,6 @@ Vue.prototype.$turnStages=turnStages;
 import Response from "./js/Response";
 Vue.prototype.$response=new Response();
 
-import HelloWorldComponent from './components/HelloWorldComponent.vue';
 import MapComponent from './components/MapComponent.vue';
 import HeroPickerComponent from './components/HeroPickerComponent.vue';
 import HeroPickerWrapper from './components/HeroPickerWrapper.vue';
@@ -27,10 +26,10 @@ import ButtonLoad from './components/ButtonLoad.vue';
 import GameTable from './components/GameTable.vue';
 import PropertyCard from './components/PropertyCard.vue';
 
+
 const app=new Vue({
     el:'#app',
     components:{
-        HelloWorldComponent,
         MapComponent,
         HeroPickerComponent,
         HeroPickerWrapper,
@@ -38,6 +37,5 @@ const app=new Vue({
         ButtonLoad,
         GameTable,
         PropertyCard
-        // FormAjax
     }
 })

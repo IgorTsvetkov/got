@@ -1,13 +1,31 @@
 <template>
   <div class="w-100 h-100 d-flex align-items-center justify-content-center">
-    <div class="event-card-wrapper"  @click="getEventRandom">
-      <div class="event-card-external btn btn-dark rounded" :class="{'rotate':isRotated}">
-        <div class="event-card-inner bg-secondary position-relative">
-          <div class="card-front">
-            <img :src="event.src" class="card-img position-absolute full" />
+    <div class="event-card-wrapper" @click="getEventRandom">
+      <div class="event-card-external btn btn-secondary rounded" :class="{'rotate':isRotated}">
+        <div class="event-card-inner bg-dark w-100 h-100 position-relative">
+          <div
+            class="card-back position-absolute w-100 h-100 d-flex align-items-center justify-content-between"
+          >
+            <div class="d-flex flex-column h-100 justify-content-around">
+              <div v-if="eventData" class="d-flex flex-column">
+                <div>
+                  <img src="/web/images/GOT.svg" class="w-50 img-GOT" />
+                </div>
+                <div v-if="eventData.operation=='earn'">
+                  <text-with-money :text="eventData.text"></text-with-money>
+                  <div class="btn btn-success m-2" @click="doEvent">
+                    Забрать {{eventData.money}}
+                    <text-with-money text="$"></text-with-money>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="card-back position-absolute">
-            <div>123111111111111</div>
+          <div class="card-front position-absolute bg-dark w-100 h-100">
+            <!-- <img :src="event.src" class="card-img position-absolute full" /> -->
+            <div>
+              <spider-animated class="spider" />
+            </div>
           </div>
         </div>
       </div>
@@ -16,7 +34,13 @@
 </template>
 
 <script>
+import SpiderAnimated from "./SpiderAnimated.vue";
+import TextWithMoney from "./TextWithMoney.vue";
 export default {
+  components: {
+    SpiderAnimated,
+    TextWithMoney,
+  },
   props: {
     event: {
       type: Object,
@@ -26,20 +50,39 @@ export default {
   data() {
     return {
       isRotated: false,
+      eventData: undefined,
     };
   },
   methods: {
-    async getEventRandom(){
-      let result = await this.$axios.get("/event/random?type=spider");
+    async getEventRandom() {
+      let result = await this.$axios.get("/event/random?type=spyder");
+      this.eventData = result.data;
       this.rotate(true);
     },
     rotate() {
       this.isRotated = true;
     },
+    async doEvent() {
+      let result = await this.$axios.post(
+        `/event/do?type=spyder&id=${this.eventData.id}`);
+        this.$emit("eventDone",result);
+    },
+  },
+  computed: {
+    eventText() {
+      return this.eventData.text;
+    },
   },
 };
 </script>
 <style scoped>
+.img-GOT {
+  clip-path: polygon(0 32%, 100% 33%, 100% 67%, 0 68%);
+}
+.rotate .spider {
+  visibility: hidden;
+  transition: visibility 0.3s linear;
+}
 .card-img {
   left: 0px;
   top: 0px;
@@ -58,24 +101,20 @@ export default {
   height: 21vw;
   transform-style: preserve-3d;
   padding: 1vw;
-  transform: rotateY(0deg);
-
   animation: card 3s linear infinite;
 }
-.event-card-external.rotate{
+.event-card-external.rotate {
   transform: rotateY(180deg);
   animation: card-rotate 2s ease-in-out;
 }
-.event-card-external:hover{
-    box-shadow: 0 0 20px 10px #9E9E9E;
+.event-card-external:hover {
+  box-shadow: 0 0 20px 10px #9e9e9e;
 }
 .card-front {
-  background: red;
   transform: translateZ(1px);
 }
 .card-back {
   top: 0;
-  background: green;
   width: 100%;
   height: 100%;
   transform: translateZ(-1px) rotateY(180deg);

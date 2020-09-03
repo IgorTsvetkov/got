@@ -23,17 +23,17 @@
         >
           <div>
             <div v-for="player in game.players" :key="player.id">
-              <div class="bg-dark text-light lead">{{player.user.username}} : {{ player.money }}$</div>
+              <div class="bg-dark text-light lead">{{player.user.username}} : {{player.money}} <text-with-money text="$"/></div>
             </div>
             <div v-if="isMyTurn">
               <button
-                v-if="!(canFinishTurn)"
+                v-if="isBeginTurn"
                 class="btn btn-light"
                 @click="move()"
                 @keypress.enter="move()"
               >Бросить кубик</button>
               <button
-                v-else
+                v-if="isFinishedTurn"
                 class="btn btn-light"
                 @click="endTurn()"
                 @keypress.enter="endTurn()"
@@ -45,10 +45,10 @@
       <div class="empty-center">
         <div class="w-100 h-100 d-flex bg-warning">
           <div class="w-50 h-inherit d-flex justify-content-center align-items-center">
-            <div class="w-100 h-100 d-flex align-items-center justify-content-center" v-if="isMyTurn&&myCell&&(canFinishTurn)">
+            <div class="w-100 h-100 d-flex align-items-center justify-content-center" v-if="isMyTurn&&myCell&&!isFinishedTurn">
               <div v-if="myCell.property">
                 <property-card
-                  :is_turn_finished="this.$turnStages['finishedAction']==this.game.turn_stage"
+                  :is_turn_finished="isFinishedTurn"
                   :id="+myCell.property_id"
                   @propertyBuy="onpropertyBuy"
                   @propertyImprove="onpropertyImprove"
@@ -58,8 +58,7 @@
                 ></property-card>
               </div>
               <div class="w-100 h-100" v-if="myCell.event">
-                <event-card class="w-100 h-100" :event="myCell.event"
-                ></event-card>
+                <event-card class="w-100 h-100" :event="myCell.event" @eventDone="oneventDone"/>
               </div>
             </div>
           </div>
@@ -86,6 +85,7 @@ import Chat from "./Chat.vue";
 import PropertyCard from "./PropertyCard.vue";
 import MatchMenu from "./MatchMenu.vue";
 import EventCard from './EventCard.vue';
+import TextWithMoney from './TextWithMoney.vue';
 
 import AuthSocket from "../js/AuthSocket";
 import { updateModel, updateModelInArrayAll } from "../js/modelHelper";
@@ -99,7 +99,8 @@ export default {
     PropertyCard,
     Figurine,
     LeaveMatchButton,
-    EventCard
+    EventCard,
+    TextWithMoney
   },
   props: {
     gameString: {
@@ -131,8 +132,10 @@ export default {
       if (!action) return;
       let data = parsedData.data.data;
       let player;
+
       switch (action) {
         case "property-pay-rent":
+        case "event-done":
           updateModel(this.game, data.game);
           updateModelInArrayAll(this.game.players, data.players);
           break;
@@ -159,10 +162,15 @@ export default {
     });
   },
   methods: {
+    oneventDone(result){
+      if (this.$response.handleGameError(result, this.socket)) return;
+
+      let systemChatMessage="событие выполнено";
+      this.socket.send(result,systemChatMessage);
+    },
     onpropertyBuy(result) {
       if (this.$response.handleGameError(result, this.socket)) return;
       let property = result.data.data.property;
-      console.log("property :>> ", property);
       let systemChatMessage = `
       <span style="color:${this.myPlayer.hero.color}">${this.myPlayer.user.username}</span>
       <img src="${this.myPlayer.hero.src}" width="35px" class="text-wrap" /> 
@@ -235,7 +243,6 @@ export default {
       if (result) {
         let data = result.data.data;
         let nextPlayer = this.findPlayer(data.game.turn_player_id);
-        // debugger
         let systemChatMessage = `
         <span style="color:${this.myPlayer.hero.color}">${this.myPlayer.user.username}</span>
         <img src="${this.myPlayer.hero.src}" width="35px" class="text-wrap" /> 
@@ -269,8 +276,15 @@ export default {
     isMyTurn: function () {
       return this.player_id == this.game.turn_player_id;
     },
+    //turn stages
+    isFinishedTurn:function(){
+      return this.game.turn_stage==this.$turnStages['finished'];
+    },
     canFinishTurn:function(){
       return +this.game.turn_stage>=this.$turnStages['canFinish'];
+    },
+    isBeginTurn:function(){
+      return this.game.turn_stage==this.$turnStages['begin'];
     }
   },
 };

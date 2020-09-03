@@ -118,7 +118,7 @@ class MatchController extends Controller
     }
     public function actionJoin($game_id)
     {
-        $game = GameSession::find()->where(["id" => $game_id])->with("players")->limit(1)->one();
+        $game = GameSession::find()->where(["id" => $game_id])->with("players")->one();
         if (GameSession::MAX_PLAYERS <= count($game->players))
             return ResponseHelper::Error("Невозможно подключиться! Лобби игры заполнено");
         $user = User::me();

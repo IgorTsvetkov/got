@@ -9,14 +9,10 @@ class EventController extends Controller
 {
     public function actionRandom($type)
     {
-        switch ($type) {
-            case 'spyder':
-                return $this->redirect("events/spyder/getRandom");
-                break;
-            
-            default:
-                throw new Exception("Unhandled type of a card event");
-                break;
-        }
+        return $this->redirect("/events/".$type."/random");
+    }
+    public function actionDo($type,$id)
+    {
+        return $this->redirect(["/events/".$type."/do","id"=>$id]);
     }
 }
