@@ -6,13 +6,13 @@
   >
     <div
       class="d-flex flex-column justify-content-between justify-content-center p-0 m-0"
-      v-if="isBought"
+      
     >
       <div class="d-flex justify-content-between w-100 m-0 p-2">
         <div class="h3 font-weight-light">
           <div class="text-capitalize m-0 p-0">{{property.name}}</div>
         </div>
-        <div class="d-flex justify-content-center align-items-center text-light">
+        <div v-if="isBought" class="d-flex justify-content-center align-items-center text-light">
           <figurine :hero="propertyGameStatus.player.hero"></figurine>
         </div>
       </div>

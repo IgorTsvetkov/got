@@ -25,6 +25,7 @@ import FormAjaxWrapper from './components/FormAjaxWrapper.vue';
 import ButtonLoad from './components/ButtonLoad.vue';
 import GameTable from './components/GameTable.vue';
 import PropertyCard from './components/PropertyCard.vue';
+import Auction from './components/Auction.vue';
 
 
 const app=new Vue({
@@ -36,6 +37,7 @@ const app=new Vue({
         FormAjaxWrapper,
         ButtonLoad,
         GameTable,
-        PropertyCard
+        PropertyCard,
+        Auction
     }
 })

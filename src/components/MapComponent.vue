@@ -23,7 +23,10 @@
         >
           <div>
             <div v-for="player in game.players" :key="player.id">
-              <div class="bg-dark text-light lead">{{player.user.username}} : {{player.money}} <text-with-money text="$"/></div>
+              <div class="bg-dark text-light lead">
+                {{player.user.username}} : {{player.money}}
+                <text-with-money text="$" />
+              </div>
             </div>
             <div v-if="isMyTurn">
               <button
@@ -33,7 +36,7 @@
                 @keypress.enter="move()"
               >Бросить кубик</button>
               <button
-                v-if="isFinishedTurn"
+                v-if="canFinishTurn"
                 class="btn btn-light"
                 @click="endTurn()"
                 @keypress.enter="endTurn()"
@@ -45,7 +48,10 @@
       <div class="empty-center">
         <div class="w-100 h-100 d-flex bg-warning">
           <div class="w-50 h-inherit d-flex justify-content-center align-items-center">
-            <div class="w-100 h-100 d-flex align-items-center justify-content-center" v-if="isMyTurn&&myCell&&!isFinishedTurn">
+            <div
+              class="w-100 h-100 d-flex align-items-center justify-content-center"
+              v-if="isMyTurn&&myCell&&isDiceRolled"
+            >
               <div v-if="myCell.property">
                 <property-card
                   :is_turn_finished="isFinishedTurn"
@@ -58,7 +64,7 @@
                 ></property-card>
               </div>
               <div class="w-100 h-100" v-if="myCell.event">
-                <event-card class="w-100 h-100" :event="myCell.event" @eventDone="oneventDone"/>
+                <event-card class="w-100 h-100" :is_finished_turn="isFinishedTurn" :event="myCell.event" @eventDone="oneventDone"/>
               </div>
             </div>
           </div>
@@ -84,8 +90,8 @@ import Figurine from "./Figurine.vue";
 import Chat from "./Chat.vue";
 import PropertyCard from "./PropertyCard.vue";
 import MatchMenu from "./MatchMenu.vue";
-import EventCard from './EventCard.vue';
-import TextWithMoney from './TextWithMoney.vue';
+import EventCard from "./EventCard.vue";
+import TextWithMoney from "./TextWithMoney.vue";
 
 import AuthSocket from "../js/AuthSocket";
 import { updateModel, updateModelInArrayAll } from "../js/modelHelper";
@@ -100,7 +106,7 @@ export default {
     Figurine,
     LeaveMatchButton,
     EventCard,
-    TextWithMoney
+    TextWithMoney,
   },
   props: {
     gameString: {
@@ -121,7 +127,6 @@ export default {
     };
   },
   async beforeMount() {
-    //set csrf for all post request
     this.game = JSON.parse(this.gameString);
     this.myPlayer = this.game.players.find((p) => p.id == this.player_id);
     let result = await this.$axios.get("/cell?game_id=" + this.game.id);
@@ -162,11 +167,11 @@ export default {
     });
   },
   methods: {
-    oneventDone(result){
+    oneventDone(result) {
       if (this.$response.handleGameError(result, this.socket)) return;
 
-      let systemChatMessage="событие выполнено";
-      this.socket.send(result,systemChatMessage);
+      let systemChatMessage = "событие выполнено";
+      this.socket.send(result, systemChatMessage);
     },
     onpropertyBuy(result) {
       if (this.$response.handleGameError(result, this.socket)) return;
@@ -277,15 +282,18 @@ export default {
       return this.player_id == this.game.turn_player_id;
     },
     //turn stages
-    isFinishedTurn:function(){
-      return this.game.turn_stage==this.$turnStages['finished'];
+    isBeginTurn: function () {
+      return this.game.turn_stage == this.$turnStages["begin"];
     },
-    canFinishTurn:function(){
-      return +this.game.turn_stage>=this.$turnStages['canFinish'];
+    isFinishedTurn: function () {
+      return this.game.turn_stage == this.$turnStages["finished"];
     },
-    isBeginTurn:function(){
-      return this.game.turn_stage==this.$turnStages['begin'];
-    }
+    canFinishTurn: function () {
+      return +this.game.turn_stage >= this.$turnStages["canFinish"];
+    },
+    isDiceRolled: function () {
+      return +this.game.turn_stage >= this.$turnStages["diceRolled"];
+    },
   },
 };
 </script>

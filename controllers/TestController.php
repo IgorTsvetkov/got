@@ -4,7 +4,7 @@ namespace app\controllers;
 
 use Yii;
 
-class HomeController extends \yii\web\Controller
+class TestController extends \yii\web\Controller
 {
     public function actionIndex()
     {

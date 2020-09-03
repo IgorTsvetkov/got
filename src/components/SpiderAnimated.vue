@@ -1,53 +1,115 @@
 <template>
-    <div>
-<!-- //////////////// SHADOW //////////////// -->
-<div class="spider-web shadow"></div>
-<div class="container-spider shadow">
-  <div class="arm-container-spider right">
-    <div class="arm A"><div class="arm B"><div class="arm C"></div></div></div>
-    <div class="arm A"><div class="arm B"><div class="arm C"></div></div></div>
-    <div class="arm A"><div class="arm B"><div class="arm C"></div></div></div>
-    <div class="arm A"><div class="arm B"><div class="arm C"></div></div></div>
-  </div>
-  <div class="arm-container-spider left">
-    <div class="arm A"><div class="arm B"><div class="arm C"></div></div></div>
-    <div class="arm A"><div class="arm B"><div class="arm C"></div></div></div>
-    <div class="arm A"><div class="arm B"><div class="arm C"></div></div></div>
-    <div class="arm A"><div class="arm B"><div class="arm C"></div></div></div>
-  </div>
-  <div class="spider-body shadow-body">
-    <div class="eye eye-left"></div>
-    <div class="eye eye-right"></div>
-  </div>
-</div>
-
-<!-- //////////////// SPIDER //////////////// -->
-<div class="spider-web"></div>
-<div class="container-spider">
-  <div class="arm-container-spider right">
-    <div class="arm A"><div class="arm B"><div class="arm C"></div></div></div>
-    <div class="arm A"><div class="arm B"><div class="arm C"></div></div></div>
-    <div class="arm A"><div class="arm B"><div class="arm C"></div></div></div>
-    <div class="arm A"><div class="arm B"><div class="arm C"></div></div></div>
-  </div>
-  <div class="arm-container-spider left">
-    <div class="arm A"><div class="arm B"><div class="arm C"></div></div></div>
-    <div class="arm A"><div class="arm B"><div class="arm C"></div></div></div>
-    <div class="arm A"><div class="arm B"><div class="arm C"></div></div></div>
-    <div class="arm A"><div class="arm B"><div class="arm C"></div></div></div>
-  </div>
-  <div class="spider-body">
-    <div class="eye eye-left"></div>
-    <div class="eye eye-right"></div>
-  </div>
-</div> 
+  <div>
+    <!-- //////////////// SHADOW //////////////// -->
+    <div class="spider-web shadow"></div>
+    <div class="container-spider shadow">
+      <div class="arm-container-spider right">
+        <div class="arm A">
+          <div class="arm B">
+            <div class="arm C"></div>
+          </div>
+        </div>
+        <div class="arm A">
+          <div class="arm B">
+            <div class="arm C"></div>
+          </div>
+        </div>
+        <div class="arm A">
+          <div class="arm B">
+            <div class="arm C"></div>
+          </div>
+        </div>
+        <div class="arm A">
+          <div class="arm B">
+            <div class="arm C"></div>
+          </div>
+        </div>
+      </div>
+      <div class="arm-container-spider left">
+        <div class="arm A">
+          <div class="arm B">
+            <div class="arm C"></div>
+          </div>
+        </div>
+        <div class="arm A">
+          <div class="arm B">
+            <div class="arm C"></div>
+          </div>
+        </div>
+        <div class="arm A">
+          <div class="arm B">
+            <div class="arm C"></div>
+          </div>
+        </div>
+        <div class="arm A">
+          <div class="arm B">
+            <div class="arm C"></div>
+          </div>
+        </div>
+      </div>
+      <div class="spider-body shadow-body">
+        <div class="eye eye-left"></div>
+        <div class="eye eye-right"></div>
+      </div>
     </div>
+
+    <!-- //////////////// SPIDER //////////////// -->
+    <div class="spider-web"></div>
+    <div class="container-spider">
+      <div class="arm-container-spider right">
+        <div class="arm A">
+          <div class="arm B">
+            <div class="arm C"></div>
+          </div>
+        </div>
+        <div class="arm A">
+          <div class="arm B">
+            <div class="arm C"></div>
+          </div>
+        </div>
+        <div class="arm A">
+          <div class="arm B">
+            <div class="arm C"></div>
+          </div>
+        </div>
+        <div class="arm A">
+          <div class="arm B">
+            <div class="arm C"></div>
+          </div>
+        </div>
+      </div>
+      <div class="arm-container-spider left">
+        <div class="arm A">
+          <div class="arm B">
+            <div class="arm C"></div>
+          </div>
+        </div>
+        <div class="arm A">
+          <div class="arm B">
+            <div class="arm C"></div>
+          </div>
+        </div>
+        <div class="arm A">
+          <div class="arm B">
+            <div class="arm C"></div>
+          </div>
+        </div>
+        <div class="arm A">
+          <div class="arm B">
+            <div class="arm C"></div>
+          </div>
+        </div>
+      </div>
+      <div class="spider-body">
+        <div class="eye eye-left"></div>
+        <div class="eye eye-right"></div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
-    export default {
-        
-    }
+export default {};
 </script>
 
 <style scoped>
