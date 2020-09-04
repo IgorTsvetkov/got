@@ -4,7 +4,8 @@ export const socketPathes={
 };
 export const turnStages={
     "begin":null,
-    "diceRolled":200,
+    "figurineMoved":200,
+    "rollAgain":225,
     "diceRolledEvent":250,
     "canFinish":275,
     "finished":300,

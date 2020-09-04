@@ -30,7 +30,7 @@ class TestController extends Controller
 {
     function actionTest()
     {
-        list($position)=Property::find()->select("cell.position as position")->where(["name"=>"king's landing"])->joinWith("cell")->column("position");
-        var_dump($position);
+       $r=rand(1,6);
+        var_dump($r);
     }
 }

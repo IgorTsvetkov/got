@@ -118,7 +118,7 @@ class PropertyGameStatusController extends \yii\web\Controller
                 "game" => $game,
                 "property" => ["name" => $property->name, "color" => $property->group->color_name],
             ];
-            return ResponseHelper::Socket("property-improve", $data);
+            return ResponseHelper::Socket("my-player-and-game", $data);
         }
         throw new Exception("Как ты здесь оказался?");
         // return ResponseHelper::Error("Вы больше не можете улучшать ");

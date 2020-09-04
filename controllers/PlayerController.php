@@ -64,6 +64,6 @@ class PlayerController extends \yii\web\Controller
             "player_to_id" => $player_to->id,
             "cost" => $rent_cost
         ];
-        return ResponseHelper::Socket("property-pay-rent", $data);
+        return ResponseHelper::Socket("players-and-game", $data);
     }
 }

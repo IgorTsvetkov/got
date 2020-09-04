@@ -39,10 +39,11 @@ class GotController extends Controller
         $userSafeQuery = function ($query) {
             $query->select("id,username");
         };
+        $propertyCellQuery=function ($q) {
+            $q->select("id,property_id,position");
+        };
         $game = $user->getLastGame()
-            ->joinWith(["players", "players.hero", "players.user" => $userSafeQuery, "players.propertyCells" => function ($q) {
-                $q->select("id,property_id,position");
-            }])
+            ->joinWith(["players", "players.hero", "players.user" => $userSafeQuery,"players.propertyCells" =>$propertyCellQuery ])
             ->andWhere(["finished_at" => null])
             ->asArray()
             ->one();
@@ -53,24 +54,24 @@ class GotController extends Controller
         $this->layout = false;
         return $this->render('index', compact('game', 'player_id'));
     }
-    public function actionMove(int $player_id)
+    public function actionMove()
     {
         $step = 1;
         /** @var Player */
-        $player = Player::find()->where(["id" => $player_id])->with("gameSession")->limit(1)->one();
+        $player = Player::me()->with("gameSession")->one();
         $game = $player->gameSession;
-        if ($game->turn_stage >=TurnStageHelper::DICE_ROLLED)
+        if ($game->turn_stage >=TurnStageHelper::FIGURINE_MOVED)
             throw new Exception("вы не можете преместиться дважды за один ход");
         $player->move($step);
 
-        $game->turn_stage = TurnStageHelper::DICE_ROLLED;
+        $game->turn_stage = TurnStageHelper::FIGURINE_MOVED;
         $game->update();
         $data = [
             "player" => $player,
             "game" => $game,
             "step" => $step
         ];
-        return ResponseHelper::Socket("move", $data);
+        return ResponseHelper::Socket("my-player-and-game", $data);
     }
     public function actionEndTurn($player_id)
     {
@@ -80,10 +81,23 @@ class GotController extends Controller
         $game = $player->gameSession;
         $game->turn_player_id = $nextTurnPlayer->id;
         //сброс настроек для следующего игрока
-        $game->turn_stage = TurnStageHelper::BEGIN;
+        $game->resetTurn();
         
         $game->update();
         $data = ["game" => $game];
-        return ResponseHelper::Socket("end-turn", $data);
+        return ResponseHelper::Socket("game", $data);
+    }
+    //test
+    public function actionRollDices()
+    {
+        $game=GameSession::meOne();
+        if($game->turn_stage==TurnStageHelper::ROLL_AGAIN)
+        {
+            $game->rollDices();
+            $game->save();
+            $data=["game"=>$game];
+            return ResponseHelper::Socket("game",$data);
+        }
+        return $this->redirect("move");
     }
 }

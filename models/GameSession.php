@@ -2,11 +2,15 @@
 
 namespace app\models;
 
+use app\helpers\GameHelper;
 use Yii;
 use app\models\User;
 use app\models\Player;
-use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
+use app\helpers\TurnStageHelper;
+use Error;
+use phpDocumentor\Reflection\Types\This;
+use yii\behaviors\TimestampBehavior;
 
 /**
  * This is the model class for table "game_session".
@@ -16,6 +20,10 @@ use yii\db\Expression;
  * @property int|null $turn_stage
  * @property int|null $leader_user_id
  * @property int|null $turn_player_id
+ * @property int|null $current_event_id
+ * @property int|null $roll_count_first
+ * @property int|null $roll_count_second
+ * @property string|null $current_event_type
  * @property string|null $created_at
  * @property string|null $started_at
  * @property string|null $finished_at
@@ -28,10 +36,30 @@ use yii\db\Expression;
 class GameSession extends \yii\db\ActiveRecord
 {
     public const MAX_PLAYERS=2;
-    public const BEGIN=null;
-    public const TURN_ROLLED=200;
-    public const TURN_ROLLED_EVENT=250;
-    public const TURN_STAGE_ACTION_FINISHED=300;
+    public const ROLL_MAX=6;
+
+    public static function me()
+    {
+        return GameSession::find()->joinWith(["userGameSessions"])->where(["user_id"=>Yii::$app->user->id]);
+    }
+    public static function meOne():?self
+    {
+        return self::me()->limit(1)->one();
+    }
+    public function getRollCount(){
+        return $this->roll_count_first+$this->roll_count_second;
+    }
+    public function rollDices()
+    {
+        $this->roll_count_first=GameHelper::roll();
+        $this->roll_count_second=GameHelper::roll();
+    }
+
+    // public function setRollCountFirst($value)
+    // {
+    //     if($value>self::ROLL_MAX)
+    //         throw new Error("Roll dice count can't be more than ".self::ROLL_MAX."you have ".$value);     
+    // }
     public function getFirstEmptySlot():int{
         $slots=GameSession::find()->where(["game_session.id"=>$this->id])->joinWith(["players"])->select("slot")->asArray()->all();
         $filledSlot=array_map(function($slot){
@@ -54,6 +82,11 @@ class GameSession extends \yii\db\ActiveRecord
     }
     public function getIsFinished():bool{
         return $this->finished_at!=null?true:false;
+    }
+    public function resetTurn()
+    {
+        $this->current_event_id=null;
+        $this->turn_stage = TurnStageHelper::MOVE;        
     }
     public function behaviors()
     {

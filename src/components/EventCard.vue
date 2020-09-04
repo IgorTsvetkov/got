@@ -1,6 +1,10 @@
 <template>
   <div class="w-100 h-100 d-flex align-items-center justify-content-center">
-    <div class="event-card-wrapper" @click="getEventRandom">
+    <div
+      class="event-card-wrapper card-wrapper-small"
+      :class="{'card-wrapper-normal':eventData}"
+      @click="pickCard"
+    >
       <div class="event-card-external btn btn-secondary rounded" :class="{'rotate':isRotated}">
         <div class="event-card-inner bg-dark w-100 h-100 position-relative">
           <div
@@ -16,6 +20,15 @@
                   <div v-if="!is_finished_turn" class="btn btn-success m-2" @click="doEvent">
                     Забрать {{eventData.money}}
                     <text-with-money text="$"></text-with-money>
+                  </div>
+                  <div v-else>
+                    <span>Выполено</span>
+                  </div>
+                </div>
+                <div v-if="eventData.operation=='rollAndPayMultiply10'">
+                  <text-with-money :text="eventData.text"></text-with-money>
+                  <div v-if="!is_finished_turn" class="btn btn-success m-2" @click="doEvent">
+                    Бросить кубик
                   </div>
                   <div v-else>
                     <span>Выполено</span>
@@ -49,10 +62,14 @@ export default {
       type: Object,
       default: null,
     },
-    is_finished_turn:{
-      type:Boolean,
-      default:false
-    }
+    is_finished_turn: {
+      type: Boolean,
+      default: false,
+    },
+    current_event_id: {
+      type: Number,
+      default: undefined,
+    },
   },
   data() {
     return {
@@ -60,19 +77,40 @@ export default {
       eventData: undefined,
     };
   },
+  async created() {
+    if (this.current_event_id)
+      this.eventData = await this.getEvent("spyder", this.current_event_id);
+  },
   methods: {
-    async getEventRandom() {
+    async pickCard() {
+      if (this.eventData) {
+        this.rotate();
+        return;
+      }
       let result = await this.$axios.get("/event/random?type=spyder");
       this.eventData = result.data;
-      this.rotate(true);
+      // this.rotate(true);
+    },
+    async getEvent(type, id) {
+      debugger
+      let result = await this.$axios.get(
+        `/event/view?type=${type}&id=${this.current_event_id}`
+      );
+      //roll dice allow
+      if(this.$response.getAction(result)){
+        this.$emit("turnStatusUpdate",result);
+        return result.data.event;
+      }
+      return result.data;
     },
     rotate() {
       this.isRotated = true;
     },
     async doEvent() {
       let result = await this.$axios.post(
-        `/event/do?type=spyder&id=${this.eventData.id}`);
-        this.$emit("eventDone",result);
+        `/event/do?type=spyder&id=${this.eventData.id}`
+      );
+      this.$emit("eventDone", result);
     },
   },
   computed: {
@@ -99,6 +137,13 @@ export default {
   height: -webkit-fill-available; /* Mozilla-based browsers will ignore this. */
   height: fill-available;
 }
+.card-wrapper-small {
+  transform: scale(0.5);
+}
+.card-wrapper-normal {
+  transform: scale(1);
+  transition: transform 2s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
 .event-card-wrapper {
   cursor: pointer;
   perspective: 400px;
@@ -108,6 +153,8 @@ export default {
   height: 21vw;
   transform-style: preserve-3d;
   padding: 1vw;
+}
+.external-animation {
   animation: card 3s linear infinite;
 }
 .event-card-external.rotate {

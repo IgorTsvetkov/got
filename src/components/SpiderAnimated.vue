@@ -274,4 +274,8 @@ export default {};
 .shadow-body .eye {
   display: none;
 }
+.pause-all,.pause-all>*,.pause-all *,.pause-all>*>*,.pause-all>*>*{
+  animation-delay: 5s;
+  animation-play-state: paused!important;
+}
 </style>

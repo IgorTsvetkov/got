@@ -15,10 +15,22 @@ use app\helpers\TurnStageHelper;
 
 class SpyderController extends \yii\web\Controller
 {
+    public function actionView($id)
+    {
+        $event = EventSpyder::findOne($id);
+        return ResponseHelper::Success($event);
+    }
     public function actionRandom()
     {
-        // $event=EventSpyder::getRandom();
-        $event = EventSpyder::findOne(1);
+        $event = EventSpyder::findOne(5);
+        $game=GameSession::meOne();
+        $game->current_event_id=$event->id;
+        if('rollAndPayMultiply10'){
+            $game->turn_stage=TurnStageHelper::ROLL_AGAIN;
+            $data=["game"=>$game,"event"=>$event];
+            return ResponseHelper::Socket("game",$data); 
+        }
+        $game->update(false);
         return ResponseHelper::Success($event);
     }
     public function actionDo($id)
@@ -31,9 +43,6 @@ class SpyderController extends \yii\web\Controller
             case 'earn':
                 $player->earn($event->money);
                 $game->turn_stage = TurnStageHelper::FINISHED;
-                $game->update(false);
-                $data = ["game" => $game, "players" => [$player]];
-                ResponseHelper::Socket("event-done", $data);
                 break;
             case 'pay':
                 if ($player->canPay($event->money))
@@ -48,11 +57,12 @@ class SpyderController extends \yii\web\Controller
                 $player->teleportToProperty("king's landing");
                 break;
             case 'rollAndPayMultiply10':
-                $rollCount = null;
-                $isDiceRolled = null;
+                if(!$game->turn_stage==TurnStageHelper::ROLL_AGAIN){
+                    $game->turn_stage=TurnStageHelper::ROLL_AGAIN; 
+                    break;
+                }
+                $rollCount=$game->rollCount;
                 $multiplier = 10;
-                // if(!$isDiceRolled){
-                // return ResponseHelper::Socket()
                 $cost = $rollCount * $multiplier;
                 $player->pay($cost);
                 break;
@@ -67,5 +77,8 @@ class SpyderController extends \yii\web\Controller
                 throw new Exception("There is no SpyderEvent with name" . $event->operation);
                 break; # 
         }
+        $game->update(false);
+        $data = ["game" => $game, "players" => [$player]];
+        ResponseHelper::Socket("players-and-game", $data);
     }
 }

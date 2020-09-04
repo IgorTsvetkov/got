@@ -30,11 +30,11 @@
             </div>
             <div v-if="isMyTurn">
               <button
-                v-if="isBeginTurn"
+                v-if="canRollDices"
                 class="btn btn-light"
                 @click="move()"
                 @keypress.enter="move()"
-              >Бросить кубик</button>
+              >Бросить кубики</button>
               <button
                 v-if="canFinishTurn"
                 class="btn btn-light"
@@ -50,7 +50,7 @@
           <div class="w-50 h-inherit d-flex justify-content-center align-items-center">
             <div
               class="w-100 h-100 d-flex align-items-center justify-content-center"
-              v-if="isMyTurn&&myCell&&isDiceRolled"
+              v-if="isMyTurn&&myCell&&isFigurineMoved"
             >
               <div v-if="myCell.property">
                 <property-card
@@ -64,7 +64,14 @@
                 ></property-card>
               </div>
               <div class="w-100 h-100" v-if="myCell.event">
-                <event-card class="w-100 h-100" :is_finished_turn="isFinishedTurn" :event="myCell.event" @eventDone="oneventDone"/>
+                <event-card
+                  class="w-100 h-100"
+                  :is_finished_turn="isFinishedTurn"
+                  :current_event_id="+game.current_event_id"
+                  :event="myCell.event"
+                  @eventDone="oneventDone"
+                  @turnStatusUpdate="onturnStatusUpdate"
+                />
               </div>
             </div>
           </div>
@@ -139,13 +146,11 @@ export default {
       let player;
 
       switch (action) {
-        case "property-pay-rent":
-        case "event-done":
+        case "players-and-game":
           updateModel(this.game, data.game);
           updateModelInArrayAll(this.game.players, data.players);
           break;
-        case "move":
-        case "property-improve":
+        case "my-player-and-game":
           player = this.findPlayer(data.player.id);
           updateModel(player, data.player);
           updateModel(this.game, data.game);
@@ -156,7 +161,7 @@ export default {
           player.propertyCells.push({ position: player.position });
           updateModel(this.game, data.game);
           break;
-        case "end-turn":
+        case "game":
           updateModel(this.game, data.game);
           break;
         default:
@@ -167,6 +172,10 @@ export default {
     });
   },
   methods: {
+    onturnStatusUpdate(result){
+      let systemChatMessage = `${this.userNameAndHeroHTML()} нужно бросить кости`;
+      this.socket.send(result,systemChatMessage);
+    },
     oneventDone(result) {
       if (this.$response.handleGameError(result, this.socket)) return;
 
@@ -175,12 +184,9 @@ export default {
     },
     onpropertyBuy(result) {
       if (this.$response.handleGameError(result, this.socket)) return;
+      console.log('onproperty buy result :>> ', result);
       let property = result.data.data.property;
-      let systemChatMessage = `
-      <span style="color:${this.myPlayer.hero.color}">${this.myPlayer.user.username}</span>
-      <img src="${this.myPlayer.hero.src}" width="35px" class="text-wrap" /> 
-      купил новую собственность 
-      <span class="text-capitalize px-1 ${property.color}">${property.name}</span>`;
+      let systemChatMessage = `${this.userNameAndHeroHTML()} купил новую собственность ${this.propertyHTML(property)}`;
 
       this.socket.send(result, systemChatMessage);
     },
@@ -188,28 +194,30 @@ export default {
       if (this.$response.handleGameError(result, this.socket)) return;
       let property = result.data.data.property;
 
-      let systemChatMessage = `
-      <span style="color:${this.myPlayer.hero.color}">${this.myPlayer.user.username}</span>
-      <img src="${this.myPlayer.hero.src}" width="35px" class="text-wrap" />
-      улучшил собственность
-      <span class="text-capitalize ${property.color}">${property.name}</span>
-      `;
+      let systemChatMessage = `${this.userNameAndHeroHTML()} улучшил собственность ${this.propertyHTML(property)}`;
 
       this.socket.send(result, systemChatMessage);
     },
     onpropertyPayRent(result) {
       if (this.$response.handleGameError(result, this.socket)) return;
+
       let data = result.data.data;
 
       let player_to = this.findPlayer(data.player_to_id);
 
-      let systemChatMessage = `<span style="color:${this.myPlayer.hero.color}">${this.myPlayer.user.username}</span>
-      <img src="${this.myPlayer.hero.src}" width="35px" class="text-wrap" /> заплатил <span class="text-success">${data.cost}</span>
-      игроку
-      <span style="color:${player_to.hero.color}">${player_to.user.username}</span>
-      <img src="${player_to.hero.src}" width="35px" class="text-wrap" /> 
-      `;
+      let systemChatMessage = `${this.userNameAndHeroHTML()} заплатил <span class="text-success">${data.cost}</span> игроку ${this.userNameAndHeroHTML(player_to)}`;
       this.socket.send(result, systemChatMessage);
+    },
+    async rollDices() {
+      let result = await this.$axios.post(
+        `/got/roll?player_id=${this.player_id}`
+      );
+      if (result) {
+        if (this.$response.handleGameError(result, this.socket)) return;
+        let game=result.data.data.game;
+        let systemChatMessage = `${this.userNameAndHeroHTML()} бросил кости и получил ${game.roll_count_first} и ${game.roll_count_second} `;
+        this.socket.send(result, systemChatMessage);
+      }
     },
     async move(player_id) {
       let result = await this.$axios.post(
@@ -217,16 +225,11 @@ export default {
       );
       if (result) {
         let data = result.data.data;
-        let systemChatMessage = `<span style="color:${
-          this.myPlayer.hero.color
-        }">${this.myPlayer.user.username}</span>        
-         переместил <img src="${
-           this.myPlayer.hero.src
-         }" width="35px" class="text-wrap" /> на ${this.getStep(data.step)}`;
+        let systemChatMessage = `${this.usernameHTML()} переместил ${this.heroHTML()} на ${data.step} ${this.getCellName(data.step)}`;
         this.socket.send(result, systemChatMessage);
       }
     },
-    getStep(step) {
+    getCellName(step) {
       let name;
       switch (step) {
         case 1:
@@ -236,10 +239,10 @@ export default {
           name = "клетки";
           break;
         default:
-          "клеток";
+          name = "клеток";
           break;
       }
-      return step + " " + name;
+      return name;
     },
     async endTurn(player_id) {
       let result = await this.$axios.post(
@@ -248,13 +251,8 @@ export default {
       if (result) {
         let data = result.data.data;
         let nextPlayer = this.findPlayer(data.game.turn_player_id);
-        let systemChatMessage = `
-        <span style="color:${this.myPlayer.hero.color}">${this.myPlayer.user.username}</span>
-        <img src="${this.myPlayer.hero.src}" width="35px" class="text-wrap" /> 
-        передал ход
-        <span style="color:${nextPlayer.hero.color}">${nextPlayer.user.username}</span>
-         <img src="${nextPlayer.hero.src}" width="35px" class="text-wrap" /> 
-        `;
+        let systemChatMessage = `${this.usernameHTML()} ${this.heroHTML()}
+        передал ход ${this.usernameHTML()} ${this.heroHTML()}`;
         this.socket.send(result, systemChatMessage);
       }
     },
@@ -268,6 +266,20 @@ export default {
           p.propertyCells.find((cell) => cell.position == position)
       );
     },
+    usernameHTML(player=this.myPlayer){
+      return `<span style="color:${player.hero.color}">
+                ${player.user.username}
+            </span>`;
+    },
+    heroHTML(player=this.myPlayer){
+      return  `<img src="${player.hero.src}" width="35px" class="text-wrap" />`;
+    },
+    userNameAndHeroHTML(player=this.myPlayer){
+      return this.usernameHTML(player)+" "+this.heroHTML(player);
+    },
+    propertyHTML(property){
+      return `<span class="text-capitalize px-1 ${property.color}">${property.name}</span>`;
+    }
   },
   computed: {
     myCell: function () {
@@ -281,7 +293,13 @@ export default {
     isMyTurn: function () {
       return this.player_id == this.game.turn_player_id;
     },
+    canRollDices: function () {
+      return this.isBeginTurn || this.canRollAgain;
+    },
     //turn stages
+    canRollAgain: function () {
+      return this.game.turn_stage == this.$turnStages["rollAgain"];
+    },
     isBeginTurn: function () {
       return this.game.turn_stage == this.$turnStages["begin"];
     },
@@ -291,8 +309,8 @@ export default {
     canFinishTurn: function () {
       return +this.game.turn_stage >= this.$turnStages["canFinish"];
     },
-    isDiceRolled: function () {
-      return +this.game.turn_stage >= this.$turnStages["diceRolled"];
+    isFigurineMoved: function () {
+      return +this.game.turn_stage >= this.$turnStages["figurineMoved"];
     },
   },
 };
