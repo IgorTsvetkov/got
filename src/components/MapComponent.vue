@@ -7,7 +7,6 @@
         </match-menu>
       </div>
       <div class="not-draggable" v-for="cell in cells" :key="cell.position">
-        <!-- {{game}} -->
         <cell :playerOwner="playerOwner(cell.position)" :cell="cell">
           <div v-for="(player,key) in game.players" :key="key">
             <div v-if="player.position==cell.position">
@@ -29,18 +28,8 @@
               </div>
             </div>
             <div v-if="isMyTurn">
-              <button
-                v-if="canRollDices"
-                class="btn btn-light"
-                @click="move()"
-                @keypress.enter="move()"
-              >Бросить кубики</button>
-              <button
-                v-if="canFinishTurn"
-                class="btn btn-light"
-                @click="endTurn()"
-                @keypress.enter="endTurn()"
-              >Закончить ход</button>
+              <button v-if="canRollDices" class="btn btn-light" @click="rollDices()">Бросить кубики</button>
+              <button v-if="isFinishedTurn" class="btn btn-light" @click="endTurn()">Закончить ход</button>
             </div>
           </div>
         </div>
@@ -50,29 +39,60 @@
           <div class="w-50 h-inherit d-flex justify-content-center align-items-center">
             <div
               class="w-100 h-100 d-flex align-items-center justify-content-center"
-              v-if="isMyTurn&&myCell&&isFigurineMoved"
+              v-if="isMyTurn&&myCell&&!isBeginTurn&&!auction"
             >
-              <div v-if="myCell.property">
-                <property-card
-                  :is_turn_finished="isFinishedTurn"
-                  :id="+myCell.property_id"
-                  @propertyBuy="onpropertyBuy"
-                  @propertyImprove="onpropertyImprove"
-                  @propertyPayRent="onpropertyPayRent"
-                  :myPlayer="myPlayer"
-                  :position="+myCell.position"
-                ></property-card>
-              </div>
-              <div class="w-100 h-100" v-if="myCell.event">
-                <event-card
-                  class="w-100 h-100"
-                  :is_finished_turn="isFinishedTurn"
-                  :current_event_id="+game.current_event_id"
-                  :event="myCell.event"
-                  @eventDone="oneventDone"
-                  @turnStatusUpdate="onturnStatusUpdate"
-                />
-              </div>
+              <property-card
+                v-if="myCell.property"
+                :is_turn_finished="isFinishedTurn"
+                :id="+myCell.property_id"
+                @propertyBuy="onpropertyBuy"
+                @propertyImprove="onpropertyImprove"
+                @propertyPayRent="onpropertyPayRent"
+                @auctionStarted="onauctionStarted"
+                :myPlayer="myPlayer"
+                :position="+myCell.position"
+              ></property-card>
+              <event-card
+                v-if="myCell.event"
+                class="w-100 h-100"
+                :is_finished_turn="isFinishedTurn"
+                :current_event_id="+game.current_event_id"
+                :dice_rolled="isRollAgainFinish"
+                :event="myCell.event"
+                @eventDone="oneventDone"
+                @turnStatusUpdate="onturnStatusUpdate"
+              />
+              <tax
+                v-if="myCell.tax"
+                :tax="myCell.tax"
+                :isReadOnly="isReadOnly"
+                :my_player_id="+myPlayer.id"
+                :game_session_id="+game.id"
+                @taxBuy="ontaxBuy"
+              />
+              <utility
+                v-if="myCell.utility"
+                :utility="myCell.utility"
+                :isReadOnly="isReadOnly"
+                :my_player_id="+myPlayer.id"
+                :game_session_id="+game.id"
+                @utilityBuy="onutilityBuy"
+              />
+            </div>
+            <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+              <!-- {{auction.turn_player_id}}
+              {{myPlayer.id}} -->
+
+              <auction
+                v-if="auction"
+                :max="+myPlayer.money"
+                :min="+auction.cost"
+                :target_type="auction.target_type"
+                :target_id="+auction.target_id"
+                :target_name="auction.target_name"
+                :canBet="auction.turn_player_id==myPlayer.id"
+                :player_id="+myPlayer.id"
+              />
             </div>
           </div>
           <div class="w-50 bg-primary d-flex flex-column h-100 p-2">
@@ -97,8 +117,11 @@ import Figurine from "./Figurine.vue";
 import Chat from "./Chat.vue";
 import PropertyCard from "./PropertyCard.vue";
 import MatchMenu from "./MatchMenu.vue";
-import EventCard from "./EventCard.vue";
 import TextWithMoney from "./TextWithMoney.vue";
+import EventCard from "./EventCard.vue";
+import Tax from "./Tax.vue";
+import Utility from "./Utility.vue";
+import Auction from "./Auction.vue";
 
 import AuthSocket from "../js/AuthSocket";
 import { updateModel, updateModelInArrayAll } from "../js/modelHelper";
@@ -114,6 +137,9 @@ export default {
     LeaveMatchButton,
     EventCard,
     TextWithMoney,
+    Tax,
+    Utility,
+    Auction,
   },
   props: {
     gameString: {
@@ -131,11 +157,13 @@ export default {
       game: undefined,
       cells: [],
       socket: undefined,
+      auction: undefined,
     };
   },
   async beforeMount() {
     this.game = JSON.parse(this.gameString);
     this.myPlayer = this.game.players.find((p) => p.id == this.player_id);
+    this.auction=this.game.auction;
     let result = await this.$axios.get("/cell?game_id=" + this.game.id);
     if (result) this.cells = result.data;
     this.socket = this.$socketGet(this.game.id, "send-local-to-all");
@@ -148,6 +176,10 @@ export default {
       switch (action) {
         case "players-and-game":
           updateModel(this.game, data.game);
+          updateModelInArrayAll(this.game.players, data.players);
+          break;
+        case "players-and-auction":
+          this.auction = data.auction;
           updateModelInArrayAll(this.game.players, data.players);
           break;
         case "my-player-and-game":
@@ -172,9 +204,32 @@ export default {
     });
   },
   methods: {
-    onturnStatusUpdate(result){
+    onauctionStarted(result) {
+      let systemChatMessage = `${this.userNameAndHeroHTML()}
+       не изъявил желания приобрести ${result.data.data.auction.target_name}. Начало аукциона`;
+      this.socket.send(result, systemChatMessage);
+    },
+    onutilityBuy(result) {
+      let utility_id = result.data.data.utility_id;
+      let utility = this.findUtility(utility_id);
+      if (!utility) throw new Error("utility have not found");
+      let systemChatMessage = `${this.userNameAndHeroHTML()} купил коммунальное предприятие ${
+        utility.name
+      }`;
+      this.socket.send(result, systemChatMessage);
+    },
+    ontaxBuy(result) {
+      let tax_id = result.data.data.tax_id;
+      let tax = this.findTax(tax_id);
+      if (!tax) throw new Error("Tax have not found");
+      let systemChatMessage = `${this.userNameAndHeroHTML()} приобрел house ${
+        tax.name
+      }`;
+      this.socket.send(result, systemChatMessage);
+    },
+    onturnStatusUpdate(result) {
       let systemChatMessage = `${this.userNameAndHeroHTML()} нужно бросить кости`;
-      this.socket.send(result,systemChatMessage);
+      this.socket.send(result, systemChatMessage);
     },
     oneventDone(result) {
       if (this.$response.handleGameError(result, this.socket)) return;
@@ -184,9 +239,11 @@ export default {
     },
     onpropertyBuy(result) {
       if (this.$response.handleGameError(result, this.socket)) return;
-      console.log('onproperty buy result :>> ', result);
+      console.log("onproperty buy result :>> ", result);
       let property = result.data.data.property;
-      let systemChatMessage = `${this.userNameAndHeroHTML()} купил новую собственность ${this.propertyHTML(property)}`;
+      let systemChatMessage = `${this.userNameAndHeroHTML()} купил новую собственность ${this.propertyHTML(
+        property
+      )}`;
 
       this.socket.send(result, systemChatMessage);
     },
@@ -194,7 +251,9 @@ export default {
       if (this.$response.handleGameError(result, this.socket)) return;
       let property = result.data.data.property;
 
-      let systemChatMessage = `${this.userNameAndHeroHTML()} улучшил собственность ${this.propertyHTML(property)}`;
+      let systemChatMessage = `${this.userNameAndHeroHTML()} улучшил собственность ${this.propertyHTML(
+        property
+      )}`;
 
       this.socket.send(result, systemChatMessage);
     },
@@ -205,27 +264,34 @@ export default {
 
       let player_to = this.findPlayer(data.player_to_id);
 
-      let systemChatMessage = `${this.userNameAndHeroHTML()} заплатил <span class="text-success">${data.cost}</span> игроку ${this.userNameAndHeroHTML(player_to)}`;
+      let systemChatMessage = `${this.userNameAndHeroHTML()} заплатил <span class="text-success">${
+        data.cost
+      }</span> игроку ${this.userNameAndHeroHTML(player_to)}`;
       this.socket.send(result, systemChatMessage);
     },
     async rollDices() {
-      let result = await this.$axios.post(
-        `/got/roll?player_id=${this.player_id}`
-      );
+      if (this.isBeginTurn) await this.move();
+      else if (this.isRollAgain) await this.rollAgain();
+    },
+    async rollAgain() {
+      let result = await this.$axios.post(`/got/roll-again`);
       if (result) {
         if (this.$response.handleGameError(result, this.socket)) return;
-        let game=result.data.data.game;
-        let systemChatMessage = `${this.userNameAndHeroHTML()} бросил кости и получил ${game.roll_count_first} и ${game.roll_count_second} `;
+        let game = result.data.data.game;
+        let systemChatMessage = `${this.userNameAndHeroHTML()} бросил кости и получил ${
+          game.roll_count_first
+        } и ${game.roll_count_second} `;
         this.socket.send(result, systemChatMessage);
       }
     },
-    async move(player_id) {
-      let result = await this.$axios.post(
-        `/got/move?player_id=${this.player_id}`
-      );
+
+    async move() {
+      let result = await this.$axios.post(`/got/move`);
       if (result) {
         let data = result.data.data;
-        let systemChatMessage = `${this.usernameHTML()} переместил ${this.heroHTML()} на ${data.step} ${this.getCellName(data.step)}`;
+        let systemChatMessage = `${this.usernameHTML()} переместил ${this.heroHTML()} на ${
+          data.step
+        } ${this.getCellName(data.step)}`;
         this.socket.send(result, systemChatMessage);
       }
     },
@@ -259,6 +325,16 @@ export default {
     findPlayer(id) {
       return this.game.players.find((p) => p.id == id);
     },
+    findTax(id) {
+      let cell = this.cells.find((t) => t.tax && t.tax.id == id);
+      if (!cell) return false;
+      return cell.tax;
+    },
+    findUtility(id) {
+      let cell = this.cells.find((t) => t.utility && t.utility.id == id);
+      if (!cell) return false;
+      return cell.utility;
+    },
     playerOwner(position) {
       return this.game.players.find(
         (p) =>
@@ -266,20 +342,20 @@ export default {
           p.propertyCells.find((cell) => cell.position == position)
       );
     },
-    usernameHTML(player=this.myPlayer){
+    usernameHTML(player = this.myPlayer) {
       return `<span style="color:${player.hero.color}">
                 ${player.user.username}
             </span>`;
     },
-    heroHTML(player=this.myPlayer){
-      return  `<img src="${player.hero.src}" width="35px" class="text-wrap" />`;
+    heroHTML(player = this.myPlayer) {
+      return `<img src="${player.hero.src}" width="35px" class="text-wrap" />`;
     },
-    userNameAndHeroHTML(player=this.myPlayer){
-      return this.usernameHTML(player)+" "+this.heroHTML(player);
+    userNameAndHeroHTML(player = this.myPlayer) {
+      return this.usernameHTML(player) + " " + this.heroHTML(player);
     },
-    propertyHTML(property){
+    propertyHTML(property) {
       return `<span class="text-capitalize px-1 ${property.color}">${property.name}</span>`;
-    }
+    },
   },
   computed: {
     myCell: function () {
@@ -294,11 +370,14 @@ export default {
       return this.player_id == this.game.turn_player_id;
     },
     canRollDices: function () {
-      return this.isBeginTurn || this.canRollAgain;
+      return this.isBeginTurn || this.isRollAgain;
     },
     //turn stages
-    canRollAgain: function () {
+    isRollAgain: function () {
       return this.game.turn_stage == this.$turnStages["rollAgain"];
+    },
+    isRollAgainFinish: function () {
+      return this.game.turn_stage == this.$turnStages["rollAgainFinish"];
     },
     isBeginTurn: function () {
       return this.game.turn_stage == this.$turnStages["begin"];
@@ -306,11 +385,11 @@ export default {
     isFinishedTurn: function () {
       return this.game.turn_stage == this.$turnStages["finished"];
     },
-    canFinishTurn: function () {
-      return +this.game.turn_stage >= this.$turnStages["canFinish"];
-    },
     isFigurineMoved: function () {
-      return +this.game.turn_stage >= this.$turnStages["figurineMoved"];
+      return +this.game.turn_stage == this.$turnStages["figurineMoved"];
+    },
+    isReadOnly: function () {
+      return !this.isFigurineMoved;
     },
   },
 };

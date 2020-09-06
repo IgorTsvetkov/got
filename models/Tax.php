@@ -10,6 +10,7 @@ use Yii;
  * @property int $id
  * @property string|null $name
  * @property string|null $src
+ * @property int $cost
  * @property string|null $tax1
  * @property string|null $tax2
  * @property string|null $tax3

@@ -15,6 +15,7 @@ class m200729_062537_create_tax_table extends Migration
         $this->createTable('{{%tax}}', [
             'id' => $this->primaryKey(),
             'name'=>$this->string(),
+            'cost'=>$this->integer(),
             'src'=>$this->string(),
             'tax1'=>$this->string(),
             'tax2'=>$this->string(),
@@ -23,7 +24,8 @@ class m200729_062537_create_tax_table extends Migration
         ]);
         $this->insert('{{%tax}}',[
             'id' =>1,
-            'name'=>'lanister',
+            'name'=>'lanister house',
+            'cost'=>'150',
             'src'=>'/web/images/cells/5.jpg',#TO DO Extract logo from tax card image
             'tax1'=>'25',
             'tax2'=>'50',
@@ -32,7 +34,8 @@ class m200729_062537_create_tax_table extends Migration
         ]);  
         $this->insert('{{%tax}}',[
             'id' =>2,
-            'name'=>'targaryen',
+            'name'=>'targaryen house',
+            'cost'=>'150',
             'src'=>'/web/images/cells/14.jpg',#TO DO Extract logo from tax card image
             'tax1'=>'25',
             'tax2'=>'50',
@@ -41,7 +44,8 @@ class m200729_062537_create_tax_table extends Migration
         ]);
         $this->insert('{{%tax}}',[
             'id' =>3,
-            'name'=>'stark',
+            'name'=>'stark house',
+            'cost'=>'150',
             'src'=>'/web/images/cells/25.jpg',#TO DO Extract logo from tax card image
             'tax1'=>'25',
             'tax2'=>'50',
@@ -51,7 +55,8 @@ class m200729_062537_create_tax_table extends Migration
 
         $this->insert('{{%tax}}',[
             'id' =>4,
-            'name'=>'baratheon',
+            'name'=>'baratheon house',
+            'cost'=>'150',
             'src'=>'/web/images/cells/34.jpg',#TO DO Extract logo from tax card image
             'tax1'=>'25',
             'tax2'=>'50',

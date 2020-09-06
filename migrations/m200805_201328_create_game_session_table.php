@@ -21,6 +21,7 @@ class m200805_201328_create_game_session_table extends Migration
             'roll_count_first'=>$this->string(),
             'roll_count_second'=>$this->string(),
             'current_event_id'=>$this->integer(),
+            'auction_id'=>$this->integer(),
             'created_at' => $this->string(),
             'started_at'=>$this->string(),
             'finished_at'=>$this->string(),

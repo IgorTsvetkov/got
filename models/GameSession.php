@@ -23,7 +23,7 @@ use yii\behaviors\TimestampBehavior;
  * @property int|null $current_event_id
  * @property int|null $roll_count_first
  * @property int|null $roll_count_second
- * @property string|null $current_event_type
+ * @property int|null $auction_id
  * @property string|null $created_at
  * @property string|null $started_at
  * @property string|null $finished_at
@@ -37,6 +37,8 @@ class GameSession extends \yii\db\ActiveRecord
 {
     public const MAX_PLAYERS=2;
     public const ROLL_MAX=6;
+    public const START_PLAYER_POSITION=20;
+    public const START_MONEY=20000;
 
     public static function me()
     {
@@ -86,7 +88,7 @@ class GameSession extends \yii\db\ActiveRecord
     public function resetTurn()
     {
         $this->current_event_id=null;
-        $this->turn_stage = TurnStageHelper::MOVE;        
+        $this->turn_stage = TurnStageHelper::BEGIN;        
     }
     public function behaviors()
     {
@@ -166,4 +168,8 @@ class GameSession extends \yii\db\ActiveRecord
     {
         return $this->hasMany(UserGameSession::className(), ['game_session_id' => 'id']);
     } 
+    public function getAuction()
+    {
+        return $this->hasOne(Auction::class,["game_session_id"=>"id"]);
+    }
 }

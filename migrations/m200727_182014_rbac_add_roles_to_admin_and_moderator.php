@@ -13,11 +13,11 @@ class m200727_182014_rbac_add_roles_to_admin_and_moderator extends Migration
     {
         $auth=Yii::$app->authManager;
 
-        $adminRole=$auth->getRole("admin");
-        $auth->assign($adminRole,app\models\User::findOne(["username"=>"admin"])->id);
-        $moderatorRole=$auth->getRole("moderator");
-        $auth->assign($moderatorRole,app\models\User::findOne(["username"=>"moderator01"])->id);
-        $auth->assign($moderatorRole,app\models\User::findOne(["username"=>"moderator02"])->id);
+        $adminRole=$auth->getRole('admin');
+        $auth->assign($adminRole,app\models\User::findOne(['username'=>'admin'])->id);
+        $moderatorRole=$auth->getRole('moderator');
+        $auth->assign($moderatorRole,app\models\User::findOne(['username'=>'moderator01'])->id);
+        $auth->assign($moderatorRole,app\models\User::findOne(['username'=>'moderator02'])->id);
     }
 
     /**
@@ -25,7 +25,7 @@ class m200727_182014_rbac_add_roles_to_admin_and_moderator extends Migration
      */
     public function safeDown()
     {
-        echo "m200727_182014_rbac_add_roles_to_admin_and_moderator cannot be reverted.\n";
+        echo 'm200727_182014_rbac_add_roles_to_admin_and_moderator cannot be reverted.\n';
 
         return false;
     }
@@ -39,7 +39,7 @@ class m200727_182014_rbac_add_roles_to_admin_and_moderator extends Migration
 
     public function down()
     {
-        echo "m200727_182014_rbac_add_roles_to_admin_and_moderator cannot be reverted.\n";
+        echo 'm200727_182014_rbac_add_roles_to_admin_and_moderator cannot be reverted.\n';
 
         return false;
     }

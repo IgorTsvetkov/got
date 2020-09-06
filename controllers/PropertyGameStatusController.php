@@ -31,7 +31,7 @@ class PropertyGameStatusController extends \yii\web\Controller
             ]
         ];
     }
-    public function actionCreate($property_id)
+    public function actionBuy($id)
     {
 
         /** @var Player */
@@ -43,7 +43,7 @@ class PropertyGameStatusController extends \yii\web\Controller
             ->one();
         /** @var PropertyGameStatus */
         $isBought = PropertyGameStatus::find()
-            ->where(["property_id" => $property_id])
+            ->where(["property_id" => $id])
             ->andWhere(["game_session_id" => $player->game_session_id])
             ->exists();
         if ($isBought)
@@ -52,7 +52,7 @@ class PropertyGameStatusController extends \yii\web\Controller
         if ($player->user->id !== Yii::$app->user->id)
             return ResponseHelper::Error("вы не можете использовать данные другого пользователя");
         /** @var Property */
-        $property = Property::find()->where(["id" => $property_id])->with(["cell", "group"])->limit(1)->one();
+        $property = Property::find()->where(["id" => $id])->with(["cell", "group"])->limit(1)->one();
         // можно купить только в свой ход и только если игрок стоит на клетке с property
         if ($player->id !== $player->gameSession->turn_player_id && $player->position !== $property->cell->position) {
             throw new Exception("в данный момент вы не можете купить это место");
@@ -62,11 +62,9 @@ class PropertyGameStatusController extends \yii\web\Controller
             return ResponseHelper::Error("недостаточно средств"); //TO DO Аукцион
         $player->pay($property->cost);
 
-
-
         $model = new PropertyGameStatus();
         $model->rent_state_id = 1;
-        $model->property_id = $property_id;
+        $model->property_id = $id;
         $model->game_session_id = $player->game_session_id;
         $model->player_id = $player->id;
         $model->group_id = $property->group_id;

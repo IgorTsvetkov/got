@@ -1,7 +1,7 @@
 <?php 
 namespace app\helpers;
 class TurnStageHelper{
-    public const MOVE=null;
+    public const BEGIN=100;
     public const FIGURINE_MOVED=200;
     public const ROLL_AGAIN=225;
     public const ROLL_AGAIN_FINISH=250;

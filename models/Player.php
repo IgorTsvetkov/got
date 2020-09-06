@@ -19,6 +19,7 @@ use yii\db\Query;
  * @property int|null $slot
  * @property int|null $position
  * @property int|null $money
+ * @property int|null $in_auction
  *
 
  * @property GameSession $gameSession
@@ -68,17 +69,17 @@ class Player extends \yii\db\ActiveRecord
         $this->position %= self::COUNT_POSITION;
         $this->update();
     }
-    public function getNextTurnPlayer():?self
+    public function getNextTurnPlayer($from=Player::tableName()):?self
     {
         $game_session_id=$this->game_session_id;
         $slot=$this->slot;
         //Take the next player slot
         /** @var Query */
-        $nextSlotNullableQuery=(new Query())->select(["slot"])->from(Player::tableName())->where(["game_session_id"=>$game_session_id])->andWhere([">","slot",$slot])->orderBy(["slot"=>SORT_ASC]);
+        $nextSlotNullableQuery=(new Query())->select(["slot"])->from($from)->where(["game_session_id"=>$game_session_id])->andWhere([">","slot",$slot])->orderBy(["slot"=>SORT_ASC]);
 
         //Take the first player slot
         /** @var Query */
-        $firstSlotQuery=(new Query())->select(["slot"=>"MIN(slot)"])->from(Player::tableName())->where(["game_session_id"=>$game_session_id]);
+        $firstSlotQuery=(new Query())->select(["slot"=>"MIN(slot)"])->from($from)->where(["game_session_id"=>$game_session_id]);
         
         //If the NEXT slot is empty take the FIRST slot 
         $nextSlotQuery=(new Query)->select("slot")->from($nextSlotNullableQuery->union($firstSlotQuery))->limit(1);
@@ -117,9 +118,10 @@ class Player extends \yii\db\ActiveRecord
         $player=new Player();
         $player->hero_id=1;//default hero: faceless men  
         $player->slot=$game->getFirstEmptySlot();
+        $player->position=GameSession::START_PLAYER_POSITION;
         $player->user_id=$user->id;
         $player->game_session_id=$game->id;
-        $player->money=200000;
+        $player->money=GameSession::START_MONEY;
         return $player;
     }
 

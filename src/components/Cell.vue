@@ -1,6 +1,6 @@
 <template>
   <div class="h-100 position-relative">
-    <div class="position-absolute h-100 w-100 d-flex align-items-center justify-content-center">
+    <div class="inner-shadow position-absolute h-100 w-100 d-flex align-items-center justify-content-center">
       <slot></slot>
     </div>
     <div class="d-flex justify-content-center h-100">
@@ -60,4 +60,7 @@ export default {
 </script>
 
 <style scoped>
+.inner-shadow{
+  box-shadow:inset 0px 0px 20px black!important;
+}
 </style>

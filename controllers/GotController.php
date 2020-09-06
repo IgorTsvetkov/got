@@ -39,11 +39,11 @@ class GotController extends Controller
         $userSafeQuery = function ($query) {
             $query->select("id,username");
         };
-        $propertyCellQuery=function ($q) {
+        $propertyCellQuery = function ($q) {
             $q->select("id,property_id,position");
         };
         $game = $user->getLastGame()
-            ->joinWith(["players", "players.hero", "players.user" => $userSafeQuery,"players.propertyCells" =>$propertyCellQuery ])
+            ->joinWith(["players", "players.hero", "players.user" => $userSafeQuery, "players.propertyCells" => $propertyCellQuery, "auction"])
             ->andWhere(["finished_at" => null])
             ->asArray()
             ->one();
@@ -60,7 +60,7 @@ class GotController extends Controller
         /** @var Player */
         $player = Player::me()->with("gameSession")->one();
         $game = $player->gameSession;
-        if ($game->turn_stage >=TurnStageHelper::FIGURINE_MOVED)
+        if ($game->turn_stage >= TurnStageHelper::FIGURINE_MOVED)
             throw new Exception("вы не можете преместиться дважды за один ход");
         $player->move($step);
 
@@ -82,22 +82,23 @@ class GotController extends Controller
         $game->turn_player_id = $nextTurnPlayer->id;
         //сброс настроек для следующего игрока
         $game->resetTurn();
-        
+
         $game->update();
         $data = ["game" => $game];
         return ResponseHelper::Socket("game", $data);
     }
     //test
-    public function actionRollDices()
+    public function actionRollAgain()
     {
-        $game=GameSession::meOne();
-        if($game->turn_stage==TurnStageHelper::ROLL_AGAIN)
-        {
-            $game->rollDices();
-            $game->save();
-            $data=["game"=>$game];
-            return ResponseHelper::Socket("game",$data);
-        }
-        return $this->redirect("move");
+        $game = GameSession::meOne();
+        // if($game->turn_stage==TurnStageHelper::ROLL_AGAIN)
+        // {
+        $game->rollDices();
+        $game->turn_stage = TurnStageHelper::ROLL_AGAIN_FINISH;
+        $game->save();
+        $data = ["game" => $game];
+        return ResponseHelper::Socket("game", $data);
+        // }
+        // return $this->redirect("begin");
     }
 }

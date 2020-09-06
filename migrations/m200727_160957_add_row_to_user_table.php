@@ -46,7 +46,7 @@ class m200727_160957_add_row_to_user_table extends Migration
 
     public function down()
     {
-        echo "m200727_180957_add_row_to_user_table cannot be reverted.\n";
+        echo 'm200727_180957_add_row_to_user_table cannot be reverted.\n';
 
         return false;
     }

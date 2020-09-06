@@ -15,11 +15,11 @@ class m200727_172614_init_rbac extends Migration
         $auth=Yii::$app->authManager;
         
         //moderator
-        $moderator=$auth->createRole("moderator");
+        $moderator=$auth->createRole('moderator');
         $auth->add($moderator);
 
         //admin
-        $admin=$auth->createRole("admin");
+        $admin=$auth->createRole('admin');
         $auth->add($admin);
         $auth->addChild($admin,$moderator);
     }
@@ -43,7 +43,7 @@ class m200727_172614_init_rbac extends Migration
 
     public function down()
     {
-        echo "m200727_172614_init_rbac cannot be reverted.\n";
+        echo 'm200727_172614_init_rbac cannot be reverted.\n';
 
         return false;
     }

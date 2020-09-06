@@ -13,6 +13,7 @@ use app\models\Player;
 use app\models\Property;
 use app\models\RentState;
 use yii\console\Controller;
+use app\models\TaxGameStatus;
 use app\helpers\spyderEventHelper;
 use app\models\PropertyGameStatus;
 
@@ -30,7 +31,7 @@ class TestController extends Controller
 {
     function actionTest()
     {
-       $r=rand(1,6);
+       $r=TaxGameStatus::find()->where(["player_id"=>10])->count();
         var_dump($r);
     }
 }

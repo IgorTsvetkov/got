@@ -28,9 +28,12 @@
 
     <hr />
     <div v-if="!is_turn_finished&&isPlayerOnCell">
-      <button v-if="!isBought" class="btn btn-success text-light w-100 shadow" @click="buy">
+      <div v-if="!isBought">
+      <button  class="btn btn-success text-light w-100 shadow mb-1" @click="buy">
         <span class="h4 py-3">Купить {{property.cost}}</span>
       </button>
+      <button-start-action type="property" :id="id"></button-start-action>
+      </div>
       <div v-else>
         <div v-if="isPlayerOwner">
           <button
@@ -59,10 +62,13 @@
 <script>
 import Figurine from "./Figurine.vue";
 import PropertyRentField from "./PropertyRentField.vue";
+import ButtonStartAction from './ButtonStartAction.vue';
 export default {
   components: {
     Figurine,
     PropertyRentField,
+    ButtonStartAction
+
   },
   props: {
     id: {
@@ -141,7 +147,7 @@ export default {
     },
     async buy() {
       let result = await this.$axios.post(
-        "/property-game-status/create?property_id=" + this.id
+        "/property-game-status/buy?id=" + this.id
       );
       if (result) {
         {

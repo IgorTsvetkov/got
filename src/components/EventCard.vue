@@ -27,11 +27,8 @@
                 </div>
                 <div v-if="eventData.operation=='rollAndPayMultiply10'">
                   <text-with-money :text="eventData.text"></text-with-money>
-                  <div v-if="!is_finished_turn" class="btn btn-success m-2" @click="doEvent">
-                    Бросить кубик
-                  </div>
-                  <div v-else>
-                    <span>Выполено</span>
+                  <div v-if="dice_rolled">
+                    <div class="btn btn-success m-2" @click="doEvent">Заплатить</div>
                   </div>
                 </div>
               </div>
@@ -70,6 +67,10 @@ export default {
       type: Number,
       default: undefined,
     },
+    dice_rolled:{
+      type:Boolean,
+      default:false
+    }
   },
   data() {
     return {
@@ -88,18 +89,21 @@ export default {
         return;
       }
       let result = await this.$axios.get("/event/random?type=spyder");
-      this.eventData = result.data;
-      // this.rotate(true);
+      this.eventData = result.data.data.event;
+
+      if (this.$response.getAction(result)) {
+        this.$emit("turnStatusUpdate", result);
+      }
     },
     async getEvent(type, id) {
-      debugger
       let result = await this.$axios.get(
         `/event/view?type=${type}&id=${this.current_event_id}`
       );
+      console.log("result :>> ", result);
       //roll dice allow
-      if(this.$response.getAction(result)){
-        this.$emit("turnStatusUpdate",result);
-        return result.data.event;
+      if (this.$response.getAction(result)) {
+        this.$emit("turnStatusUpdate", result);
+        return result.data.data.event;
       }
       return result.data;
     },

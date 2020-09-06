@@ -18,12 +18,12 @@ class m200823_143732_create_rent_state_table extends Migration
         ]);
         $this->batchInsert('{{%rent_state}}',['name'],
         [ 
-            ["rent"],
-            ["rent_home1"],
-            ["rent_home2"],
-            ["rent_home3"],
-            ["rent_home4"],
-            ["rent_inn"],
+            ['rent'],
+            ['rent_home1'],
+            ['rent_home2'],
+            ['rent_home3'],
+            ['rent_home4'],
+            ['rent_inn'],
         ]);
     }
 

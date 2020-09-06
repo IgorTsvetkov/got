@@ -10,6 +10,7 @@ use yii\helpers\VarDumper;
 use app\models\GameSession;
 use yii\filters\AccessControl;
 use app\helpers\ResponseHelper;
+use app\helpers\TurnStageHelper;
 
 class MatchController extends Controller
 {
@@ -198,6 +199,7 @@ class MatchController extends Controller
         $game = $anyPlayer->gameSession;
         if ($game->leader_user_id === $user_id) {
             $game->turn_player_id = $anyPlayer->id;
+            $game->turn_stage=TurnStageHelper::BEGIN;
             $game->update();
             $game->touch("started_at");
         }

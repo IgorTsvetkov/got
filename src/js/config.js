@@ -3,10 +3,9 @@ export const socketPathes={
     "send-to-all":"ws://127.0.0.1:8990/",
 };
 export const turnStages={
-    "begin":null,
+    "begin":100,
     "figurineMoved":200,
     "rollAgain":225,
-    "diceRolledEvent":250,
-    "canFinish":275,
+    "rollAgainFinish":250,
     "finished":300,
 }
