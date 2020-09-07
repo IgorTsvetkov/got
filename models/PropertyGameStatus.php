@@ -17,6 +17,7 @@ use phpDocumentor\Reflection\Types\Boolean;
  * @property int|null $player_id
  * @property int|null $game_session_id
  * @property int|null $group_id
+ * @property int|null $cell_id
  * @property bool|null $is_group_full
  */
 class PropertyGameStatus extends \yii\db\ActiveRecord

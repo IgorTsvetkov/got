@@ -72,6 +72,7 @@ class PropertyGameStatusController extends \yii\web\Controller
         $model->game_session_id = $player->game_session_id;
         $model->player_id = $player->id;
         $model->group_id = $property->group_id;
+        $model->cell_id=$cell->id;
         $model->save(false);
 
         $group_id = $property->group_id;

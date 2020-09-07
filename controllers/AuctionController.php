@@ -113,24 +113,25 @@ class AuctionController extends \yii\web\Controller
     }
     public static function getTypedModel($type, $id,$loadGameStatus=false)
     {
-        $typedModel = null;
+        $query = null;
         switch ($type) {
             case 'property':
-                $typedModel = Property::find($id);
+                $query = Property::find();
                 break;
             case 'tax':
-                $typedModel = Tax::find($id);
+                $query = Tax::find();
                 break;
             case 'utility':
-                $typedModel = Utility::find($id);
+                $query = Utility::find();
                 break;
             default:
                 throw new Exception("Cand start Auction for " . $type);
                 break;
         }
+        $query->where(["id"=>$id]);
         if($loadGameStatus)
-            $typedModel->with($type."GameStatus")->one();
-
-        return $typedModel;
+            $query->with($type."GameStatus");
+        $model=$query->one();
+        return $model;
     }
 }

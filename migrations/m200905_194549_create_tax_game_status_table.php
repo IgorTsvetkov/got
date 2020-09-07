@@ -14,6 +14,7 @@ class m200905_194549_create_tax_game_status_table extends Migration
     {
         $this->createTable('{{%tax_game_status}}', [
             'id' => $this->primaryKey(),
+            'cell_id'=>$this->integer(),
             'tax_id'=>$this->integer(),
             'player_id'=>$this->integer(),
             'game_session_id'=>$this->integer(),

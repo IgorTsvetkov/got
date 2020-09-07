@@ -8,9 +8,11 @@ use Yii;
  * This is the model class for table "tax_game_status".
  *
  * @property int $id
+ * @property int|null $cell_id
  * @property int|null $tax_id
  * @property int|null $player_id
  * @property int|null $game_session_id
+ * 
  */
 class TaxGameStatus extends \yii\db\ActiveRecord
 {

@@ -9,6 +9,7 @@ use app\models\Cell;
  * This is the model class for table "utility".
  *
  * @property int $id
+ * @property int $cost
  * @property string|null $name
  * @property string|null $src
  */

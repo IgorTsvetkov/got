@@ -7,7 +7,7 @@
         </match-menu>
       </div>
       <div class="not-draggable" v-for="cell in cells" :key="cell.position">
-        <cell :playerOwner="playerOwner(cell.position)" :cell="cell">
+        <cell :playerOwner="playerOwner(cell.id)" :cell="cell">
           <div v-for="(player,key) in game.players" :key="key">
             <div v-if="player.position==cell.position">
               <figurine :hero="player.hero"></figurine>
@@ -165,7 +165,7 @@ export default {
   async beforeMount() {
     this.game = JSON.parse(this.gameString);
     this.myPlayer = this.game.players.find((p) => p.id == this.player_id);
-    this.auction=this.game.auction;
+    this.auction = this.game.auction;
     let result = await this.$axios.get("/cell?game_id=" + this.game.id);
     if (result) this.cells = result.data;
     this.socket = this.$socketGet(this.game.id, "send-local-to-all");
@@ -192,7 +192,7 @@ export default {
         case "property-bought":
           player = this.findPlayer(data.player.id);
           updateModel(player, data.player);
-          player.propertyCells.push({ position: player.position });
+          player.ownedIdCells.push({ position: player.position });
           updateModel(this.game, data.game);
           break;
         case "game":
@@ -206,12 +206,12 @@ export default {
     });
   },
   methods: {
-    onauctionFinished(result){
-      
-    },
+    onauctionFinished(result) {},
     onauctionStarted(result) {
       let systemChatMessage = `${this.userNameAndHeroHTML()}
-       не изъявил желания приобрести ${result.data.data.auction.target_name}. Начало аукциона`;
+       не изъявил желания приобрести ${
+         result.data.data.auction.target_name
+       }. Начало аукциона`;
       this.socket.send(result, systemChatMessage);
     },
     onutilityBuy(result) {
@@ -223,7 +223,7 @@ export default {
       }`;
       this.socket.send(result, systemChatMessage);
     },
-        onpropertyBuy(result) {
+    onpropertyBuy(result) {
       if (this.$response.handleGameError(result, this.socket)) return;
       console.log("onproperty buy result :>> ", result);
       let property = result.data.data.property;
@@ -340,11 +340,11 @@ export default {
       if (!cell) return false;
       return cell.utility;
     },
-    playerOwner(position) {
+    playerOwner(cell_id) {
       return this.game.players.find(
         (p) =>
-          p.propertyCells &&
-          p.propertyCells.find((cell) => cell.position == position)
+          p.ownedIdCells &&
+          p.ownedIdCells.find((cell) => cell.id == cell_id)
       );
     },
     usernameHTML(player = this.myPlayer) {

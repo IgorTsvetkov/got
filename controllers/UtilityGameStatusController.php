@@ -39,11 +39,12 @@ class UtilityGameStatusController extends \yii\web\Controller
         $isAlreadyBought = UtilityGameStatus::find()->where(["utility_id" => $id])->andWhere(["game_session_id" => $game->id])->exists();
         if ($isAlreadyBought)
             throw new Error("The коммунальное предприятие has already bought");
-        $utilityStatus = new UtilityGameStatus();
-        $utilityStatus->utility_id = $id;
-        $utilityStatus->player_id = $player->id;
-        $utilityStatus->game_session_id = $player->id;
-        $utilityStatus->save(false);
+        $model = new UtilityGameStatus();
+        $model->cell_id=$cell->id;
+        $model->utility_id = $id;
+        $model->player_id = $player->id;
+        $model->game_session_id = $player->id;
+        $model->save(false);
         /** @var GameSession */
         $game->turn_stage = TurnStageHelper::FINISHED;
         $game->update(false);

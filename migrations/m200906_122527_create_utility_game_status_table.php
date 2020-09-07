@@ -14,6 +14,7 @@ class m200906_122527_create_utility_game_status_table extends Migration
     {
         $this->createTable('{{%utility_game_status}}', [
             'id' => $this->primaryKey(),
+            'cell_id'=>$this->integer(),
             'utility_id' => $this->integer(),
             'player_id' => $this->integer(),
             'game_session_id' => $this->integer(),

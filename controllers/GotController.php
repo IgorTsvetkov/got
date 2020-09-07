@@ -2,16 +2,20 @@
 
 namespace app\controllers;
 
+use Exception;
+use yii\db\Query;
 use app\models\Cell;
 use app\models\User;
+use app\helpers\YesNo;
 use app\models\Player;
 use yii\web\Controller;
 use app\models\GameSession;
+use app\models\TaxGameStatus;
 use yii\filters\AccessControl;
 use app\helpers\ResponseHelper;
 use app\helpers\TurnStageHelper;
-use app\helpers\YesNo;
-use Exception;
+use app\models\UtilityGameStatus;
+use app\models\PropertyGameStatus;
 
 class GotController extends Controller
 {
@@ -35,21 +39,25 @@ class GotController extends Controller
     }
     public function actionGame()
     {
-        $user = User::me();
+        $user=User::me();
         $userSafeQuery = function ($query) {
             $query->select("id,username");
         };
-        $propertyCellQuery = function ($q) {
-            $q->select("id,property_id,position");
+        $queryCellsId=(new Query)->select("cell_id,player_id")->from(PropertyGameStatus::tableName())
+            ->union((new Query())->select("cell_id,player_id")->from(TaxGameStatus::tableName()))
+            ->union((new Query())->select("cell_id,player_id")->from(UtilityGameStatus::tableName()));
+        $playerQuery=function(Query $q)use($userSafeQuery,$queryCellsId){
+            $q->with(["user"=>$userSafeQuery,"xxx","hero"]);
+            // $q->leftJoin(["queryCellsId"=>$queryCellsId],"queryCellsId.player_id=player.id");
         };
         $game = $user->getLastGame()
-            ->joinWith(["players", "players.hero", "players.user" => $userSafeQuery, "players.propertyCells" => $propertyCellQuery, "auction"])
-            ->andWhere(["finished_at" => null])
-            ->asArray()
-            ->one();
+        ->joinWith(["players"=>$playerQuery, "auction"])
+        ->andWhere(["finished_at" => null])
+        ->asArray()
+        ->one();
+        $player = Player::me()->one();
         if (empty($game))
             return $this->redirect("/");
-        $player = $user->getLastPlayer();
         $player_id = $player->id;
         $this->layout = false;
         return $this->render('index', compact('game', 'player_id'));
@@ -82,8 +90,7 @@ class GotController extends Controller
         $game->turn_player_id = $nextTurnPlayer->id;
         //сброс настроек для следующего игрока
         $game->resetTurn();
-
-        $game->update();
+        $game->update(false);
         $data = ["game" => $game];
         return ResponseHelper::Socket("game", $data);
     }

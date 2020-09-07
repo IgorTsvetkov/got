@@ -49,11 +49,12 @@ class TaxGameStatusController extends \yii\web\Controller
         ->exists();
         if ($isAlreadyBought)
             throw new Error("The house has already bought");
-        $taxStatus = new TaxGameStatus();
-        $taxStatus->player_id = $player->id;
-        $taxStatus->tax_id = $id;
-        $taxStatus->game_session_id = $player->id;
-        $taxStatus->save(false);
+        $model = new TaxGameStatus();
+        $model->cell_id=$cell->id;
+        $model->player_id = $player->id;
+        $model->tax_id = $id;
+        $model->game_session_id = $player->id;
+        $model->save(false);
         /** @var GameSession */
         $game->turn_stage = TurnStageHelper::FINISHED;
         $game->update(false);

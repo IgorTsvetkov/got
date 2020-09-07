@@ -3,11 +3,12 @@
 namespace app\models;
 
 use Yii;
+use Exception;
+use yii\db\Query;
 use app\models\User;
 use app\models\GameSession;
-use Exception;
+use app\models\UtilityGameStatus;
 use yii\behaviors\BlameableBehavior;
-use yii\db\Query;
 
 /**
  * This is the model class for table "player".
@@ -27,109 +28,117 @@ use yii\db\Query;
  */
 class Player extends \yii\db\ActiveRecord
 {
-    public const COUNT_POSITION=40;
-    public const PREVIOUS_SLOT=111;
-    public const NEXT_SLOT=112;
-    public static function meOne():?self
+    public const COUNT_POSITION = 40;
+    public const PREVIOUS_SLOT = 111;
+    public const NEXT_SLOT = 112;
+    public static function meOne(): ?self
     {
         return self::me()->one();
     }
     public static function me()
     {
-        return Player::find()->where(["user_id"=>Yii::$app->user->id])->orderBy(['id'=>SORT_DESC])->limit(1);
+        return Player::find()->where(["user_id" => Yii::$app->user->id])->orderBy(['id' => SORT_DESC])->limit(1);
     }
-    public function teleportToProperty($propertyName){
-        list($position)=Property::find()->select("cell.position as position")->where(["name"=>$propertyName])->joinWith("cell")->column("position");
-        if(empty($position))
-            throw new Exception("teleport position is empty");        
-        $this->position=$position;
+    public function teleportToProperty($propertyName)
+    {
+        list($position) = Property::find()->select("cell.position as position")->where(["name" => $propertyName])->joinWith("cell")->column("position");
+        if (empty($position))
+            throw new Exception("teleport position is empty");
+        $this->position = $position;
         $this->update(false);
     }
-    public function canPay($cost){
-        if($this->money<$cost)
+    public function canPay($cost)
+    {
+        if ($this->money < $cost)
             return false;
         return true;
     }
-    public function pay($value){
-        $this->money-=$value;
+    public function pay($value)
+    {
+        $this->money -= $value;
         $this->update(false);
     }
-    public function earn(int $value){
-        $this->money+=$value;
+    public function earn(int $value)
+    {
+        $this->money += $value;
         $this->update(false);
     }
-    public function payTo($player_to,$cost=0){
-        $this->money-=$cost;
-        $player_to->money+=$cost;
+    public function payTo($player_to, $cost = 0)
+    {
+        $this->money -= $cost;
+        $player_to->money += $cost;
         $this->update();
         $player_to->update();
     }
-    public function move($value){
+    public function move($value)
+    {
         $this->position += $value;
         $this->position %= self::COUNT_POSITION;
         $this->update();
     }
-    public function getNextTurnPlayer($from):?self
+    public function getNextTurnPlayer($from = null): ?self
     {
-        if(empty($from))
-            $from=self::tableName();
-        $game_session_id=$this->game_session_id;
-        $slot=$this->slot;
+        if (empty($from))
+            $from = self::tableName();
+        $game_session_id = $this->game_session_id;
+        $slot = $this->slot;
         //Take the next player slot
         /** @var Query */
-        $nextSlotNullableQuery=(new Query())->select(["slot"])->from($from)->where(["game_session_id"=>$game_session_id])->andWhere([">","slot",$slot])->orderBy(["slot"=>SORT_ASC]);
+        $nextSlotNullableQuery = (new Query())->select(["slot"])->from($from)->where(["game_session_id" => $game_session_id])->andWhere([">", "slot", $slot])->orderBy(["slot" => SORT_ASC]);
 
         //Take the first player slot
         /** @var Query */
-        $firstSlotQuery=(new Query())->select(["slot"=>"MIN(slot)"])->from($from)->where(["game_session_id"=>$game_session_id]);
-        
+        $firstSlotQuery = (new Query())->select(["slot" => "MIN(slot)"])->from($from)->where(["game_session_id" => $game_session_id]);
+
         //If the NEXT slot is empty take the FIRST slot 
-        $nextSlotQuery=(new Query)->select("slot")->from($nextSlotNullableQuery->union($firstSlotQuery))->limit(1);
-        
-        $nextTurnPlayer=self::takePlayerBySlot($game_session_id,$nextSlotQuery);
+        $nextSlotQuery = (new Query)->select("slot")->from($nextSlotNullableQuery->union($firstSlotQuery))->limit(1);
+
+        $nextTurnPlayer = self::takePlayerBySlot($game_session_id, $nextSlotQuery);
         return $nextTurnPlayer;
-    } 
-    public static function takePlayerBySlot($game_session_id, $slotCanBeQuery):?self{
-        $player = Player::find()
-        ->where(["game_session_id"=>$game_session_id])
-        ->andWhere(["=","slot",$slotCanBeQuery])
-        ->one();
-        return $player;
-    }   
-    public function getPreviousTurnPlayer():?self
+    }
+    public static function takePlayerBySlot($game_session_id, $slotCanBeQuery): ?self
     {
-        $game_session_id=$this->game_session_id;
-        $slot=$this->slot;
+        $player = Player::find()
+            ->where(["game_session_id" => $game_session_id])
+            ->andWhere(["=", "slot", $slotCanBeQuery])
+            ->one();
+        return $player;
+    }
+    public function getPreviousTurnPlayer(): ?self
+    {
+        $game_session_id = $this->game_session_id;
+        $slot = $this->slot;
         //Take previous player slot
         /** @var Query */
-        $previousNullableQuery=(new Query())->select(["slot"])->from(Player::tableName())->where(["game_session_id"=>$game_session_id])->andWhere(["<","slot",$slot])->orderBy(["slot"=>SORT_ASC]);
+        $previousNullableQuery = (new Query())->select(["slot"])->from(Player::tableName())->where(["game_session_id" => $game_session_id])->andWhere(["<", "slot", $slot])->orderBy(["slot" => SORT_ASC]);
 
         //Take the last player slot
         /** @var Query */
-        $lastSlotQuery=(new Query())->select(["slot"=>"MAX(slot)"])->from(Player::tableName())->where(["game_session_id"=>$game_session_id]);
-        
-        //If PREVIOUS slot is empty take the LAST slot 
-        $previousSlotQuery=(new Query)->select("slot")->from($previousNullableQuery->union($lastSlotQuery))->limit(1);
+        $lastSlotQuery = (new Query())->select(["slot" => "MAX(slot)"])->from(Player::tableName())->where(["game_session_id" => $game_session_id]);
 
-        $previousPlayer=self::takePlayerBySlot($this->game_session_id,$previousSlotQuery);
+        //If PREVIOUS slot is empty take the LAST slot 
+        $previousSlotQuery = (new Query)->select("slot")->from($previousNullableQuery->union($lastSlotQuery))->limit(1);
+
+        $previousPlayer = self::takePlayerBySlot($this->game_session_id, $previousSlotQuery);
 
         return $previousPlayer;
     }
-    public static function createAndLink(GameSession $game,User $user){
-        $game->link("users",$user);
-        $player=new Player();
-        $player->hero_id=1;//default hero: faceless men  
-        $player->slot=$game->getFirstEmptySlot();
-        $player->position=GameSession::START_PLAYER_POSITION;
-        $player->user_id=$user->id;
-        $player->game_session_id=$game->id;
-        $player->money=GameSession::START_MONEY;
+    public static function createAndLink(GameSession $game, User $user)
+    {
+        $game->link("users", $user);
+        $player = new Player();
+        $player->hero_id = 1; //default hero: faceless men  
+        $player->slot = $game->getFirstEmptySlot();
+        $player->position = GameSession::START_PLAYER_POSITION;
+        $player->user_id = $user->id;
+        $player->game_session_id = $game->id;
+        $player->money = GameSession::START_MONEY;
         return $player;
     }
 
     function init()
     {
-        $this->position=0;
+        $this->position = 0;
     }
     /**
      * {@inheritdoc}
@@ -138,15 +147,15 @@ class Player extends \yii\db\ActiveRecord
     {
         return 'player';
     }
-    
+
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['game_session_id',"hero_id",'slot', 'position'], 'integer'],
-            [['game_session_id',"hero_id",'slot','position'],'required']
+            [['game_session_id', "hero_id", 'slot', 'position'], 'integer'],
+            [['game_session_id', "hero_id", 'slot', 'position'], 'required']
         ];
     }
 
@@ -191,20 +200,34 @@ class Player extends \yii\db\ActiveRecord
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
-    public function getPropertyGameStatuses(){
-        return $this->hasMany(PropertyGameStatus::class,["player_id"=>"id"]);
+    public function getPropertyGameStatuses()
+    {
+        return $this->hasMany(PropertyGameStatus::class, ["player_id" => "id"]);
     }
-    public function getGameProperties(){
-        return $this->hasMany(Property::class,["id"=>"property_id"])->via("propertyGameStatuses");
+    public function getTaxGameStatuses()
+    {
+        return $this->hasMany(TaxGameStatus::class, ["player_id" => "id"]);
     }
-    public function getPropertyCells(){
-        return $this->hasMany(Cell::class,["property_id"=>"id"])->via("gameProperties");
+    public function getUtilityGameStatuses()
+    {
+        return $this->hasMany(UtilityGameStatus::class, ["player_id" => "id"]);
     }
-    public function getPositionCell(){
-        return $this->hasOne(Cell::class,["position"=>"position"]);
+    public function getGameProperties()
+    {
+        return $this->hasMany(Property::class, ["id" => "property_id"])->via("propertyGameStatuses");
+    }
+    public function getPropertyCells()
+    {
+        return $this->hasMany(Cell::class, ["property_id" => "id"])->via("gameProperties");
     }
     public function getAuction()
     {
-        return $this->hasOne(Auction::class,["turn_player_id"=>"id"]);
+        return $this->hasOne(Auction::class, ["turn_player_id" => "id"]);
+    }
+    public function getXxx()
+    {
+        return $this->hasMany((new Query)->select("cell_id,player_id")->from(PropertyGameStatus::tableName())
+            ->union((new Query())->select("cell_id,player_id")->from(TaxGameStatus::tableName())), ["player_id"=>"id"];
+            // ->union((new Query())->select("cell_id,player_id")->from(UtilityGameStatus::tableName()))->where(["player_id" => $this->id]));
     }
 }

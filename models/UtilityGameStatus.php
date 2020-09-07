@@ -8,9 +8,11 @@ use Yii;
  * This is the model class for table "utility_game_status".
  *
  * @property int $id
+ * @property int|null $cell_id
  * @property int|null $utility_id
  * @property int|null $player_id
  * @property int|null $game_session_id
+ * 
  */
 class UtilityGameStatus extends \yii\db\ActiveRecord
 {
