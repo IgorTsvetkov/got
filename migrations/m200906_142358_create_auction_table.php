@@ -19,7 +19,9 @@ class m200906_142358_create_auction_table extends Migration
             "target_id"=>$this->integer(),
             'target_name'=>$this->string(),
             "cost"=>$this->integer(),
-            "turn_player_id"=>$this->integer()
+            "max_bet_player_id"=>$this->integer(),
+            "turn_player_id"=>$this->integer(),
+            "is_finished"=>$this->boolean(),
         ]);
     }
 

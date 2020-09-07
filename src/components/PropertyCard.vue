@@ -4,10 +4,7 @@
     class="d-flex flex-column shadow p-4 lead bg-dark text-light"
     style="width:300px"
   >
-    <div
-      class="d-flex flex-column justify-content-between justify-content-center p-0 m-0"
-      
-    >
+    <div class="d-flex flex-column justify-content-between justify-content-center p-0 m-0">
       <div class="d-flex justify-content-between w-100 m-0 p-2">
         <div class="h3 font-weight-light">
           <div class="text-capitalize m-0 p-0">{{property.name}}</div>
@@ -29,10 +26,10 @@
     <hr />
     <div v-if="!is_turn_finished&&isPlayerOnCell">
       <div v-if="!isBought">
-      <button  class="btn btn-success text-light w-100 shadow mb-1" @click="buy">
-        <span class="h4 py-3">Купить {{property.cost}}</span>
-      </button>
-      <button-start-action type="property" :id="id"></button-start-action>
+        <button class="btn btn-success text-light w-100 shadow mb-1" @click="buy">
+          <span class="h4 py-3">Купить {{property.cost}}</span>
+        </button>
+        <button-start-action type="property" :id="id"></button-start-action>
       </div>
       <div v-else>
         <div v-if="isPlayerOwner">
@@ -62,13 +59,12 @@
 <script>
 import Figurine from "./Figurine.vue";
 import PropertyRentField from "./PropertyRentField.vue";
-import ButtonStartAction from './ButtonStartAction.vue';
+import ButtonStartAction from "./ButtonStartAction.vue";
 export default {
   components: {
     Figurine,
     PropertyRentField,
-    ButtonStartAction
-
+    ButtonStartAction,
   },
   props: {
     id: {
@@ -113,31 +109,31 @@ export default {
             cost: this.property.rent,
           },
           {
-            level:2,
+            level: 2,
             fieldName: "rent_home1",
             label: "Рента c 1 домом",
             cost: this.property.rent_home1,
           },
           {
-            level:3,
+            level: 3,
             fieldName: "rent_home2",
             label: "Рента c 2 домами",
             cost: this.property.rent_home2,
           },
           {
-            level:4,
+            level: 4,
             fieldName: "rent_home3",
             label: "Рента c 3 домами",
             cost: this.property.rent_home3,
           },
           {
-            level:5,
+            level: 5,
             fieldName: "rent_home4",
             label: "Рента c 4 домами",
             cost: this.property.rent_home4,
           },
           {
-            level:6,
+            level: 6,
             fieldName: "rent_inn",
             label: "Рента c постоялым двором",
             cost: this.property.rent_inn,

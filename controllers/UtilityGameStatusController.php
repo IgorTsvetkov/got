@@ -3,9 +3,11 @@
 namespace app\controllers;
 
 use Error;
+use Exception;
 use app\models\Player;
 use app\helpers\ResponseHelper;
 use app\helpers\TurnStageHelper;
+use app\models\Utility;
 use app\models\UtilityGameStatus;
 
 class UtilityGameStatusController extends \yii\web\Controller
@@ -29,6 +31,11 @@ class UtilityGameStatusController extends \yii\web\Controller
     {
         $player = Player::me()->with("gameSession")->one();
         $game = $player->gameSession;
+        $utility=Utility::find()->where(["id"=>$id])->with("cell")->one();
+        /** @var Cell */
+        $cell=$utility->cell;
+        if(!$game->isTurn($player->id)&&!$cell->hasEqualPosition($player))
+            throw new Exception("Access denied");
         $isAlreadyBought = UtilityGameStatus::find()->where(["utility_id" => $id])->andWhere(["game_session_id" => $game->id])->exists();
         if ($isAlreadyBought)
             throw new Error("The коммунальное предприятие has already bought");

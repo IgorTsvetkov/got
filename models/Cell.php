@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use app\models\Player;
 
 /**
  * This is the model class for table "cell".
@@ -10,7 +11,9 @@ use Yii;
  * @property int $id
  * @property int|null $position
  * @property string|null $event_id
- * @property string|null $property_id
+ * @property int|null $property_id
+ * @property int|null $tax_id
+ * @property int|null $utility_id
  */
 class Cell extends \yii\db\ActiveRecord
 {
@@ -20,6 +23,10 @@ class Cell extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return 'cell';
+    }
+    public function hasEqualPosition(Player $player):bool
+    {
+        return $this->position==$player->position;
     }
     public function getProperty()
     {

@@ -69,8 +69,10 @@ class Player extends \yii\db\ActiveRecord
         $this->position %= self::COUNT_POSITION;
         $this->update();
     }
-    public function getNextTurnPlayer($from=Player::tableName()):?self
+    public function getNextTurnPlayer($from):?self
     {
+        if(empty($from))
+            $from=self::tableName();
         $game_session_id=$this->game_session_id;
         $slot=$this->slot;
         //Take the next player slot
@@ -200,5 +202,9 @@ class Player extends \yii\db\ActiveRecord
     }
     public function getPositionCell(){
         return $this->hasOne(Cell::class,["position"=>"position"]);
+    }
+    public function getAuction()
+    {
+        return $this->hasOne(Auction::class,["turn_player_id"=>"id"]);
     }
 }

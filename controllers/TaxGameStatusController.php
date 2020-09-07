@@ -2,15 +2,17 @@
 
 namespace app\controllers;
 
+use Error;
+use Exception;
+use yii\db\Query;
+use app\models\Tax;
+use app\models\Cell;
+use app\models\Player;
+use app\models\GameSession;
+use app\models\TaxGameStatus;
+use GuzzleHttp\Psr7\Response;
 use app\helpers\ResponseHelper;
 use app\helpers\TurnStageHelper;
-use app\models\GameSession;
-use app\models\Player;
-use app\models\Tax;
-use app\models\TaxGameStatus;
-use Error;
-use GuzzleHttp\Psr7\Response;
-use yii\db\Query;
 
 class TaxGameStatusController extends \yii\web\Controller
 {
@@ -30,11 +32,21 @@ class TaxGameStatusController extends \yii\web\Controller
         ];
         return ResponseHelper::Success($data);
     }
-    public function actionBuy(int $id)
+    public function actionBuy(int $id,$is_auction=false)
     {
         $player = Player::me()->with("gameSession")->one();
+        /** @var GameSession */
         $game = $player->gameSession;
-        $isAlreadyBought = TaxGameStatus::find()->where(["tax_id" => $id])->andWhere(["game_session_id"=>$game->id])->exists();
+        $tax=Tax::find()->where(["id"=>$id])->with("cell")->one();
+        /** @var Cell */
+        $cell=$tax->cell;
+        if(!$game->isTurn($player->id)&&!$cell->hasEqualPosition($player))
+            throw new Exception("Access denied");
+            
+        $isAlreadyBought = TaxGameStatus::find()
+        ->where(["tax_id" => $id])
+        ->andWhere(["game_session_id"=>$game->id])
+        ->exists();
         if ($isAlreadyBought)
             throw new Error("The house has already bought");
         $taxStatus = new TaxGameStatus();
@@ -49,7 +61,8 @@ class TaxGameStatusController extends \yii\web\Controller
             "game" => [
                 "turn_stage" => $game->turn_stage
             ],
-            "tax_id"=>$id
+            "player"=>,
+            "tax_id"=>$id,
         ];
         return ResponseHelper::Socket("game", $data);
     }

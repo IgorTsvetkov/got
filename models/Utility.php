@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use app\models\Cell;
 
 /**
  * This is the model class for table "utility".
@@ -41,5 +42,9 @@ class Utility extends \yii\db\ActiveRecord
             'name' => 'Name',
             'src' => 'Src',
         ];
+    }
+    public function getCell()
+    {
+        return $this->hasOne(Cell::class,["utility_id"=>"id"]);
     }
 }

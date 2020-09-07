@@ -3,20 +3,21 @@
 namespace app\controllers;
 
 use Yii;
+use Exception;
+use app\models\Cell;
 use app\models\User;
+use app\helpers\YesNo;
 use app\models\Player;
 use app\models\Property;
+use app\models\RentState;
+use yii\helpers\VarDumper;
 use app\models\GameSession;
 use yii\filters\VerbFilter;
-use app\helpers\ResponseHelper;
-use app\helpers\TurnStageHelper;
-use app\helpers\YesNo;
-use app\models\UserGameSession;
-use app\models\PropertyGameStatus;
 use app\models\PropertyGroup;
-use app\models\RentState;
-use Exception;
-use yii\helpers\VarDumper;
+use app\helpers\ResponseHelper;
+use app\models\UserGameSession;
+use app\helpers\TurnStageHelper;
+use app\models\PropertyGameStatus;
 
 class PropertyGameStatusController extends \yii\web\Controller
 {
@@ -31,16 +32,11 @@ class PropertyGameStatusController extends \yii\web\Controller
             ]
         ];
     }
-    public function actionBuy($id)
+    public function actionBuy($id,$is_auction=false)
     {
 
         /** @var Player */
-        $player = Player::find()
-            ->where(["user_id" => Yii::$app->user->id])
-            ->orderBy(["id" => SORT_DESC])
-            ->with("gameSession")
-            ->limit(1)
-            ->one();
+        $player = Player::me()->with("gameSession")->one();
         /** @var PropertyGameStatus */
         $isBought = PropertyGameStatus::find()
             ->where(["property_id" => $id])
@@ -53,13 +49,21 @@ class PropertyGameStatusController extends \yii\web\Controller
             return ResponseHelper::Error("вы не можете использовать данные другого пользователя");
         /** @var Property */
         $property = Property::find()->where(["id" => $id])->with(["cell", "group"])->limit(1)->one();
+        /** @var GameSession */
+        $game=$player->gameSession;
+        /** @var Cell */
+        $cell=$property->cell;
+        // защита от злоумышленников
         // можно купить только в свой ход и только если игрок стоит на клетке с property
-        if ($player->id !== $player->gameSession->turn_player_id && $player->position !== $property->cell->position) {
+        if (!$is_auction&&$player->in_auction===YesNo::NO
+            ||!$game->isTurn($player->id) && !$cell->hasEqualPosition($player)) {
             throw new Exception("в данный момент вы не можете купить это место");
-            return ResponseHelper::Error("в данный момент вы не можете купить это место");
         }
         if ($player->canPay($property->cost) === false)
             return ResponseHelper::Error("недостаточно средств"); //TO DO Аукцион
+        if($is_auction){
+            $player->in_auction=YesNo::NO;
+        }
         $player->pay($property->cost);
 
         $model = new PropertyGameStatus();
@@ -76,8 +80,6 @@ class PropertyGameStatusController extends \yii\web\Controller
         if ($isMonopoly)
             PropertyGameStatus::markGroupImprovable($group_id);
 
-        /** @var GameSession */
-        $game = $player->gameSession;
         $game->turn_stage = TurnStageHelper::FINISHED;
         $game->update();
         $data = [

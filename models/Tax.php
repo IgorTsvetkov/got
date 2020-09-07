@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use app\models\Cell;
 
 /**
  * This is the model class for table "tax".
@@ -50,5 +51,12 @@ class Tax extends \yii\db\ActiveRecord
             'tax3' => 'Tax3',
             'tax4' => 'Tax4',
         ];
+    }
+    public function getTaxGameStatuses(){
+        return $this->hasMany(TaxGameStatus::class,["tax_id"=>"id"]);
+    }
+    public function getCell()
+    {
+        return $this->hasOne(Cell::class,["tax_id"=>"id"]);
     }
 }

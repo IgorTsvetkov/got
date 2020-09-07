@@ -81,7 +81,7 @@
             </div>
             <div class="w-100 h-100 d-flex align-items-center justify-content-center">
               <!-- {{auction.turn_player_id}}
-              {{myPlayer.id}} -->
+              {{myPlayer.id}}-->
 
               <auction
                 v-if="auction"
@@ -92,6 +92,8 @@
                 :target_name="auction.target_name"
                 :canBet="auction.turn_player_id==myPlayer.id"
                 :player_id="+myPlayer.id"
+                ::max_bet_player="auction.maxBetPlayer"
+                @finish="onauctionFinished"
               />
             </div>
           </div>
@@ -204,6 +206,9 @@ export default {
     });
   },
   methods: {
+    onauctionFinished(result){
+      
+    },
     onauctionStarted(result) {
       let systemChatMessage = `${this.userNameAndHeroHTML()}
        не изъявил желания приобрести ${result.data.data.auction.target_name}. Начало аукциона`;
@@ -218,26 +223,7 @@ export default {
       }`;
       this.socket.send(result, systemChatMessage);
     },
-    ontaxBuy(result) {
-      let tax_id = result.data.data.tax_id;
-      let tax = this.findTax(tax_id);
-      if (!tax) throw new Error("Tax have not found");
-      let systemChatMessage = `${this.userNameAndHeroHTML()} приобрел house ${
-        tax.name
-      }`;
-      this.socket.send(result, systemChatMessage);
-    },
-    onturnStatusUpdate(result) {
-      let systemChatMessage = `${this.userNameAndHeroHTML()} нужно бросить кости`;
-      this.socket.send(result, systemChatMessage);
-    },
-    oneventDone(result) {
-      if (this.$response.handleGameError(result, this.socket)) return;
-
-      let systemChatMessage = "событие выполнено";
-      this.socket.send(result, systemChatMessage);
-    },
-    onpropertyBuy(result) {
+        onpropertyBuy(result) {
       if (this.$response.handleGameError(result, this.socket)) return;
       console.log("onproperty buy result :>> ", result);
       let property = result.data.data.property;
@@ -245,6 +231,15 @@ export default {
         property
       )}`;
 
+      this.socket.send(result, systemChatMessage);
+    },
+    ontaxBuy(result) {
+      let tax_id = result.data.data.tax_id;
+      let tax = this.findTax(tax_id);
+      if (!tax) throw new Error("Tax have not found");
+      let systemChatMessage = `${this.userNameAndHeroHTML()} приобрел house ${
+        tax.name
+      }`;
       this.socket.send(result, systemChatMessage);
     },
     onpropertyImprove(result) {
@@ -267,6 +262,16 @@ export default {
       let systemChatMessage = `${this.userNameAndHeroHTML()} заплатил <span class="text-success">${
         data.cost
       }</span> игроку ${this.userNameAndHeroHTML(player_to)}`;
+      this.socket.send(result, systemChatMessage);
+    },
+    onturnStatusUpdate(result) {
+      let systemChatMessage = `${this.userNameAndHeroHTML()} нужно бросить кости`;
+      this.socket.send(result, systemChatMessage);
+    },
+    oneventDone(result) {
+      if (this.$response.handleGameError(result, this.socket)) return;
+
+      let systemChatMessage = "событие выполнено";
       this.socket.send(result, systemChatMessage);
     },
     async rollDices() {

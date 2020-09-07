@@ -56,7 +56,10 @@ class GameSession extends \yii\db\ActiveRecord
         $this->roll_count_first=GameHelper::roll();
         $this->roll_count_second=GameHelper::roll();
     }
-
+    public function isTurn(int $player_id):bool
+    {
+       return $player_id===(int)$this->turn_player_id;
+    }
     // public function setRollCountFirst($value)
     // {
     //     if($value>self::ROLL_MAX)
