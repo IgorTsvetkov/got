@@ -33,6 +33,7 @@
 </template>
 
 <script>
+import {estateTypes} from "../js/config";
 export default {
   props: {
     utility: {
@@ -74,15 +75,13 @@ export default {
   methods: {
     async getUtilityGameStatus() {
       let result = await this.$axios.get(
-        `/utility-game-status/view?game_session_id=${this.game_session_id}&utility_id=${this.utility.id}`
+        `/gamestatus/tax/view?id=${this.utility.id}&game_session_id=${this.game_session_id}`
       );
       if (!result) throw new Error("no result getUtilityGameStatus");
       return result.data;
     },
     async buy() {
-      let result = await this.$axios.post(
-        `/utility-game-status/buy?id=${this.utility.id}`
-      );
+      let result = await this.$axios.post(`/common-estate/buy?type_id=${estateTypes["utility"]}&id=${this.utility.id}`);
       //if success
       if (result && result.data && result.data.data) {
         this.utilityStatus = await this.getUtilityGameStatus();

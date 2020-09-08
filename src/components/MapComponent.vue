@@ -79,12 +79,11 @@
                 @utilityBuy="onutilityBuy"
               />
             </div>
-            <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+            <div v-if="auction" class="w-100 h-100 d-flex align-items-center justify-content-center">
               <!-- {{auction.turn_player_id}}
               {{myPlayer.id}}-->
 
               <auction
-                v-if="auction"
                 :max="+myPlayer.money"
                 :min="+auction.cost"
                 :target_type="auction.target_type"
@@ -92,7 +91,7 @@
                 :target_name="auction.target_name"
                 :canBet="auction.turn_player_id==myPlayer.id"
                 :player_id="+myPlayer.id"
-                ::max_bet_player="auction.maxBetPlayer"
+                :max_bet_player="auction.maxBetPlayer"
                 @finish="onauctionFinished"
               />
             </div>
@@ -127,7 +126,7 @@ import Auction from "./Auction.vue";
 
 import AuthSocket from "../js/AuthSocket";
 import { updateModel, updateModelInArrayAll } from "../js/modelHelper";
-
+import {estateTypes} from "../js/config";
 export default {
   components: {
     ImageComponent,
@@ -189,10 +188,10 @@ export default {
           updateModel(player, data.player);
           updateModel(this.game, data.game);
           break;
-        case "property-bought":
+        case "estate-bought":
           player = this.findPlayer(data.player.id);
           updateModel(player, data.player);
-          player.ownedIdCells.push({ position: player.position });
+          player.estates.push(data.estate);
           updateModel(this.game, data.game);
           break;
         case "game":
@@ -215,8 +214,9 @@ export default {
       this.socket.send(result, systemChatMessage);
     },
     onutilityBuy(result) {
-      let utility_id = result.data.data.utility_id;
-      let utility = this.findUtility(utility_id);
+      let estate_type_id = result.data.data.chatHelp.estate_type_id;
+      let estate_id = result.data.data.chatHelp.estate_id;
+      let utility = this.findEstate("utility",estate_id);
       if (!utility) throw new Error("utility have not found");
       let systemChatMessage = `${this.userNameAndHeroHTML()} купил коммунальное предприятие ${
         utility.name
@@ -226,7 +226,9 @@ export default {
     onpropertyBuy(result) {
       if (this.$response.handleGameError(result, this.socket)) return;
       console.log("onproperty buy result :>> ", result);
-      let property = result.data.data.property;
+      
+      let estate_id = result.data.data.chatHelp.estate_id;
+      let property = this.findEstate("property",estate_id);
       let systemChatMessage = `${this.userNameAndHeroHTML()} купил новую собственность ${this.propertyHTML(
         property
       )}`;
@@ -234,8 +236,8 @@ export default {
       this.socket.send(result, systemChatMessage);
     },
     ontaxBuy(result) {
-      let tax_id = result.data.data.tax_id;
-      let tax = this.findTax(tax_id);
+      let estate_id = result.data.data.chatHelp.estate_id;
+      let tax = this.findEstate("tax",estate_id);
       if (!tax) throw new Error("Tax have not found");
       let systemChatMessage = `${this.userNameAndHeroHTML()} приобрел house ${
         tax.name
@@ -330,22 +332,18 @@ export default {
     findPlayer(id) {
       return this.game.players.find((p) => p.id == id);
     },
-    findTax(id) {
-      let cell = this.cells.find((t) => t.tax && t.tax.id == id);
+    // findTax(id) {
+    //   let cell = this.cells.find((t) => t.tax && t.tax.id == id);
+    //   if (!cell) return false;
+    //   return cell.tax;
+    // },
+    findEstate(type,id) {
+      let cell = this.cells.find((t) => t[type] && t[type].id == id);
       if (!cell) return false;
-      return cell.tax;
-    },
-    findUtility(id) {
-      let cell = this.cells.find((t) => t.utility && t.utility.id == id);
-      if (!cell) return false;
-      return cell.utility;
+      return cell[type];
     },
     playerOwner(cell_id) {
-      return this.game.players.find(
-        (p) =>
-          p.ownedIdCells &&
-          p.ownedIdCells.find((cell) => cell.id == cell_id)
-      );
+      return this.game.players.find((p) =>p.estates &&p.estates.find((estate) => estate.cell_id == cell_id));
     },
     usernameHTML(player = this.myPlayer) {
       return `<span style="color:${player.hero.color}">

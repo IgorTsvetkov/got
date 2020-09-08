@@ -60,6 +60,7 @@
 import Figurine from "./Figurine.vue";
 import PropertyRentField from "./PropertyRentField.vue";
 import ButtonStartAction from "./ButtonStartAction.vue";
+import {estateTypes} from "../js/config";
 export default {
   components: {
     Figurine,
@@ -142,9 +143,7 @@ export default {
       }
     },
     async buy() {
-      let result = await this.$axios.post(
-        "/property-game-status/buy?id=" + this.id
-      );
+      let result = await this.$axios.post(`/common-estate/buy?type_id=${estateTypes["property"]}&id=${this.id}`);
       if (result) {
         {
           this.$emit("propertyBuy", result);

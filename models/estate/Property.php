@@ -1,11 +1,13 @@
 <?php
 
-namespace app\models;
+namespace app\models\estate;
 
 use Yii;
+use app\models\Cell;
+use app\models\gamestatus\CommonGameStatus;
 use app\models\Player;
 use app\models\PropertyGroup;
-use Codeception\Lib\Generator\Group;
+use app\models\gamestatus\PropertyGameStatus;
 
 /**
  * This is the model class for table "property".
@@ -74,13 +76,16 @@ class Property extends \yii\db\ActiveRecord
         return $this->hasOne(Cell::class,["property_id"=>"id"]);
     }
     public function getPropertyGameStatuses(){
-        return $this->hasMany(PropertyGameStatus::class,["property_id"=>"id"]);
+        return $this->hasMany(PropertyGameStatus::class,["estate_id"=>"id"]);
     }
-    public function getPropertyGameStatus(int $game_session_id)
-    {
-        return $this->via("propertyGameStatuses")->where(["game_session_id"=>$game_session_id])->limit(1)->one();
+    // public function getPropertyGameStatus(int $game_session_id)
+    // {
+    //     return $this->via("propertyGameStatuses")->where(["game_session_id"=>$game_session_id])->limit(1)->one();
+    // }
+    public function getCommonGameStatuses(){
+        return $this->hasMany(CommonGameStatus::class,["estate_id"=>"id"]);
     }
     public function getPlayerOwner(){
-        return $this->hasOne(Player::class,["id"=>"player_id"])->via("propertyGameStatuses");
+        return $this->hasOne(Player::class,["id"=>"player_id"])->via("commonGameStatuses");
     }
 }

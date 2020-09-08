@@ -2,15 +2,16 @@
 
 namespace app\models;
 
-use app\helpers\GameHelper;
 use Yii;
+use Error;
 use app\models\User;
 use app\models\Player;
 use yii\db\Expression;
+use app\helpers\GameHelper;
 use app\helpers\TurnStageHelper;
-use Error;
-use phpDocumentor\Reflection\Types\This;
 use yii\behaviors\TimestampBehavior;
+use phpDocumentor\Reflection\Types\This;
+use app\models\gamestatus\PropertyGameStatus;
 
 /**
  * This is the model class for table "game_session".
@@ -37,7 +38,7 @@ class GameSession extends \yii\db\ActiveRecord
 {
     public const MAX_PLAYERS=2;
     public const ROLL_MAX=6;
-    public const START_PLAYER_POSITION=20;
+    public const START_PLAYER_POSITION=22;
     public const START_MONEY=20000;
 
     public static function me()

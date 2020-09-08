@@ -1,29 +1,23 @@
 <?php
 
-namespace app\models;
+namespace app\models\gamestatus;
 
 use Yii;
+use app\models\Player;
 
 /**
  * This is the model class for table "tax_game_status".
  *
  * @property int $id
  * @property int|null $cell_id
- * @property int|null $tax_id
+ * @property int|null $estate_id
+ * @property int|null $estate_type_id
  * @property int|null $player_id
  * @property int|null $game_session_id
  * 
  */
-class TaxGameStatus extends \yii\db\ActiveRecord
+class TaxGameStatus extends CommonGameStatus
 {
-    /**
-     * {@inheritdoc}
-     */
-    public static function tableName()
-    {
-        return 'tax_game_status';
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -46,9 +40,5 @@ class TaxGameStatus extends \yii\db\ActiveRecord
             'player_id' => 'Player ID',
             'game_session_id' => 'Game Session ID',
         ];
-    }
-    public function getPlayer()
-    {
-        return $this->hasOne(Player::class,["id"=>"player_id"]);
     }
 }

@@ -28,6 +28,7 @@
 </template>
 
 <script>
+import {estateTypes} from "../js/config";
 export default {
   props: {
     tax: {
@@ -75,14 +76,14 @@ export default {
   methods: {
     async getTaxGameStatus() {
       let result =await this.$axios.get(
-        `/tax-game-status/view?game_session_id=${this.game_session_id}&tax_id=${this.tax.id}`
+        `/gamestatus/tax/view?id=${this.tax.id}&game_session_id=${this.game_session_id}`
       );
       if (!result) 
         throw new Error("no result getTaxGameStatus");
       return result.data;
     },
     async buy(){
-        let result=await this.$axios.post(`/tax-game-status/buy?id=${this.tax.id}`);
+        let result=await this.$axios.post(`/common-estate/buy?type_id=${estateTypes["tax"]}&id=${this.tax.id}`);
         //if success
         if(result&&result.data&&result.data.data){
             this.taxStatus=await this.getTaxGameStatus();

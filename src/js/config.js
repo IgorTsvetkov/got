@@ -9,3 +9,8 @@ export const turnStages={
     "rollAgainFinish":250,
     "finished":300,
 }
+export const estateTypes={
+    "property":10,
+    "tax":20,
+    "utility":30,
+}

@@ -7,8 +7,11 @@ use Exception;
 use yii\db\Query;
 use app\models\User;
 use app\models\GameSession;
+use app\models\estate\Property;
+use app\models\gamestatus\CommonGameStatus;
 use app\models\UtilityGameStatus;
 use yii\behaviors\BlameableBehavior;
+use app\models\gamestatus\PropertyGameStatus;
 
 /**
  * This is the model class for table "player".
@@ -200,34 +203,32 @@ class Player extends \yii\db\ActiveRecord
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
-    public function getPropertyGameStatuses()
-    {
-        return $this->hasMany(PropertyGameStatus::class, ["player_id" => "id"]);
-    }
-    public function getTaxGameStatuses()
-    {
-        return $this->hasMany(TaxGameStatus::class, ["player_id" => "id"]);
-    }
-    public function getUtilityGameStatuses()
-    {
-        return $this->hasMany(UtilityGameStatus::class, ["player_id" => "id"]);
-    }
-    public function getGameProperties()
-    {
-        return $this->hasMany(Property::class, ["id" => "property_id"])->via("propertyGameStatuses");
-    }
-    public function getPropertyCells()
-    {
-        return $this->hasMany(Cell::class, ["property_id" => "id"])->via("gameProperties");
-    }
+    // public function getPropertyGameStatuses()
+    // {
+    //     return $this->hasMany(PropertyGameStatus::class, ["player_id" => "id"]);
+    // }
+    // public function getTaxGameStatuses()
+    // {
+    //     return $this->hasMany(TaxGameStatus::class, ["player_id" => "id"]);
+    // }
+    // public function getUtilityGameStatuses()
+    // {
+    //     return $this->hasMany(UtilityGameStatus::class, ["player_id" => "id"]);
+    // }
+    // public function getGameProperties()
+    // {
+    //     return $this->hasMany(Property::class, ["id" => "property_id"])->via("propertyGameStatuses");
+    // }
+    // public function getPropertyCells()
+    // {
+    //     return $this->hasMany(Cell::class, ["property_id" => "id"])->via("gameProperties");
+    // }
     public function getAuction()
     {
         return $this->hasOne(Auction::class, ["turn_player_id" => "id"]);
     }
-    public function getXxx()
+    public function getEstates()
     {
-        return $this->hasMany((new Query)->select("cell_id,player_id")->from(PropertyGameStatus::tableName())
-            ->union((new Query())->select("cell_id,player_id")->from(TaxGameStatus::tableName())), ["player_id"=>"id"];
-            // ->union((new Query())->select("cell_id,player_id")->from(UtilityGameStatus::tableName()))->where(["player_id" => $this->id]));
+        return $this->hasMany(CommonGameStatus::class,["player_id"=>"id"]);
     }
 }

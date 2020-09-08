@@ -8,16 +8,17 @@ use app\models\Cell;
 use app\models\User;
 use app\helpers\YesNo;
 use app\models\Player;
-use app\models\Property;
 use app\models\RentState;
 use yii\helpers\VarDumper;
 use app\models\GameSession;
 use yii\filters\VerbFilter;
 use app\models\PropertyGroup;
 use app\helpers\ResponseHelper;
+use app\models\estate\Property;
 use app\models\UserGameSession;
 use app\helpers\TurnStageHelper;
-use app\models\PropertyGameStatus;
+use app\models\gamestatus\CommonGameStatus;
+use app\models\gamestatus\PropertyGameStatus;
 
 class PropertyGameStatusController extends \yii\web\Controller
 {
@@ -38,7 +39,7 @@ class PropertyGameStatusController extends \yii\web\Controller
         /** @var Player */
         $player = Player::me()->with("gameSession")->one();
         /** @var PropertyGameStatus */
-        $isBought = PropertyGameStatus::find()
+        $isBought = CommonGameStatus::find()
             ->where(["property_id" => $id])
             ->andWhere(["game_session_id" => $player->game_session_id])
             ->exists();
@@ -94,8 +95,8 @@ class PropertyGameStatusController extends \yii\web\Controller
     {
         $user_id = Yii::$app->user->id;
         $player = Player::find()->where(["user_id" => $user_id])->orderBy(["id" => SORT_DESC])->limit(1)->one();
-        $propertyGameStatus = PropertyGameStatus::find()
-            ->where(["player_id" => $player->id, "property_id" => $property_id])
+        $propertyGameStatus = CommonGameStatus::find()
+            ->where(["player_id" => $player->id, "estate_id" => $property_id,"estate_type_id"=>CommonGameStatus::TYPE_ESTATE_PROPERTY])
             ->with(["property" => function ($q) {
                 $q->with("group");
             }, "gameSession"])

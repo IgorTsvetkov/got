@@ -4,16 +4,15 @@ namespace app\controllers;
 
 use Yii;
 use Exception;
-use app\models\Tax;
 use app\helpers\YesNo;
 use app\models\Player;
-use app\models\Utility;
-use app\models\Property;
-use app\models\GameSession;
-use app\helpers\ResponseHelper;
-use app\helpers\TurnStageHelper;
 use app\models\Auction;
-use GuzzleHttp\Psr7\Response;
+use app\models\estate\Tax;
+use app\models\GameSession;
+use app\models\estate\Utility;
+use app\helpers\ResponseHelper;
+use app\models\estate\Property;
+use app\helpers\TurnStageHelper;
 
 class AuctionController extends \yii\web\Controller
 {
@@ -76,7 +75,7 @@ class AuctionController extends \yii\web\Controller
         $type=$auction->target_type;
         $id=$auction->target_id;
         $auction->delete();
-        $this->redirect($type."-game-status/buy",["id"=>$id]);        
+        return $this->redirect($type."-game-status/buy",["id"=>$id]);        
     }
     public function actionLeave($player_id)
     {

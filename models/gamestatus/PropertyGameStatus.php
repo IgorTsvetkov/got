@@ -1,26 +1,29 @@
 <?php
 
-namespace app\models;
+namespace app\models\gamestatus;
 
 use Yii;
 use app\helpers\YesNo;
+use app\models\Player;
 use app\models\RentState;
-use yii\helpers\VarDumper;
-use phpDocumentor\Reflection\Types\Boolean;
+use app\models\GameSession;
+use app\models\PropertyGroup;
+use app\models\estate\Property;
 
 /**
  * This is the model class for table "property_player".
  *
  * @property int $id
  * @property int|null $rent_state_id
- * @property int|null $property_id
+ * @property int|null $estate_id
+ * @property int|null $estate_type_id
  * @property int|null $player_id
  * @property int|null $game_session_id
  * @property int|null $group_id
  * @property int|null $cell_id
  * @property bool|null $is_group_full
  */
-class PropertyGameStatus extends \yii\db\ActiveRecord
+class PropertyGameStatus extends CommonGameStatus
 {
     //equal rent_state table row count
     public const MAXRENTLEVEL=6;
@@ -28,7 +31,7 @@ class PropertyGameStatus extends \yii\db\ActiveRecord
     public static function markGroupImprovable($group_id){
         self::updateAll(["is_group_full"=>YesNo::YES],["in","group_id",$group_id]);
     }
-    public static function isMonopoly(int $group_id,int $game_session_id):bool{
+    public static function isGroupFull(int $group_id,int $game_session_id):bool{
         $counts=self::find()
         ->select(["COUNT(*) as count","count_max"])
         ->where(["group_id"=>$group_id])
@@ -50,13 +53,6 @@ class PropertyGameStatus extends \yii\db\ActiveRecord
             return true;
         }
         return false;
-    }
-    /**
-     * {@inheritdoc}
-     */
-    public static function tableName()
-    {
-        return 'property_game_status';
     }
 
     /**
@@ -85,14 +81,6 @@ class PropertyGameStatus extends \yii\db\ActiveRecord
     public function getProperty()
     {
         return $this->hasOne(Property::class,["id"=>"property_id"]);
-    }
-    public function getPlayer()
-    {
-        return $this->hasOne(Player::class,["id"=>"player_id"]);
-    }
-    public function getGameSession()
-    {
-        return $this->hasOne(GameSession::class,["id"=>"game_session_id"]);
     }
     public function getRentState()
     {

@@ -4,9 +4,10 @@ namespace app\controllers;
 
 use Yii;
 use yii\web\Controller;
-use app\models\Property;
 use yii\filters\VerbFilter;
 use app\helpers\ResponseHelper;
+use app\models\estate\Property;
+use app\models\GameSession;
 use app\models\UserGameSession;
 
 class PropertyController extends Controller
@@ -24,17 +25,12 @@ class PropertyController extends Controller
     }
     public function actionView($id)
     {
-        $user_game_session = UserGameSession::find()
-            ->select("game_session_id")
-            ->where(["user_id" => Yii::$app->user->id])
-            ->orderBy(["game_session_id" => SORT_DESC])
-            ->limit(1)
-            ->one();
-        $game_session_id = $user_game_session->game_session_id;
+        $game=GameSession::me()->one();
+        $game_session_id = $game->id;
         $property = Property::find()
             ->where(["id" => $id])
             ->with(["propertyGameStatuses" => function ($query) use ($game_session_id) {
-                $query->where(["game_session_id" => $game_session_id])->limit(1);
+                $query->where(["game_session_id" => $game_session_id]);
                 $query->with(["player.user" => function ($query) {
                     $query->select("username");
                 }, "player.hero", "rentState"]);

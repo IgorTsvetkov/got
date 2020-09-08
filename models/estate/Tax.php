@@ -1,9 +1,10 @@
 <?php
 
-namespace app\models;
+namespace app\models\estate;
 
 use Yii;
 use app\models\Cell;
+use app\models\gamestatus\TaxGameStatus;
 
 /**
  * This is the model class for table "tax".

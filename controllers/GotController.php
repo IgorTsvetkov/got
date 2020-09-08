@@ -43,12 +43,8 @@ class GotController extends Controller
         $userSafeQuery = function ($query) {
             $query->select("id,username");
         };
-        $queryCellsId=(new Query)->select("cell_id,player_id")->from(PropertyGameStatus::tableName())
-            ->union((new Query())->select("cell_id,player_id")->from(TaxGameStatus::tableName()))
-            ->union((new Query())->select("cell_id,player_id")->from(UtilityGameStatus::tableName()));
-        $playerQuery=function(Query $q)use($userSafeQuery,$queryCellsId){
-            $q->with(["user"=>$userSafeQuery,"xxx","hero"]);
-            // $q->leftJoin(["queryCellsId"=>$queryCellsId],"queryCellsId.player_id=player.id");
+        $playerQuery=function(Query $q)use($userSafeQuery){
+            $q->with(["user"=>$userSafeQuery,"estates","hero"]);
         };
         $game = $user->getLastGame()
         ->joinWith(["players"=>$playerQuery, "auction"])

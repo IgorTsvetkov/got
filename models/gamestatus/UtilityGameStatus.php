@@ -1,6 +1,6 @@
 <?php
 
-namespace app\models;
+namespace app\models\gamestatus;
 
 use Yii;
 
@@ -9,21 +9,14 @@ use Yii;
  *
  * @property int $id
  * @property int|null $cell_id
- * @property int|null $utility_id
+ * @property int|null $estate_id
+ * @property int|null $estate_type_id
  * @property int|null $player_id
  * @property int|null $game_session_id
  * 
  */
-class UtilityGameStatus extends \yii\db\ActiveRecord
+class UtilityGameStatus extends CommonGameStatus
 {
-    /**
-     * {@inheritdoc}
-     */
-    public static function tableName()
-    {
-        return 'utility_game_status';
-    }
-
     /**
      * {@inheritdoc}
      */

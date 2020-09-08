@@ -1,6 +1,6 @@
 <?php
 
-namespace app\models;
+namespace app\models\estate;
 
 use Yii;
 use app\models\Cell;
@@ -9,9 +9,9 @@ use app\models\Cell;
  * This is the model class for table "utility".
  *
  * @property int $id
- * @property int $cost
  * @property string|null $name
  * @property string|null $src
+ * @property int $cost
  */
 class Utility extends \yii\db\ActiveRecord
 {

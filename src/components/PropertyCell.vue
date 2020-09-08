@@ -3,15 +3,7 @@
     <div v-if="this.price" class="text-center height" :class="[price_bgcolor]">
       <span>{{this.price}}</span>      
     </div>
-    <div class="w-inherit position-relative">
-      <div 
-        v-if="playerOwner"
-        :style="{'background':playerOwner.hero.color}"
-        class="position-absolute opacity-4 w-100 h-100"
-      ></div>
-      <div v-if="playerOwner&&playerOwner" class="w-100 h-100 opacity-8 d-flex position-absolute justify-content-center align-items-center text-light">{{playerOwner.user.username}}</div>
-      <img class="property-img" :src="this.src" alt />
-    </div>
+    <slot></slot>
   </div>
 </template>
 

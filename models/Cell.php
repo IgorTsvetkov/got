@@ -4,6 +4,9 @@ namespace app\models;
 
 use Yii;
 use app\models\Player;
+use app\models\estate\Tax;
+use app\models\estate\Utility;
+use app\models\estate\Property;
 
 /**
  * This is the model class for table "cell".

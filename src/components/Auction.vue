@@ -10,10 +10,10 @@
         class="w-100 text-center lead text-capitalize"
       >Аукцион {{target_name}}</label>
       <div class="lead">Цена: {{min}}</div>
-      <div class="lead">Величина ставки: {{current}}</div>
+      <!-- <div class="lead">Величина ставки: {{current}}</div> -->
       <div v-if="canBet">
         <div v-if="!max_bet_player">
-          <div class="btn btn-success" @click="makeBet">Поставить начальную ставку</div>
+          <div class="btn btn-success w-100" @click="makeBet()">Купить за {{current}}</div>
         </div>
         <div v-else class="shadow p-2 shadow bg-dark text-light rounded">
           <div class>Повысить на:</div>
@@ -52,6 +52,7 @@
         </div>
         <div class="btn btn-danger w-100 mt-2" @click="leave">Покинуть аукцион</div>
       </div>
+      <div v-else class="text-center lead bg-warning shadow rounded p-3">Вы не учавствуете в аукционе</div>
     </div>
   
   </div>
@@ -90,7 +91,7 @@ export default {
     },
     max_bet_player: {
       type: Object,
-      required: true,
+      default:undefined,
     },
     is_finished:{
       type:Boolean,
@@ -108,7 +109,7 @@ export default {
   methods: {
     makeBet(valueBet = this.current) {
       this.$axios.post(
-        `/auction/bet/player_id=${this.player_id}&cost=${valueBet}`
+        `/auction/bet?cost=${valueBet}`
       );
     },
     leave() {
