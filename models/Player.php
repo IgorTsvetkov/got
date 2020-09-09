@@ -34,6 +34,13 @@ class Player extends \yii\db\ActiveRecord
     public const COUNT_POSITION = 40;
     public const PREVIOUS_SLOT = 111;
     public const NEXT_SLOT = 112;
+    public function isOwnEstateOnCell(){
+        $owner_player_id=Cell::getOwnerPlayerId($this->game_session_id,$this->position);
+        return $this->id===$owner_player_id;
+    }
+    public function canFinishTurn(){
+        return $this->isOwnEstateOnCell();
+    }
     public static function meOne(): ?self
     {
         return self::me()->one();

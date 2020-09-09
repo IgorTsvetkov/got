@@ -7,6 +7,7 @@ use app\models\Player;
 use app\models\estate\Tax;
 use app\models\estate\Utility;
 use app\models\estate\Property;
+use app\models\gamestatus\CommonGameStatus;
 
 /**
  * This is the model class for table "cell".
@@ -20,6 +21,15 @@ use app\models\estate\Property;
  */
 class Cell extends \yii\db\ActiveRecord
 {
+    public static function getOwnerPlayerId($game_id,$cell_position):?int{
+        list($player_owner_id)=CommonGameStatus::find()
+        ->select("player_id")
+        ->joinWith("cell")
+        ->where(["game_session_id"=>$game_id])
+        ->andWhere(["cell.position"=>$cell_position])
+        ->column();
+        return $player_owner_id;
+    }
     /**
      * {@inheritdoc}
      */

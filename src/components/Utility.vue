@@ -4,9 +4,7 @@
       <h1 class="h1 lead">{{utility.name}}</h1>
       <h2 class="lead w-100">Коммунальные предприятия</h2>
       <div v-if="utilityStatus" class="d-flex flex-column lead">
-        <div
-          class="d-flex justify-content-between"
-        >
+        <div class="d-flex justify-content-between">
           <div>Количество</div>
           <div>Рента</div>
         </div>
@@ -24,8 +22,11 @@
           <div>Два</div>
           <div>Бросок кубика x10</div>
         </div>
-        <div v-if="!isReadOnly&&isForSale">
+        <div v-if="!is_readonly&&isForSale&&!isBought">
           <div class="btn btn-primary w-100" @click="buy">Купить</div>
+        </div>
+        <div v-else>
+          <div class="btn btn-danger w-100" @click="payRent">Заплатить ренту</div>
         </div>
       </div>
     </div>
@@ -33,14 +34,14 @@
 </template>
 
 <script>
-import {estateTypes} from "../js/config";
+import { estateTypes } from "../js/config";
 export default {
   props: {
     utility: {
       type: Object,
       default: undefined,
     },
-    isReadOnly: {
+    is_readonly: {
       type: Boolean,
       default: true,
     },
@@ -75,18 +76,33 @@ export default {
   methods: {
     async getUtilityGameStatus() {
       let result = await this.$axios.get(
-        `/gamestatus/tax/view?id=${this.utility.id}&game_session_id=${this.game_session_id}`
+        `/gamestatus/utility/view?id=${this.utility.id}&game_session_id=${this.game_session_id}`
       );
       if (!result) throw new Error("no result getUtilityGameStatus");
       return result.data;
     },
     async buy() {
-      let result = await this.$axios.post(`/common-estate/buy?type_id=${estateTypes["utility"]}&id=${this.utility.id}`);
+      let result = await this.$axios.post(
+        `/common-estate/buy?type_id=${estateTypes["utility"]}&id=${this.utility.id}`
+      );
       //if success
       if (result && result.data && result.data.data) {
         this.utilityStatus = await this.getUtilityGameStatus();
         this.$emit("utilityBuy", result);
       } else throw new Error("Can't get getUtilityGameStatus request result");
+    },
+    async payRent() {
+      let type="utility";
+      let estate_id=this.utility.id;
+      let result = await this.$axios.post(
+        "/common-estate/pay-rent?player_from_id=" + this.myPlayer.id 
+        +"&&player_to_id=" +this.propertyGameStatus.player_id 
+        +"&&type_id"+this.estateTypes[type]
+        +"&&id=" +estate_id
+      );
+      if (result) {
+        this.$emit("payRent", result);
+      }
     },
   },
 };

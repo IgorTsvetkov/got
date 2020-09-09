@@ -199,7 +199,7 @@ class MatchController extends Controller
         $game = $anyPlayer->gameSession;
         if ($game->leader_user_id === $user_id) {
             $game->turn_player_id = $anyPlayer->id;
-            $game->turn_stage=TurnStageHelper::BEGIN;
+            $game->turn_stage=TurnStageHelper::START_MOVE;
             $game->update();
             $game->touch("started_at");
         }

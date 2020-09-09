@@ -6,7 +6,7 @@ if(window.yii)
     Vue.prototype.$axios.defaults.headers.common["X-CSRF-TOKEN"] = window.yii.getCsrfToken();
 import AuthSocket from "./js/AuthSocket";
 Vue.prototype.$socketStorage=new Map();
-import {socketPathes,turnStages} from "./js/config";
+import {socketPathes,turnStages,estateTypes} from "./js/config";
 Vue.prototype.$socketGet=function(game_id,action){
     if(!this.$socketStorage.has(action))
     {
@@ -15,6 +15,7 @@ Vue.prototype.$socketGet=function(game_id,action){
    return this.socket=this.$socketStorage.get(action);
   }
 Vue.prototype.$turnStages=turnStages;
+Vue.prototype.$estateTypes=estateTypes;
 import Response from "./js/Response";
 Vue.prototype.$response=new Response();
 

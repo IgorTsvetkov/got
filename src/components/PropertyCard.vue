@@ -24,7 +24,7 @@
     </div>
 
     <hr />
-    <div v-if="!is_turn_finished&&isPlayerOnCell">
+    <div v-if="!is_readonly&&isPlayerOnCell">
       <div v-if="!isBought">
         <button class="btn btn-success text-light w-100 shadow mb-1" @click="buy">
           <span class="h4 py-3">Купить {{property.cost}}</span>
@@ -34,13 +34,13 @@
       <div v-else>
         <div v-if="isPlayerOwner">
           <button
-            v-if="!isMaxLevel()&&propertyGameStatus.is_group_full"
+            v-if="!isMaxLevel()&&Boolean(propertyGameStatus.is_group_full)"
             class="btn btn-success text-light w-100 shadow"
             @click="improve"
           >
             <span class="h4 py-3">Улучшить {{property.homes_inn_cost}}</span>
           </button>
-          <span v-show="!propertyGameStatus.is_group_full" class="small">
+          <span v-show="!Boolean(propertyGameStatus.is_group_full)" class="small">
             <a>
               Купите
               <span class="font-weight-bold text-warning">все</span> имущество одной цветовой группы, для улучшения
@@ -72,7 +72,7 @@ export default {
       type: Number,
       default: undefined,
     },
-    is_turn_finished: {
+    is_readonly: {
       type: Boolean,
       default: false,
     },
@@ -153,7 +153,7 @@ export default {
     },
     async improve() {
       let result = await this.$axios.post(
-        "/property-game-status/improve?property_id=" + this.id
+        "/gamestatus/property/improve?id=" + this.id
       );
       if (result) {
         this.$emit("propertyImprove", result);
@@ -161,16 +161,16 @@ export default {
       }
     },
     async payRent() {
+      let type="property";
+      let estate_id=this.property.id;
       let result = await this.$axios.post(
-        "/player/pay-rent?player_from_id=" +
-          this.myPlayer.id +
-          "&&player_to_id=" +
-          this.propertyGameStatus.player_id +
-          "&&property_id=" +
-          this.property.id
+        "/common-estate/pay-rent?player_from_id=" + this.myPlayer.id 
+        +"&&player_to_id=" +this.propertyGameStatus.player_id 
+        +"&&type_id"+this.estateTypes[type]
+        +"&&id=" +estate_id
       );
       if (result) {
-        this.$emit("propertyPayRent", result);
+        this.$emit("payRent", result);
       }
     },
     isActiveRent(name) {
@@ -188,7 +188,7 @@ export default {
   },
   computed: {
     isBought() {
-      return this.propertyGameStatus;
+      return !!this.propertyGameStatus;
     },
     isPlayerOnCell() {
       return this.position == this.myPlayer.position;
@@ -196,7 +196,6 @@ export default {
     isPlayerOwner() {
       return this.myPlayer.id === this.propertyGameStatus.player_id;
     },
-    ownFullGroup() {},
   },
   watch: {
     async id(newValue, oldValue) {

@@ -14,6 +14,7 @@ use app\models\TaxGameStatus;
 use yii\filters\AccessControl;
 use app\helpers\ResponseHelper;
 use app\helpers\TurnStageHelper;
+use app\models\gamestatus\CommonGameStatus;
 use app\models\UtilityGameStatus;
 use app\models\PropertyGameStatus;
 
@@ -64,12 +65,16 @@ class GotController extends Controller
         /** @var Player */
         $player = Player::me()->with("gameSession")->one();
         $game = $player->gameSession;
-        if ($game->turn_stage >= TurnStageHelper::FIGURINE_MOVED)
+        if ($game->turn_stage!==TurnStageHelper::START_MOVE)
             throw new Exception("вы не можете преместиться дважды за один ход");
         $player->move($step);
-
-        $game->turn_stage = TurnStageHelper::FIGURINE_MOVED;
+        if($player->canFinishTurn())
+            $game->turn_stage = TurnStageHelper::ACTION_CAN_SKIPPED;
+        else
+            $game->turn_stage = TurnStageHelper::ACTION_UNSKIP;
+            
         $game->update();
+
         $data = [
             "player" => $player,
             "game" => $game,
@@ -102,6 +107,6 @@ class GotController extends Controller
         $data = ["game" => $game];
         return ResponseHelper::Socket("game", $data);
         // }
-        // return $this->redirect("begin");
+        // return $this->redirect("startMove");
     }
 }

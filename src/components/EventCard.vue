@@ -17,7 +17,7 @@
                 </div>
                 <div v-if="eventData.operation=='earn'">
                   <text-with-money :text="eventData.text"></text-with-money>
-                  <div v-if="!is_finished_turn" class="btn btn-success m-2" @click="doEvent">
+                  <div v-if="!is_readonly" class="btn btn-success m-2" @click="doEvent">
                     Забрать {{eventData.money}}
                     <text-with-money text="$"></text-with-money>
                   </div>
@@ -59,7 +59,7 @@ export default {
       type: Object,
       default: null,
     },
-    is_finished_turn: {
+    is_readonly: {
       type: Boolean,
       default: false,
     },

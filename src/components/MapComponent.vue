@@ -39,15 +39,15 @@
           <div class="w-50 h-inherit d-flex justify-content-center align-items-center">
             <div
               class="w-100 h-100 d-flex align-items-center justify-content-center"
-              v-if="isMyTurn&&myCell&&!isBeginTurn&&!auction"
+              v-if="isMyTurn&&myCell&&!isStartMoveTurn&&!auction"
             >
               <property-card
                 v-if="myCell.property"
-                :is_turn_finished="isFinishedTurn"
+                :is_readonly="isReadOnly"
                 :id="+myCell.property_id"
                 @propertyBuy="onpropertyBuy"
                 @propertyImprove="onpropertyImprove"
-                @propertyPayRent="onpropertyPayRent"
+                @payRent="onpayRent"
                 @auctionStarted="onauctionStarted"
                 :myPlayer="myPlayer"
                 :position="+myCell.position"
@@ -55,7 +55,7 @@
               <event-card
                 v-if="myCell.event"
                 class="w-100 h-100"
-                :is_finished_turn="isFinishedTurn"
+                :is_readonly="isReadOnly"
                 :current_event_id="+game.current_event_id"
                 :dice_rolled="isRollAgainFinish"
                 :event="myCell.event"
@@ -65,18 +65,20 @@
               <tax
                 v-if="myCell.tax"
                 :tax="myCell.tax"
-                :isReadOnly="isReadOnly"
+                :is_readonly="isReadOnly"
                 :my_player_id="+myPlayer.id"
                 :game_session_id="+game.id"
                 @taxBuy="ontaxBuy"
+                @payRent="onpayRent"
               />
               <utility
                 v-if="myCell.utility"
                 :utility="myCell.utility"
-                :isReadOnly="isReadOnly"
+                :is_readonly="isReadOnly"
                 :my_player_id="+myPlayer.id"
                 :game_session_id="+game.id"
                 @utilityBuy="onutilityBuy"
+                @payRent="onpayRent"
               />
             </div>
             <div v-if="auction" class="w-100 h-100 d-flex align-items-center justify-content-center">
@@ -254,7 +256,7 @@ export default {
 
       this.socket.send(result, systemChatMessage);
     },
-    onpropertyPayRent(result) {
+    onpayRent(result) {
       if (this.$response.handleGameError(result, this.socket)) return;
 
       let data = result.data.data;
@@ -277,7 +279,7 @@ export default {
       this.socket.send(result, systemChatMessage);
     },
     async rollDices() {
-      if (this.isBeginTurn) await this.move();
+      if (this.isStartMoveTurn) await this.move();
       else if (this.isRollAgain) await this.rollAgain();
     },
     async rollAgain() {
@@ -325,7 +327,7 @@ export default {
         let data = result.data.data;
         let nextPlayer = this.findPlayer(data.game.turn_player_id);
         let systemChatMessage = `${this.usernameHTML()} ${this.heroHTML()}
-        передал ход ${this.usernameHTML()} ${this.heroHTML()}`;
+        передал ход ${this.usernameHTML(nextPlayer)} ${this.heroHTML(nextPlayer)}`;
         this.socket.send(result, systemChatMessage);
       }
     },
@@ -373,7 +375,7 @@ export default {
       return this.player_id == this.game.turn_player_id;
     },
     canRollDices: function () {
-      return this.isBeginTurn || this.isRollAgain;
+      return this.isStartMoveTurn || this.isRollAgain;
     },
     //turn stages
     isRollAgain: function () {
@@ -382,17 +384,20 @@ export default {
     isRollAgainFinish: function () {
       return this.game.turn_stage == this.$turnStages["rollAgainFinish"];
     },
-    isBeginTurn: function () {
-      return this.game.turn_stage == this.$turnStages["begin"];
+    isStartMoveTurn: function () {
+      return this.game.turn_stage == this.$turnStages["startMove"];
     },
     isFinishedTurn: function () {
       return this.game.turn_stage == this.$turnStages["finished"];
     },
-    isFigurineMoved: function () {
-      return +this.game.turn_stage == this.$turnStages["figurineMoved"];
+    isReadOnly:function(){
+      return this.isFinishedTurn;
     },
-    isReadOnly: function () {
-      return !this.isFigurineMoved;
+    isActionUnSkipTurn: function () {
+      return +this.game.turn_stage == this.$turnStages["actionUnskip"];
+    },
+    isActionCanSkipTurn:function(){
+      return +this.game.turn_stage == this.$turnStages["actionCanSkip"];
     },
   },
 };

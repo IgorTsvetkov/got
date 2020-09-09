@@ -1,6 +1,6 @@
 <?php
 
-namespace app\controllers;
+namespace app\controllers\gamestatus;
 
 use Error;
 use Exception;
@@ -11,7 +11,7 @@ use app\helpers\TurnStageHelper;
 use app\models\UtilityGameStatus;
 use app\models\gamestatus\CommonGameStatus;
 
-class UtilityGameStatusController extends \yii\web\Controller
+class UtilityController extends \yii\web\Controller
 {
     public function actionView(int $id,int $game_session_id)
     {
@@ -19,12 +19,13 @@ class UtilityGameStatusController extends \yii\web\Controller
             ->select("player_id")
             ->where(["game_session_id" => $game_session_id])
             ->andWhere(["estate_id" => $id])
-            ->andWhere(["estate_type_id" => CommonGameStatus::TYPE_ESTATE_TAX])
+            ->andWhere(["estate_type_id" => CommonGameStatus::TYPE_ESTATE_UTILITY])
             ->asArray()
             ->one();
         $count_utilties = CommonGameStatus::find()
             ->where(["player_id" => $owner_player_id])
-            ->andWhere(["estate_type_id" => CommonGameStatus::TYPE_ESTATE_TAX]);
+            ->andWhere(["estate_type_id" => CommonGameStatus::TYPE_ESTATE_UTILITY])
+            ->count();
         $data = [
             "count" => $count_utilties,
             "player_id" => $owner_player_id,

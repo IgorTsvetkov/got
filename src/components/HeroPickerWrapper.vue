@@ -29,15 +29,12 @@
       </div>
     </div>
     <div class="d-flex">
-      <div v-if="gameParsed.leader_user_id===this.current_user_id">
-        <start-game-button
+        <start-game-button v-if="gameParsed.leader_user_id===this.current_user_id"
           class="w-100"
           :game_id="gameParsed.id"
           :action="'/match/start?game_id='+gameParsed.id"
           @startGame="onstartgame"
         >Начать игру</start-game-button>
-      </div>
-      <div class="d-flex justify-content-center align-items-center"></div>
     </div>
 
     <div v-if="error" class="lead bg-danger text-light border shadow p-20">{{error.message}}</div>

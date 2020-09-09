@@ -40,7 +40,6 @@ class GameSession extends \yii\db\ActiveRecord
     public const ROLL_MAX=6;
     public const START_PLAYER_POSITION=22;
     public const START_MONEY=20000;
-
     public static function me()
     {
         return GameSession::find()->joinWith(["userGameSessions"])->where(["user_id"=>Yii::$app->user->id]);
@@ -92,7 +91,7 @@ class GameSession extends \yii\db\ActiveRecord
     public function resetTurn()
     {
         $this->current_event_id=null;
-        $this->turn_stage = TurnStageHelper::BEGIN;        
+        $this->turn_stage = TurnStageHelper::START_MOVE;        
     }
     public function behaviors()
     {

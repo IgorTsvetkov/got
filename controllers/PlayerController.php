@@ -5,13 +5,14 @@ namespace app\controllers;
 use Yii;
 use Exception;
 use app\models\User;
+use app\helpers\YesNo;
 use app\models\Player;
 use app\models\Property;
 use app\models\GameSession;
 use app\helpers\ResponseHelper;
 use app\helpers\TurnStageHelper;
-use app\helpers\YesNo;
-use app\models\PropertyGameStatus;
+use app\models\gamestatus\CommonGameStatus;
+use app\models\gamestatus\PropertyGameStatus;
 
 class PlayerController extends \yii\web\Controller
 {
@@ -33,7 +34,7 @@ class PlayerController extends \yii\web\Controller
 
         /** @var PropertyGameStatus */
         $propertyGameStatus = PropertyGameStatus::find()
-            ->where(["property_id" => $property_id, "player_id" => $player_to_id])
+            ->where(["estate_id" => $property_id,"estate_type_id"=>CommonGameStatus::TYPE_ESTATE_PROPERTY,"player_id" => $player_to_id])
             ->with(["property.cell", "rentState", "gameSession"])
             ->limit(1)
             ->one();

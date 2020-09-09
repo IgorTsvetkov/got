@@ -2,6 +2,7 @@
 
 namespace app\models\gamestatus;
 
+use app\models\Cell;
 use Yii;
 use app\models\Player;
 use app\models\GameSession;
@@ -75,5 +76,9 @@ class CommonGameStatus extends \yii\db\ActiveRecord
     public function getGameSession()
     {
         return $this->hasOne(GameSession::class,["id"=>"game_session_id"]);
+    }
+    public function getCell()
+    {
+        return $this->hasOne(Cell::class,["id"=>"cell_id"]);
     }
 }
