@@ -6,6 +6,5 @@ class TurnStageHelper{
     public const ACTION_CAN_SKIPPED=210;
     public const ROLL_AGAIN=225;
     public const ROLL_AGAIN_FINISH=250;
-    public const CAN_FINISH=275;
     public const FINISHED=300;
 }

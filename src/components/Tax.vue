@@ -31,11 +31,13 @@
           <div>Четыре дома</div>
           <div>{{tax.tax4}}</div>
         </div>
-        <div v-if="!is_readonly&&isForSale&&!isBought">
-          <div class="btn btn-primary w-100" @click="buy">Купить</div>
-        </div>
-        <div v-else>
-          <div class="btn btn-danger w-100" @click="payRent">Заплатить ренту</div>
+        <div v-if="!is_readonly">
+          <div v-if="!isBought">
+            <div class="btn btn-primary w-100" @click="buy">Купить</div>
+          </div>
+          <div v-else-if="isEnemyTax">
+            <div class="btn btn-danger w-100" @click="payRent">Заплатить ренту</div>
+          </div>
         </div>
       </div>
     </div>
@@ -69,25 +71,15 @@ export default {
     };
   },
   computed: {
-    isMyTax() {
-      return this.taxStatus.player_id == my_player_id;
+    isEnemyTax() {
+      return this.taxStatus.player_id !== this.my_player_id;
     },
     color() {
-      return this.isMyTax ? "bg-warning" : "bg-danger";
-    },
-    isForSale() {
-      return !this.taxStatus.player_id;
+      return this.isEnemyTax ?"bg-danger":"bg-warning";
     },
     isBought() {
-      return !!this.taxStatus;
+      return this.taxStatus && this.taxStatus.player_id;
     },
-
-    // color(){
-    //   return {
-    //     "bg_warning":this.isMyTax,
-    //     "bg_danger":!this.isMyTax,
-    //   }
-    // }
   },
   async created() {
     this.taxStatus = await this.getTaxGameStatus();
@@ -111,14 +103,15 @@ export default {
       } else throw new Error("Can't get getTaxGameStatus request result");
     },
     async payRent() {
-      let type="tax";
-      let estate_id=this.tax.id;
-      debugger
+      let type = "tax";
+      let estate_id = this.tax.id;
       let result = await this.$axios.post(
-        "/common-estate/pay-rent?player_from_id=" + this.myPlayer.id 
-        +"&&player_to_id=" +this.propertyGameStatus.player_id 
-        +"&&type_id"+this.estateTypes[type]
-        +"&&id=" +estate_id
+        "/common-estate/pay-rent?player_to_id=" +
+          this.taxStatus.player_id +
+          "&&type_id=" +
+          this.$estateTypes[type] +
+          "&&id=" +
+          estate_id
       );
       if (result) {
         this.$emit("payRent", result);

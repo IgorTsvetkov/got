@@ -27,7 +27,7 @@
                 </div>
                 <div v-if="eventData.operation=='rollAndPayMultiply10'">
                   <text-with-money :text="eventData.text"></text-with-money>
-                  <div v-if="dice_rolled">
+                  <div v-if="is_dice_rolled">
                     <div class="btn btn-success m-2" @click="doEvent">Заплатить</div>
                   </div>
                 </div>
@@ -67,7 +67,7 @@ export default {
       type: Number,
       default: undefined,
     },
-    dice_rolled:{
+    is_dice_rolled:{
       type:Boolean,
       default:false
     }

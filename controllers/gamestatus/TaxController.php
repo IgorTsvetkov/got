@@ -2,6 +2,7 @@
 
 namespace app\controllers\gamestatus;
 
+use app\helpers\EstateTypeHelper;
 use Error;
 use Exception;
 use yii\db\Query;
@@ -13,22 +14,22 @@ use app\models\TaxGameStatus;
 use GuzzleHttp\Psr7\Response;
 use app\helpers\ResponseHelper;
 use app\helpers\TurnStageHelper;
-use app\models\gamestatus\CommonGameStatus;
+use app\models\gamestatus\CommonEstateGameStatus;
 
 class TaxController extends \yii\web\Controller
 {
     public function actionView(int $id,int $game_session_id)
     {
-        list("player_id" => $owner_player_id) = CommonGameStatus::find()
+        list("player_id" => $owner_player_id) = CommonEstateGameStatus::find()
             ->select("player_id")
             ->where(["game_session_id" => $game_session_id])
             ->andWhere(["estate_id" => $id])
-            ->andWhere(["estate_type_id" => CommonGameStatus::TYPE_ESTATE_TAX])
+            ->andWhere(["estate_type_id" => EstateTypeHelper::TAX])
             ->asArray()
             ->one();
-        $count_taxes = CommonGameStatus::find()
+        $count_taxes = CommonEstateGameStatus::find()
         ->where(["player_id" => $owner_player_id])
-        ->andWhere(["estate_type_id"=>CommonGameStatus::TYPE_ESTATE_TAX])
+        ->andWhere(["estate_type_id"=>EstateTypeHelper::TAX])
         ->count();
         
         $data = [

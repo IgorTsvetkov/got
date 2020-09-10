@@ -14,7 +14,7 @@ use app\models\TaxGameStatus;
 use yii\filters\AccessControl;
 use app\helpers\ResponseHelper;
 use app\helpers\TurnStageHelper;
-use app\models\gamestatus\CommonGameStatus;
+use app\models\gamestatus\CommonEstateGameStatus;
 use app\models\UtilityGameStatus;
 use app\models\PropertyGameStatus;
 
@@ -70,10 +70,12 @@ class GotController extends Controller
         $player->move($step);
         if($player->canFinishTurn())
             $game->turn_stage = TurnStageHelper::ACTION_CAN_SKIPPED;
+        else if($player->isTaxRollRequired())
+            $game->turn_stage = TurnStageHelper::ROLL_AGAIN;
         else
             $game->turn_stage = TurnStageHelper::ACTION_UNSKIP;
             
-        $game->update();
+        $game->update(false);
 
         $data = [
             "player" => $player,

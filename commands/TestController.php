@@ -10,7 +10,7 @@ namespace app\commands;
 
 use app\models\Cell;
 use yii\console\Controller;
-use app\models\gamestatus\CommonGameStatus;
+use app\models\gamestatus\CommonEstateGameStatus;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 /**
@@ -26,7 +26,7 @@ class TestController extends Controller
 {
     function actionTest()
     {
-        $cell=Cell::getOwnerPlayerId(19,);
-        var_dump($cell);
+        // $cell=Cell::getOwnerPlayerId(19,);
+        // var_dump($cell);
     }
 }

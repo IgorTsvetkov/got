@@ -95,7 +95,8 @@ export default {
   async beforeMount() {
     await this.getProperty(this.id);
   },
-  created() {},
+  created() {
+  },
   methods: {
     async getProperty(id) {
       let result = await this.$axios.get("/property/view?id=" + id);
@@ -164,9 +165,8 @@ export default {
       let type="property";
       let estate_id=this.property.id;
       let result = await this.$axios.post(
-        "/common-estate/pay-rent?player_from_id=" + this.myPlayer.id 
-        +"&&player_to_id=" +this.propertyGameStatus.player_id 
-        +"&&type_id"+this.estateTypes[type]
+        "/common-estate/pay-rent?player_to_id=" +this.propertyGameStatus.player_id 
+        +"&&type_id="+this.$estateTypes[type]
         +"&&id=" +estate_id
       );
       if (result) {

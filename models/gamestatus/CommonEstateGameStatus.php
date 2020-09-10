@@ -2,10 +2,12 @@
 
 namespace app\models\gamestatus;
 
+use app\helpers\IPayRent;
 use app\models\Cell;
 use Yii;
 use app\models\Player;
 use app\models\GameSession;
+use Exception;
 
 /**
  * This is the model class for table "common_game_status".
@@ -20,15 +22,19 @@ use app\models\GameSession;
  * @property int|null $group_id
  * @property int|null $is_group_full
  */
-class CommonGameStatus extends \yii\db\ActiveRecord
+class CommonEstateGameStatus extends \yii\db\ActiveRecord implements IPayRent
 {
-    public const TYPE_ESTATE_PROPERTY=10;
-    public const TYPE_ESTATE_TAX=20;
-    public const TYPE_ESTATE_UTILITY=30;
-    
+
+    public static function getRentCost(int $estate_id, int $estate_type_id, int $player_to_id,?int $roll_value=null): int {
+        throw new Exception("Not implemented");
+    }
+
+    public static function isNeedRollForPayRent(): bool {
+        return false;
+    }    
     public static function exist(int $type,int $id,int $game_session_id)
     {
-        return CommonGameStatus::find()
+        return CommonEstateGameStatus::find()
         ->where(["estate_type_id" => $type])
         ->andWhere(["estate_id" => $id])
         ->andWhere(["game_session_id" =>$game_session_id])

@@ -2,6 +2,7 @@
 
 namespace app\controllers\gamestatus;
 
+use app\helpers\EstateTypeHelper;
 use Error;
 use Exception;
 use app\models\Player;
@@ -9,22 +10,22 @@ use app\models\Utility;
 use app\helpers\ResponseHelper;
 use app\helpers\TurnStageHelper;
 use app\models\UtilityGameStatus;
-use app\models\gamestatus\CommonGameStatus;
+use app\models\gamestatus\CommonEstateGameStatus;
 
 class UtilityController extends \yii\web\Controller
 {
     public function actionView(int $id,int $game_session_id)
     {
-        list("player_id" => $owner_player_id) = CommonGameStatus::find()
+        list("player_id" => $owner_player_id) = CommonEstateGameStatus::find()
             ->select("player_id")
             ->where(["game_session_id" => $game_session_id])
             ->andWhere(["estate_id" => $id])
-            ->andWhere(["estate_type_id" => CommonGameStatus::TYPE_ESTATE_UTILITY])
+            ->andWhere(["estate_type_id" => EstateTypeHelper::UTILITY])
             ->asArray()
             ->one();
-        $count_utilties = CommonGameStatus::find()
+        $count_utilties = CommonEstateGameStatus::find()
             ->where(["player_id" => $owner_player_id])
-            ->andWhere(["estate_type_id" => CommonGameStatus::TYPE_ESTATE_UTILITY])
+            ->andWhere(["estate_type_id" => EstateTypeHelper::UTILITY])
             ->count();
         $data = [
             "count" => $count_utilties,

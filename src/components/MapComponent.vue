@@ -29,7 +29,7 @@
             </div>
             <div v-if="isMyTurn">
               <button v-if="canRollDices" class="btn btn-light" @click="rollDices()">Бросить кубики</button>
-              <button v-if="isFinishedTurn" class="btn btn-light" @click="endTurn()">Закончить ход</button>
+              <button v-if="canFinishTurn" class="btn btn-light" @click="endTurn()">Закончить ход</button>
             </div>
           </div>
         </div>
@@ -57,7 +57,7 @@
                 class="w-100 h-100"
                 :is_readonly="isReadOnly"
                 :current_event_id="+game.current_event_id"
-                :dice_rolled="isRollAgainFinish"
+                :is_dice_rolled="isRollAgainFinish"
                 :event="myCell.event"
                 @eventDone="oneventDone"
                 @turnStatusUpdate="onturnStatusUpdate"
@@ -334,11 +334,6 @@ export default {
     findPlayer(id) {
       return this.game.players.find((p) => p.id == id);
     },
-    // findTax(id) {
-    //   let cell = this.cells.find((t) => t.tax && t.tax.id == id);
-    //   if (!cell) return false;
-    //   return cell.tax;
-    // },
     findEstate(type,id) {
       let cell = this.cells.find((t) => t[type] && t[type].id == id);
       if (!cell) return false;
@@ -376,6 +371,9 @@ export default {
     },
     canRollDices: function () {
       return this.isStartMoveTurn || this.isRollAgain;
+    },
+    canFinishTurn: function(){
+      return this.isFinishedTurn||this.isActionCanSkipTurn;
     },
     //turn stages
     isRollAgain: function () {

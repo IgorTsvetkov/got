@@ -2,13 +2,14 @@
 
 namespace app\models;
 
+use app\helpers\EstateTypeHelper;
 use Yii;
 use Exception;
 use yii\db\Query;
 use app\models\User;
 use app\models\GameSession;
 use app\models\estate\Property;
-use app\models\gamestatus\CommonGameStatus;
+use app\models\gamestatus\CommonEstateGameStatus;
 use app\models\UtilityGameStatus;
 use yii\behaviors\BlameableBehavior;
 use app\models\gamestatus\PropertyGameStatus;
@@ -35,8 +36,17 @@ class Player extends \yii\db\ActiveRecord
     public const PREVIOUS_SLOT = 111;
     public const NEXT_SLOT = 112;
     public function isOwnEstateOnCell(){
-        $owner_player_id=Cell::getOwnerPlayerId($this->game_session_id,$this->position);
+        $estateStatus=Cell::getCommonEstateGameStatus($this->game_session_id,$this->position);
+        if(empty($estateStatus))
+            return false;
+        $owner_player_id=$estateStatus->player_id;
         return $this->id===$owner_player_id;
+    }
+    public function isTaxRollRequired(){
+        $estateStatus=Cell::getCommonEstateGameStatus($this->game_session_id,$this->position);
+        if($estateStatus->estate_type_id==EstateTypeHelper::TAX)
+            return true;
+        return false;
     }
     public function canFinishTurn(){
         return $this->isOwnEstateOnCell();
@@ -236,6 +246,6 @@ class Player extends \yii\db\ActiveRecord
     }
     public function getEstates()
     {
-        return $this->hasMany(CommonGameStatus::class,["player_id"=>"id"]);
+        return $this->hasMany(CommonEstateGameStatus::class,["player_id"=>"id"]);
     }
 }

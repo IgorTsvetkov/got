@@ -24,12 +24,12 @@ use app\models\estate\Property;
  * @property int|null $cell_id
  * @property bool|null $is_group_full
  */
-class PropertyGameStatus extends CommonGameStatus implements IPayRent
+class PropertyGameStatus extends CommonEstateGameStatus
 {
     //equal rent_state table row count
     public const MAXRENTLEVEL = 6;
 
-    public function getRentCost(int $estate_id,int $estate_type_id,int $player_to_id): int
+    public static function getRentCost(int $estate_id, int $estate_type_id, int $player_to_id,int $roll_value=null): int
     {
         $propertyGameStatus = self::find()
             ->where(["estate_id" => $estate_id, "estate_type_id" => $estate_type_id, "player_id" => $player_to_id])

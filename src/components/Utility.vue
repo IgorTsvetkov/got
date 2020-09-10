@@ -22,11 +22,13 @@
           <div>Два</div>
           <div>Бросок кубика x10</div>
         </div>
-        <div v-if="!is_readonly&&isForSale&&!isBought">
-          <div class="btn btn-primary w-100" @click="buy">Купить</div>
-        </div>
-        <div v-else>
-          <div class="btn btn-danger w-100" @click="payRent">Заплатить ренту</div>
+        <div v-if="!is_readonly">
+          <div v-if="!isBought">
+            <div class="btn btn-primary w-100" @click="buy">Купить</div>
+          </div>
+          <div v-else-if="isEnemyUtility">
+            <div class="btn btn-danger w-100" @click="payRent">Заплатить ренту</div>
+          </div>
         </div>
       </div>
     </div>
@@ -60,14 +62,14 @@ export default {
     };
   },
   computed: {
-    isMyUtility() {
-      return this.utilityStatus.player_id == my_player_id;
+    isEnemyUtility() {
+      return this.utilityStatus.player_id !== this.my_player_id;
     },
     color() {
-      return this.isMyUtility ? "bg-warning" : "bg-danger";
+      return this.isEnemyTax ?"bg-danger":"bg-warning";
     },
-    isForSale() {
-      return !this.utilityStatus.player_id;
+    isBought() {
+      return this.utilityStatus&&this.utilityStatus.player_id;
     },
   },
   async created() {
@@ -92,13 +94,15 @@ export default {
       } else throw new Error("Can't get getUtilityGameStatus request result");
     },
     async payRent() {
-      let type="utility";
-      let estate_id=this.utility.id;
+      let type = "utility";
+      let estate_id = this.utility.id;
       let result = await this.$axios.post(
-        "/common-estate/pay-rent?player_from_id=" + this.myPlayer.id 
-        +"&&player_to_id=" +this.propertyGameStatus.player_id 
-        +"&&type_id"+this.estateTypes[type]
-        +"&&id=" +estate_id
+        "/common-estate/pay-rent?player_to_id=" +
+          this.propertyGameStatus.player_id +
+          "&&type_id=" +
+          this.$estateTypes[type] +
+          "&&id=" +
+          estate_id
       );
       if (result) {
         this.$emit("payRent", result);

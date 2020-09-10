@@ -5,6 +5,7 @@ namespace app\models\gamestatus;
 use app\helpers\IPayRent;
 use Yii;
 use app\models\Player;
+use Exception;
 
 /**
  * This is the model class for table "tax_game_status".
@@ -17,16 +18,25 @@ use app\models\Player;
  * @property int|null $game_session_id
  * 
  */
-class TaxGameStatus extends CommonGameStatus implements IPayRent
+class TaxGameStatus extends CommonEstateGameStatus
 {
-    public function getRentCost(int $estate_id, int $estate_type_id, int $player_to_id): int
+    const TAX_ONE_BUILDING=25;
+    const MAX_TAX_COUNT=4;
+
+    public static function getRentCost(int $estate_id, int $estate_type_id, int $player_to_id,?int $roll_value=null): int
     {
-        $taxGameStatus = self::find()
-        ->select("concat('tax',count('estate_type_id'))")
+        $count = self::find()
         ->where(["estate_type_id" => $estate_type_id, "player_id" => $player_to_id])
-        ->with(["tax"])
-        ->limit(1)
-        ->one();
+        ->count();
+        return self::getTaxRentByCount($count);
+    }
+
+    public static function getTaxRentByCount($count):int{
+        if($count==0||$count>TaxGameStatus::MAX_TAX_COUNT)
+            throw new Exception("Tax max count have to be more than 0 and less than ".self::MAX_TAX_COUNT.". You have ". $count);
+        if($count==1)
+            return self::TAX_ONE_BUILDING;          
+        return self::getTaxRentByCount(--$count);
     }
     /**
      * {@inheritdoc}

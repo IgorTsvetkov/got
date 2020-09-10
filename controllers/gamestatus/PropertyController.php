@@ -2,6 +2,7 @@
 
 namespace app\controllers\gamestatus;
 
+use app\helpers\EstateTypeHelper;
 use Yii;
 use Exception;
 use app\models\Cell;
@@ -17,7 +18,7 @@ use app\helpers\ResponseHelper;
 use app\models\estate\Property;
 use app\models\UserGameSession;
 use app\helpers\TurnStageHelper;
-use app\models\gamestatus\CommonGameStatus;
+use app\models\gamestatus\CommonEstateGameStatus;
 use app\models\gamestatus\PropertyGameStatus;
 
 class PropertyController extends \yii\web\Controller
@@ -96,7 +97,7 @@ class PropertyController extends \yii\web\Controller
         $user_id = Yii::$app->user->id;
         $player = Player::find()->where(["user_id" => $user_id])->orderBy(["id" => SORT_DESC])->limit(1)->one();
         $propertyGameStatus = PropertyGameStatus::find()
-            ->where(["player_id" => $player->id, "estate_id" => $id,"estate_type_id"=>CommonGameStatus::TYPE_ESTATE_PROPERTY])
+            ->where(["player_id" => $player->id, "estate_id" => $id,"estate_type_id"=>EstateTypeHelper::PROPERTY])
             ->with(["property" => function ($q) {
                 $q->with("group");
             }, "gameSession"])
