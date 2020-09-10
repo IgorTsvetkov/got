@@ -60,25 +60,29 @@ class AuctionController extends \yii\web\Controller
     {
         /** @var Player */
         $player = Player::me()->with("auction")->one();
-        if (!$player || $player->in_auction==YesNo::NO ||!$player->auction)
+        if (!$player || $player->in_auction == YesNo::NO || !$player->auction)
             throw new Exception("Access denied. Auction involving is impossible");
-        $auction=$player->auction;
-        if($player->canPay($cost)&&$cost>=$auction->cost){
-            $auction->cost=$cost;        
+        $auction = $player->auction;
+        if ($player->canPay($cost) && $cost >= $auction->cost) {
+            $auction->cost = $cost;
             $auction->update(false);
         }
     }
-    public function actionFinish(){
+    public function actionFinish()
+    {
         $player = Player::me()->with("auction")->one();
         /** @var Auction */
         $auction = $player->auction;
-        $type=$auction->target_type;
-        $id=$auction->target_id;
+        $type = $auction->target_type;
+        $id = $auction->target_id;
         $auction->delete();
-        return $this->redirect($type."-game-status/buy",["id"=>$id]);        
+        return $this->redirect($type . "-game-status/buy", ["id" => $id]);
     }
     public function actionLeave($player_id)
     {
+
+        //case 2: one bet, other leave
+        //case 3: first bet, second bet, other leave, first leave, second win
         $player = Player::findOne($player_id);
         if ($player->user_id !== Yii::$app->user->id)
             throw new Exception("Access denied");
@@ -86,31 +90,40 @@ class AuctionController extends \yii\web\Controller
         $player->update(false);
         /** @var Auction */
         $auction = Auction::find()->where(["turn_player_id" => $player->id])->with(["gameSession", "activePlayers"])->one();
-        $activePlayers = $auction->activePlayers;
-        if (empty($activePlayers)) {
+        $auctionPlayers = $auction->activePlayers;
+                //case 1: no want to buy
+        //is_max_Player!==player_id
+        //allow leave
+        //ismaxplayer=null count=0 auction finish
+        //message player leave auciton. Аукцион не удался
+        //
+        if (empty($auctionPlayers)) {
             /** @var GameSession */
             $game = $auction->gameSession;
             $game->turn_stage = TurnStageHelper::FINISHED;
             $game->update(false);
-            $data = ["game" => ["turn_stage" => $game->turn_stage]];
             $auction->delete();
+            $data = [
+                "game" => ["turn_stage" => $game->turn_stage],
+                "chatHelp" =>["message"=>"покинул аукцион.Аукцион не удался"],
+            ];
             //нужно еще сообщение в чат
-            return ResponseHelper::Socket("game", $data);            
+            return ResponseHelper::Socket("game", $data);
         }
-        if (count($activePlayers) == 1){
-            $auction->turn_player_id=$auction->max_bet_player_id;
-            $auction->is_finished=YesNo::YES;
+        else if (count($auctionPlayers) == 1&&$auction->isBuyer($auctionPlayers[0])) {
+            $auction->turn_player_id = $auction->max_bet_player_id;
+            $auction->is_finished = YesNo::YES;
             $auction->update(false);
-            $data=["auction"=>$auction];
-            return ResponseHelper::Socket("auction",$data);
+            $data = ["auction" => $auction];
+            return ResponseHelper::Socket("auction", $data);
             // return $this->redirect([$auction->target_type . "-game-status/create", "id" => $auction->target_id]);
         }
-        $player = $player->getNextTurnPlayer($activePlayers);
+        $player = $player->getNextTurnPlayer($auctionPlayers);
         $auction->turn_player_id = $player_id;
         $auction->update(false);
         return ResponseHelper::Success("");
     }
-    public static function getTypedModel($type, $id,$loadGameStatus=false)
+    public static function getTypedModel($type, $id, $loadGameStatus = false)
     {
         $query = null;
         switch ($type) {
@@ -127,10 +140,10 @@ class AuctionController extends \yii\web\Controller
                 throw new Exception("Cand start Auction for " . $type);
                 break;
         }
-        $query->where(["id"=>$id]);
-        if($loadGameStatus)
-            $query->with($type."GameStatus");
-        $model=$query->one();
+        $query->where(["id" => $id]);
+        if ($loadGameStatus)
+            $query->with($type . "GameStatus");
+        $model = $query->one();
         return $model;
     }
 }

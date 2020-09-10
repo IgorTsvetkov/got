@@ -137,6 +137,7 @@ class CommonEstateController extends \yii\web\Controller
         $user = User::me();
         $player_from=Player::me()->with("gameSession")->one();
         $player_to=Player::findOne($player_to_id);
+        /** @var GameSession */
         $game=$player_from->gameSession;
         
         if($user->id !== $player_from->user_id)
@@ -152,13 +153,14 @@ class CommonEstateController extends \yii\web\Controller
 
         /** @var IPayRent */
         $gameStatus=GameStatusHelper::getClassByType($type_id);
+        $roll_value=null;
         if($gameStatus->isNeedRollForPayRent())
         {
-            throw new Exception("Roll unhadled");
-            $game->turn_stage=TurnStageHelper::ROLL_AGAIN;
-            $game->update(false);
+            if($game->turn_stage!==TurnStageHelper::ROLL_AGAIN_FINISH)
+                throw new Exception("Access denied");
+            $roll_value=$game->getRollCount();
         }
-        $rentCost=$gameStatus->getRentCost($id,$type_id,$player_to_id);
+        $rentCost=$gameStatus->getRentCost($id,$type_id,$player_to_id,$roll_value);
         if (!$player_from->canPay($rentCost))
             throw new Exception("have no money");
         $player_from->payTo($player_to, $rentCost);

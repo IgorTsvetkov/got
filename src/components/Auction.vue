@@ -1,8 +1,13 @@
 <template>
   <div class="bg-secondary text-dark-50 shadow rounded p-3 m-3 w-75">
     <div v-if="is_finished">
-      Поздравляю. Вы выйграли аукцион. Итоговая цена {{current}}
-      <div class="btn btn-success" @click="finish">Заплатить</div>
+      <div v-if="player_id==max_bet_player">
+        Поздравляю. Вы выйграли аукцион. Итоговая цена {{current}}
+        <div class="btn btn-success" @click="finish">Заплатить</div>
+      </div>
+      <div v-else>
+        Аукцион не удался
+      </div>
     </div>
     <div v-else-if="min<max" class="form-group">
       <label
@@ -52,9 +57,8 @@
         </div>
         <div class="btn btn-danger w-100 mt-2" @click="leave">Покинуть аукцион</div>
       </div>
-      <div v-else class="text-center lead bg-warning shadow rounded p-3">Вы не учавствуете в аукционе</div>
+      <div v-else class="text-center lead bg-warning shadow rounded p-3">Вы не участвуете в аукционе</div>
     </div>
-  
   </div>
 </template>
 
@@ -91,12 +95,12 @@ export default {
     },
     max_bet_player: {
       type: Object,
-      default:undefined,
+      default: undefined,
     },
-    is_finished:{
-      type:Boolean,
-      default:false
-    }
+    is_finished: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -108,12 +112,13 @@ export default {
   },
   methods: {
     makeBet(valueBet = this.current) {
-      this.$axios.post(
-        `/auction/bet?cost=${valueBet}`
-      );
+      this.$axios.post(`/auction/bet?cost=${valueBet}`);
     },
-    leave() {
-      this.$axios.post(`/auction/leave?player_id=${player_id}`);
+    async leave() {
+      let result = await this.$axios.post(
+        `/auction/leave?player_id=${this.player_id}`
+      );
+      this.$emit("leaveAuction", result);
     },
     takePartCost(percent) {
       return this.min * percent;
@@ -125,10 +130,12 @@ export default {
       let valueBet = this.takePartCost(percent);
       this.makeBet(valueBet);
     },
-    async finish(){
-      let result=this.$axios.post(`/auction/leave?player_id=${player_id}`);
-      this.emit("finish",result)
-    }
+    async finish() {
+      let result = this.$axios.post(
+        `/auction/leave?player_id=${this.player_id}`
+      );
+      this.emit("finish", result);
+    },
   },
   watch: {
     percent(newPersent, oldValue) {

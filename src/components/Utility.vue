@@ -27,7 +27,8 @@
             <div class="btn btn-primary w-100" @click="buy">Купить</div>
           </div>
           <div v-else-if="isEnemyUtility">
-            <div class="btn btn-danger w-100" @click="payRent">Заплатить ренту</div>
+            <div v-if="is_dice_rolled" class="btn btn-danger w-100" @click="payRent">Заплатить ренту</div>
+            <div v-else class="btn btn-warning disabled w-100">Бросьте кубик</div>
           </div>
         </div>
       </div>
@@ -55,6 +56,10 @@ export default {
       type: Number,
       required: true,
     },
+    is_dice_rolled:{
+      type:Boolean,
+      default:false
+    }
   },
   data() {
     return {
@@ -98,7 +103,7 @@ export default {
       let estate_id = this.utility.id;
       let result = await this.$axios.post(
         "/common-estate/pay-rent?player_to_id=" +
-          this.propertyGameStatus.player_id +
+          this.utilityStatus.player_id +
           "&&type_id=" +
           this.$estateTypes[type] +
           "&&id=" +

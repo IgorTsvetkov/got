@@ -35,7 +35,7 @@ class UtilityGameStatus extends CommonEstateGameStatus
     {
         return true;
     }
-    private static function getMultiplierByCount($count)
+    private static function getMultiplierByCount(int $count)
     {
         if($count===1)
             return self::MULTIPLIER_ONE_BUILDING;

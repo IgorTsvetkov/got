@@ -77,6 +77,7 @@
                 :is_readonly="isReadOnly"
                 :my_player_id="+myPlayer.id"
                 :game_session_id="+game.id"
+                :is_dice_rolled="isRollAgainFinish"
                 @utilityBuy="onutilityBuy"
                 @payRent="onpayRent"
               />
@@ -94,7 +95,9 @@
                 :canBet="auction.turn_player_id==myPlayer.id"
                 :player_id="+myPlayer.id"
                 :max_bet_player="auction.maxBetPlayer"
+                :is_finished="isFinishedTurn"
                 @finish="onauctionFinished"
+                @leaveAuction="onleaveAuction"
               />
             </div>
           </div>
@@ -207,6 +210,14 @@ export default {
     });
   },
   methods: {
+    onleaveAuction(result){
+      let data=result.data.data;
+      // debugger
+      let systemChatMessage;
+      if(data.chatHelp)
+        systemChatMessage=`${this.userNameAndHeroHTML()} ${data.chatHelp.message}`; 
+       this.socket.send(result, systemChatMessage);
+    },
     onauctionFinished(result) {},
     onauctionStarted(result) {
       let systemChatMessage = `${this.userNameAndHeroHTML()}

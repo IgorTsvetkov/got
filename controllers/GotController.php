@@ -70,7 +70,7 @@ class GotController extends Controller
         $player->move($step);
         if($player->canFinishTurn())
             $game->turn_stage = TurnStageHelper::ACTION_CAN_SKIPPED;
-        else if($player->isTaxRollRequired())
+        else if($player->isUtilityRollRequired())
             $game->turn_stage = TurnStageHelper::ROLL_AGAIN;
         else
             $game->turn_stage = TurnStageHelper::ACTION_UNSKIP;

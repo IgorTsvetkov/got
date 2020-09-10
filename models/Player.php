@@ -13,6 +13,7 @@ use app\models\gamestatus\CommonEstateGameStatus;
 use app\models\UtilityGameStatus;
 use yii\behaviors\BlameableBehavior;
 use app\models\gamestatus\PropertyGameStatus;
+use yii\helpers\VarDumper;
 
 /**
  * This is the model class for table "player".
@@ -42,9 +43,10 @@ class Player extends \yii\db\ActiveRecord
         $owner_player_id=$estateStatus->player_id;
         return $this->id===$owner_player_id;
     }
-    public function isTaxRollRequired(){
+    public function isUtilityRollRequired(){
         $estateStatus=Cell::getCommonEstateGameStatus($this->game_session_id,$this->position);
-        if($estateStatus->estate_type_id==EstateTypeHelper::TAX)
+        // VarDumper::dump($estateStatus,10,true);
+        if($estateStatus->estate_type_id==EstateTypeHelper::UTILITY)
             return true;
         return false;
     }

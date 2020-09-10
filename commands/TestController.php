@@ -11,6 +11,7 @@ namespace app\commands;
 use app\models\Cell;
 use yii\console\Controller;
 use app\models\gamestatus\CommonEstateGameStatus;
+use app\models\gamestatus\TaxGameStatus;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 /**
@@ -26,7 +27,7 @@ class TestController extends Controller
 {
     function actionTest()
     {
-        // $cell=Cell::getOwnerPlayerId(19,);
-        // var_dump($cell);
+        
+        echo count(null);
     }
 }

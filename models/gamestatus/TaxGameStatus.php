@@ -28,15 +28,16 @@ class TaxGameStatus extends CommonEstateGameStatus
         $count = self::find()
         ->where(["estate_type_id" => $estate_type_id, "player_id" => $player_to_id])
         ->count();
+        
         return self::getTaxRentByCount($count);
     }
-
+    //COUNT-RENT_COST 1-25 2-50 3-100 4-200
     public static function getTaxRentByCount($count):int{
         if($count==0||$count>TaxGameStatus::MAX_TAX_COUNT)
             throw new Exception("Tax max count have to be more than 0 and less than ".self::MAX_TAX_COUNT.". You have ". $count);
         if($count==1)
             return self::TAX_ONE_BUILDING;          
-        return self::getTaxRentByCount(--$count);
+        return 2*self::getTaxRentByCount(--$count);
     }
     /**
      * {@inheritdoc}

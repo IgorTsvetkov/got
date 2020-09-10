@@ -20,6 +20,10 @@ use Yii;
  */
 class Auction extends \yii\db\ActiveRecord
 {
+    public function isBuyer(Player $player):bool
+    {
+        return $this->max_bet_player_id==$player->id;
+    }
     /**
      * {@inheritdoc}
      */
@@ -52,17 +56,14 @@ class Auction extends \yii\db\ActiveRecord
             'turn_player_id' => 'Turn Player ID',
         ];
     }
-    public function isAnyWantToBuy()
-    {
-        return isset($this->max_bet_player_id);
-    }
+
     public function getGameSession()
     {
         return $this->hasOne(GameSession::class,["id"=>"game_session_id"]);
     }
     public function getActivePlayers()
     {
-        return $this->hasMany(Player::class,["game_session_id"=>"id"])->via("gameSession")->where(["in_action"=>YesNo::YES]);
+        return $this->hasMany(Player::class,["game_session_id"=>"id"])->via("gameSession")->where(["in_auction"=>YesNo::YES]);
     }
     public function getAuctionTurnPlayer()
     {
