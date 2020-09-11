@@ -2,18 +2,19 @@
 
 namespace app\models;
 
-use app\helpers\EstateTypeHelper;
 use Yii;
 use Exception;
 use yii\db\Query;
 use app\models\User;
+use yii\helpers\VarDumper;
 use app\models\GameSession;
 use app\models\estate\Property;
-use app\models\gamestatus\CommonEstateGameStatus;
+use app\helpers\EstateTypeHelper;
 use app\models\UtilityGameStatus;
+use app\models\estate\Estate;
 use yii\behaviors\BlameableBehavior;
 use app\models\gamestatus\PropertyGameStatus;
-use yii\helpers\VarDumper;
+use app\models\gamestatus\CommonEstateGameStatus;
 
 /**
  * This is the model class for table "player".
@@ -36,6 +37,25 @@ class Player extends \yii\db\ActiveRecord
     public const COUNT_POSITION = 40;
     public const PREVIOUS_SLOT = 111;
     public const NEXT_SLOT = 112;
+    public function buy(Estate $estate,$cost):CommonEstateGameStatus{
+        $this->pay($cost);
+        $model = new CommonEstateGameStatus();
+        $model->cell_id=$estate->cell->id;
+        $model->game_session_id = $this->game_session_id;
+        $model->player_id = $this->id;
+        $model->estate_type_id = $estate::getEstateType();
+        $model->estate_id = $estate->id;
+        if ($estate::getEstateType()==EstateTypeHelper::PROPERTY){
+            $group_id=$estate->group->id;
+            $model->rent_state_id = 1;
+            $model->group_id = $group_id;
+            $isGroupFull = PropertyGameStatus::isGroupFull($group_id, $this->game_session_id);
+            if ($isGroupFull)
+                PropertyGameStatus::markGroupImprovable($group_id);
+            }
+        $model->save(false);
+        return $model;
+    }
     public function isOwnEstateOnCell(){
         $estateStatus=Cell::getCommonEstateGameStatus($this->game_session_id,$this->position);
         if(empty($estateStatus))

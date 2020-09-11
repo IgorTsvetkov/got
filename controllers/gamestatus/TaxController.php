@@ -2,7 +2,6 @@
 
 namespace app\controllers\gamestatus;
 
-use app\helpers\EstateTypeHelper;
 use Error;
 use Exception;
 use yii\db\Query;
@@ -14,7 +13,9 @@ use app\models\TaxGameStatus;
 use GuzzleHttp\Psr7\Response;
 use app\helpers\ResponseHelper;
 use app\helpers\TurnStageHelper;
+use app\helpers\EstateTypeHelper;
 use app\models\gamestatus\CommonEstateGameStatus;
+use Symfony\Component\Finder\Exception\AccessDeniedException;
 
 class TaxController extends \yii\web\Controller
 {
@@ -47,7 +48,7 @@ class TaxController extends \yii\web\Controller
     //     /** @var Cell */
     //     $cell=$tax->cell;
     //     if(!$game->isTurn($player->id)&&!$cell->hasEqualPosition($player))
-    //         throw new Exception("Access denied");
+    //         throw new AccessDeniedException();
             
     //     $isAlreadyBought = TaxGameStatus::find()
     //     ->where(["tax_id" => $id])

@@ -5,8 +5,8 @@
 <script>
     export default {
         props: {
-            "type": {
-                type: String,
+            "type_id": {
+                type: Number,
                 required:true
             },
             "id":{
@@ -16,7 +16,7 @@
         },
         methods: {
             async startAuction() {
-                let result=await this.$axios.post(`/auction/start?type=${this.type}&id=${this.id}`);
+                let result=await this.$axios.post(`/auction/start?type_id=${this.type_id}&id=${this.id}`);
                 this.$parent.$emit("auctionStarted",result);
             },
         },

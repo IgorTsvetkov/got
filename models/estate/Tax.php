@@ -4,6 +4,9 @@ namespace app\models\estate;
 
 use Yii;
 use app\models\Cell;
+use app\models\estate\Estate;
+use app\helpers\EstateTypeHelper;
+use app\models\estate\Base\IEstate;
 use app\models\gamestatus\TaxGameStatus;
 
 /**
@@ -18,8 +21,12 @@ use app\models\gamestatus\TaxGameStatus;
  * @property string|null $tax3
  * @property string|null $tax4
  */
-class Tax extends \yii\db\ActiveRecord
+class Tax extends Estate
 {
+    public static function getEstateType()
+    {
+        return EstateTypeHelper::TAX;
+    }
     /**
      * {@inheritdoc}
      */

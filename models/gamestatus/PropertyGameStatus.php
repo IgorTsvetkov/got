@@ -43,7 +43,16 @@ class PropertyGameStatus extends CommonEstateGameStatus
         $rent_cost = $property->getAttribute($rent_state_name);
         return $rent_cost;
     }
-
+    public function connectToGroupAndUpdate($group_id)
+    {
+        $this->rent_state_id = 1;
+        $this->group_id = $group_id;
+        $this->is_group_full=YesNO::YES;
+        $this->update(false);
+        $iGroupFull = self::isGroupFull($group_id, $this->game_session_id);
+        if ($iGroupFull)
+            self::markGroupImprovable($group_id);
+    }
     public static function markGroupImprovable($group_id)
     {
         self::updateAll(["is_group_full" => YesNo::YES], ["in", "group_id", $group_id]);

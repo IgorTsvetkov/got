@@ -82,16 +82,19 @@
                 @payRent="onpayRent"
               />
             </div>
-            <div v-if="auction" class="w-100 h-100 d-flex align-items-center justify-content-center">
+            <div
+              v-if="auction"
+              class="w-100 h-100 d-flex align-items-center justify-content-center"
+            >
               <!-- {{auction.turn_player_id}}
               {{myPlayer.id}}-->
 
               <auction
                 :max="+myPlayer.money"
                 :min="+auction.cost"
-                :target_type="auction.target_type"
-                :target_id="+auction.target_id"
-                :target_name="auction.target_name"
+                :estata_type_id="auction.estate_type_id"
+                :estate_id="+auction.estate_id"
+                :estate_name="auction.estate_name"
                 :canBet="auction.turn_player_id==myPlayer.id"
                 :player_id="+myPlayer.id"
                 :max_bet_player="auction.maxBetPlayer"
@@ -220,10 +223,10 @@ export default {
     },
     onauctionFinished(result) {},
     onauctionStarted(result) {
-      let systemChatMessage = `${this.userNameAndHeroHTML()}
-       не изъявил желания приобрести ${
-         result.data.data.auction.target_name
-       }. Начало аукциона`;
+      let systemChatMessage;
+      if(result.data.data.auction)
+        systemChatMessage = `${this.userNameAndHeroHTML()} не изъявил желания приобрести ${result.data.data.auction.estate_name}. Начало аукциона`;
+      else systemChatMessage=`${this.userNameAndHeroHTML()} Остался совсем один одинёшенек во всём королевстве, но всё равно пытается провести аукцион. Что это, жест отчаяния или биполярное расстройство личности?`;
       this.socket.send(result, systemChatMessage);
     },
     onutilityBuy(result) {

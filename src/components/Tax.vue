@@ -34,6 +34,7 @@
         <div v-if="!is_readonly">
           <div v-if="!isBought">
             <div class="btn btn-primary w-100" @click="buy">Купить</div>
+            <button-start-action :type_id="this.$estateTypes['tax']" :id="+tax.id"></button-start-action>
           </div>
           <div v-else-if="isEnemyTax">
             <div class="btn btn-danger w-100" @click="payRent">Заплатить ренту</div>
@@ -46,7 +47,11 @@
 
 <script>
 import { estateTypes } from "../js/config";
+import ButtonStartAction from "./ButtonStartAction.vue";
 export default {
+  components: {
+    ButtonStartAction,
+  },
   props: {
     tax: {
       type: Object,

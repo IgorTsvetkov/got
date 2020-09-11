@@ -29,7 +29,7 @@
         <button class="btn btn-success text-light w-100 shadow mb-1" @click="buy">
           <span class="h4 py-3">Купить {{property.cost}}</span>
         </button>
-        <button-start-action type="property" :id="id"></button-start-action>
+        <button-start-action :type_id="this.$estateTypes['property']" :id="id"></button-start-action>
       </div>
       <div v-else>
         <div v-if="isPlayerOwner">

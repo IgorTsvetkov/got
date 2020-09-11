@@ -2,6 +2,9 @@
 
 namespace app\controllers;
 
+use app\helpers\EstateHelper;
+use app\helpers\EstateTypeHelper;
+use app\helpers\exceptions\ActionDeniedException;
 use Yii;
 use Exception;
 use app\helpers\YesNo;
@@ -13,28 +16,37 @@ use app\models\estate\Utility;
 use app\helpers\ResponseHelper;
 use app\models\estate\Property;
 use app\helpers\TurnStageHelper;
+use Symfony\Component\Finder\Exception\AccessDeniedException;
+use yii\helpers\VarDumper;
 
 class AuctionController extends \yii\web\Controller
 {
-    public function actionStart($type, $id)
+    public function actionStart($type_id, $id)
     {
         $my_user_id = Yii::$app->user->id;
         // $types=["property","tax","utility"];
-        $model = self::getTypedModel($type, $id);
+        $model = EstateHelper::getEstate($type_id, $id);
         $startCost = $model->cost;
         $name = $model->name;
-        $auctionPlayers = function ($query) use ($startCost, $my_user_id) {
+        $auctionPlayersQuery = function ($query) use ($startCost, $my_user_id) {
             $query->where([">=", "money", $startCost]);
             $query->andWhere(["not in", "user_id", $my_user_id]);
         };
         /**
          * @var GameSession
          */
-        $gameSession = GameSession::me()->with(["players" => $auctionPlayers, "auction.maxBetPlayer"])->one();
-        if (isset($gameSession->auction))
-            throw new Exception("Auction already started");
+        $game = GameSession::me()->with(["players" => $auctionPlayersQuery, "auction.maxBetPlayer"])->one();
+        if (isset($game->auction))
+            throw new ActionDeniedException("Auction already started");
+        $actionPlayers = $game->players;
+        if (empty($actionPlayers)) {
+            $game->turn_stage = TurnStageHelper::FINISHED;
+            $game->update(false);
+            $data = ["game" => $game];
+            return ResponseHelper::Socket("game", $data);
+        }
 
-        $players = $gameSession->players;
+        $players = $game->players;
 
         /** @var Player */
         foreach ($players as $player) {
@@ -42,11 +54,11 @@ class AuctionController extends \yii\web\Controller
             $player->update(false);
         }
         $auction = new Auction();
-        $auction->target_type = $type;
-        $auction->target_id = $id;
-        $auction->target_name = $name;
+        $auction->estate_type_id = $type_id;
+        $auction->estate_id = $id;
+        $auction->estate_name = $name;
         $auction->cost = $startCost;
-        $auction->game_session_id = $gameSession->id;
+        $auction->game_session_id = $game->id;
         $auction->turn_player_id = $players[0]->id;
         $auction->save(false);
 
@@ -59,44 +71,37 @@ class AuctionController extends \yii\web\Controller
     public function actionBet(int $cost)
     {
         /** @var Player */
-        $player = Player::me()->with("auction")->one();
+        $player = Player::me()->with(["gameSession", "auction.activePlayers"])->one();
         if (!$player || $player->in_auction == YesNo::NO || !$player->auction)
-            throw new Exception("Access denied. Auction involving is impossible");
-        $auction = $player->auction;
-        if ($player->canPay($cost) && $cost >= $auction->cost) {
-            $auction->cost = $cost;
-            $auction->update(false);
-        }
-    }
-    public function actionFinish()
-    {
-        $player = Player::me()->with("auction")->one();
+            throw new ActionDeniedException("You can't involve in this auction");
         /** @var Auction */
         $auction = $player->auction;
-        $type = $auction->target_type;
-        $id = $auction->target_id;
-        $auction->delete();
-        return $this->redirect($type . "-game-status/buy", ["id" => $id]);
+        $auctionPlayers = $auction->activePlayers;
+        if ($cost < $auction->cost) {
+            throw new ActionDeniedException("Cost is too low");
+        }
+        if (!$player->canPay($cost))
+            throw new ActionDeniedException("Player don't have enough money.");
+            // VarDumper::dump($auctionPlayers,10,true);
+            $nextTurnPlayer=$player->getNextTurnPlayer($auctionPlayers);
+
+        $auction->cost = $cost;
+        $auction->max_bet_player_id = $player->id;
+        $auction->turn_player_id = $nextTurnPlayer->id;
+        $auction->update(false);
+        $data = ["auction" => $auction];
+        return ResponseHelper::Socket("auction", $data);
     }
     public function actionLeave($player_id)
     {
-
-        //case 2: one bet, other leave
-        //case 3: first bet, second bet, other leave, first leave, second win
         $player = Player::findOne($player_id);
         if ($player->user_id !== Yii::$app->user->id)
-            throw new Exception("Access denied");
+            throw new AccessDeniedException();
         $player->in_auction = YesNo::NO;
         $player->update(false);
         /** @var Auction */
         $auction = Auction::find()->where(["turn_player_id" => $player->id])->with(["gameSession", "activePlayers"])->one();
         $auctionPlayers = $auction->activePlayers;
-                //case 1: no want to buy
-        //is_max_Player!==player_id
-        //allow leave
-        //ismaxplayer=null count=0 auction finish
-        //message player leave auciton. Аукцион не удался
-        //
         if (empty($auctionPlayers)) {
             /** @var GameSession */
             $game = $auction->gameSession;
@@ -105,12 +110,11 @@ class AuctionController extends \yii\web\Controller
             $auction->delete();
             $data = [
                 "game" => ["turn_stage" => $game->turn_stage],
-                "chatHelp" =>["message"=>"покинул аукцион.Аукцион не удался"],
+                "chatHelp" => ["message" => "покинул аукцион.Аукцион не удался"],
             ];
             //нужно еще сообщение в чат
             return ResponseHelper::Socket("game", $data);
-        }
-        else if (count($auctionPlayers) == 1&&$auction->isBuyer($auctionPlayers[0])) {
+        } else if (count($auctionPlayers) == 1 && $auction->isMaxBetPlayer($auctionPlayers[0])) {
             $auction->turn_player_id = $auction->max_bet_player_id;
             $auction->is_finished = YesNo::YES;
             $auction->update(false);
@@ -123,27 +127,29 @@ class AuctionController extends \yii\web\Controller
         $auction->update(false);
         return ResponseHelper::Success("");
     }
-    public static function getTypedModel($type, $id, $loadGameStatus = false)
+    public function actionBuy($player_id)
     {
-        $query = null;
-        switch ($type) {
-            case 'property':
-                $query = Property::find();
-                break;
-            case 'tax':
-                $query = Tax::find();
-                break;
-            case 'utility':
-                $query = Utility::find();
-                break;
-            default:
-                throw new Exception("Cand start Auction for " . $type);
-                break;
-        }
-        $query->where(["id" => $id]);
-        if ($loadGameStatus)
-            $query->with($type . "GameStatus");
-        $model = $query->one();
-        return $model;
+        /** @var Auction */
+        $auction = Auction::find()->where(["max_bet_player_id" => $player_id])->with(["gameSession", "maxBetPlayer"])->one();
+        $player = $auction->maxBetPlayer;
+        /** @var GameSession */
+        $game=$auction->gameSession;
+        $estate = EstateHelper::getEstate($auction->estate_type_id, $auction->estate_id);
+
+        $cost = $auction->cost;
+        if (!$player->canPay($cost))
+            return ResponseHelper::Error("Недостаточно средств");
+        $estateGameStatus = $player->buy($estate, $cost);
+        $auction->delete(false);
+        $game->turn_stage=TurnStageHelper::FINISHED;
+        $game->update(false);
+        //дублируется код  в CommonStateController actionBuy  
+        $data = [
+            "player" => $player,
+            "game" => $game,
+            "estate" => $estateGameStatus,
+            "chatHelp" => ["estate_type_id" => $estateGameStatus->estate_type_id, "estate_id" => $estateGameStatus->estate_id]
+        ];
+        return ResponseHelper::Socket("estate-bought", $data);
     }
 }

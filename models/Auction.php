@@ -10,9 +10,9 @@ use Yii;
  *
  * @property int $id
  * @property int|null $game_session_id
- * @property string|null $target_type
- * @property string|null $target_name
- * @property int|null $target_id
+ * @property string|null $estate_name
+ * @property string|null $estate_type_id
+ * @property int|null $estate_id
  * @property int|null $cost
  * @property int|null $turn_player_id
  * @property int|null $max_bet_player_id
@@ -20,7 +20,10 @@ use Yii;
  */
 class Auction extends \yii\db\ActiveRecord
 {
-    public function isBuyer(Player $player):bool
+    public function finishAuction(){
+        $this->is_finished=YesNo::YES;
+    }
+    public function isMaxBetPlayer(Player $player):bool
     {
         return $this->max_bet_player_id==$player->id;
     }

@@ -4,6 +4,9 @@ namespace app\models\estate;
 
 use Yii;
 use app\models\Cell;
+use app\models\estate\Estate;
+use app\helpers\EstateTypeHelper;
+use app\models\estate\Base\IEstate;
 
 /**
  * This is the model class for table "utility".
@@ -13,8 +16,12 @@ use app\models\Cell;
  * @property string|null $src
  * @property int $cost
  */
-class Utility extends \yii\db\ActiveRecord
+class Utility extends Estate
 {
+    public static function getEstateType()
+    {
+        return EstateTypeHelper::UTILITY;
+    }
     /**
      * {@inheritdoc}
      */

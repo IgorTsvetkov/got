@@ -2,15 +2,16 @@
 
 namespace app\controllers\gamestatus;
 
-use app\helpers\EstateTypeHelper;
 use Error;
 use Exception;
 use app\models\Player;
 use app\models\Utility;
 use app\helpers\ResponseHelper;
 use app\helpers\TurnStageHelper;
+use app\helpers\EstateTypeHelper;
 use app\models\UtilityGameStatus;
 use app\models\gamestatus\CommonEstateGameStatus;
+use Symfony\Component\Finder\Exception\AccessDeniedException;
 
 class UtilityController extends \yii\web\Controller
 {
@@ -41,7 +42,7 @@ class UtilityController extends \yii\web\Controller
     //     /** @var Cell */
     //     $cell=$utility->cell;
     //     if(!$game->isTurn($player->id)&&!$cell->hasEqualPosition($player))
-    //         throw new Exception("Access denied");
+    //         throw new AccessDeniedException();
     //     $isAlreadyBought = UtilityGameStatus::find()->where(["utility_id" => $id])->andWhere(["game_session_id" => $game->id])->exists();
     //     if ($isAlreadyBought)
     //         throw new Error("The коммунальное предприятие has already bought");

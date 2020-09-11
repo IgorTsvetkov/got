@@ -3,17 +3,17 @@
     <div v-if="is_finished">
       <div v-if="player_id==max_bet_player">
         Поздравляю. Вы выйграли аукцион. Итоговая цена {{current}}
-        <div class="btn btn-success" @click="finish">Заплатить</div>
+        <div class="btn btn-success" @click="finishAndBuy">Заплатить</div>
       </div>
       <div v-else>
-        Аукцион не удался
+        Аукцион не удался. Ожидание завершения хода...
       </div>
     </div>
     <div v-else-if="min<max" class="form-group">
       <label
         for="formControlRange"
         class="w-100 text-center lead text-capitalize"
-      >Аукцион {{target_name}}</label>
+      >Аукцион {{estate_name}}</label>
       <div class="lead">Цена: {{min}}</div>
       <!-- <div class="lead">Величина ставки: {{current}}</div> -->
       <div v-if="canBet">
@@ -73,15 +73,15 @@ export default {
       type: Number,
       required: true,
     },
-    target_type: {
+    estate_type_id: {
       type: String,
       required: true,
     },
-    target_id: {
+    estate_id: {
       type: Number,
       required: true,
     },
-    target_name: {
+    estate_name: {
       type: String,
       required: true,
     },
@@ -130,9 +130,9 @@ export default {
       let valueBet = this.takePartCost(percent);
       this.makeBet(valueBet);
     },
-    async finish() {
+    async finishAndBuy() {
       let result = this.$axios.post(
-        `/auction/leave?player_id=${this.player_id}`
+        `/auction/buy?player_id=${this.player_id}`
       );
       this.emit("finish", result);
     },

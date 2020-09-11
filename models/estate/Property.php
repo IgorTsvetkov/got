@@ -2,8 +2,12 @@
 
 namespace app\models\estate;
 
+use app\helpers\EstateHelper;
+use app\helpers\EstateTypeHelper;
 use Yii;
 use app\models\Cell;
+use app\models\estate\Estate;
+use app\models\estate\Base\IEstate;
 use app\models\gamestatus\CommonEstateGameStatus;
 use app\models\Player;
 use app\models\PropertyGroup;
@@ -25,11 +29,15 @@ use app\models\gamestatus\PropertyGameStatus;
  * @property int|null $homes_inn_cost
  * @property int|null $group_id
  */
-class Property extends \yii\db\ActiveRecord
+class Property extends Estate
 {
     /**
      * {@inheritdoc}
      */
+    public static function getEstateType()
+    {
+        return EstateTypeHelper::PROPERTY;
+    }
     public static function tableName()
     {
         return 'property';
