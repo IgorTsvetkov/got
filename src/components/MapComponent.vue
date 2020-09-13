@@ -21,15 +21,20 @@
           class="d-flex justify-content-center align-items-center w-100 h-100 position-absolute top-0"
         >
           <div>
-            <div v-for="player in game.players" :key="player.id">
-              <div class="bg-dark text-light lead">
+            <div class="bg-dark" v-for="player in game.players" :key="player.id">
+              <div class="text-light lead" :class="{'bg-primary':player.id==game.turn_player_id}">
                 {{player.user.username}} : {{player.money}}
                 <text-with-money text="$" />
               </div>
             </div>
             <div v-if="isMyTurn">
+              <div class="bg-success">ВАШ ХОД</div>
               <button v-if="canRollDices" class="btn btn-light" @click="rollDices()">Бросить кубики</button>
+              <dices v-if="canRollDices" :first="4" :second="2" readonly="true"/>
               <button v-if="canFinishTurn" class="btn btn-light" @click="endTurn()">Закончить ход</button>
+            </div>
+            <div v-else>
+              <div class="bg-danger"></div>
             </div>
           </div>
         </div>
@@ -90,17 +95,19 @@
               {{myPlayer.id}}-->
 
               <auction
+                v-if="!isStartMoveTurn"
                 :max="+myPlayer.money"
                 :min="+auction.cost"
-                :estata_type_id="auction.estate_type_id"
+                :estate_type_id="+auction.estate_type_id"
                 :estate_id="+auction.estate_id"
                 :estate_name="auction.estate_name"
                 :canBet="auction.turn_player_id==myPlayer.id"
                 :player_id="+myPlayer.id"
-                :max_bet_player="auction.maxBetPlayer"
-                :is_finished="isFinishedTurn"
+                :max_bet_player_id="+auction.max_bet_player_id"
+                :is_finished="Boolean(auction.is_finished)"
                 @finish="onauctionFinished"
                 @leaveAuction="onleaveAuction"
+                @bet="onbetAuction"
               />
             </div>
           </div>
@@ -131,10 +138,12 @@ import EventCard from "./EventCard.vue";
 import Tax from "./Tax.vue";
 import Utility from "./Utility.vue";
 import Auction from "./Auction.vue";
+import Dices from './Dices.vue';
+
 
 import AuthSocket from "../js/AuthSocket";
 import { updateModel, updateModelInArrayAll } from "../js/modelHelper";
-import {estateTypes} from "../js/config";
+import { estateTypes } from "../js/config";
 export default {
   components: {
     ImageComponent,
@@ -149,6 +158,7 @@ export default {
     Tax,
     Utility,
     Auction,
+    Dices
   },
   props: {
     gameString: {
@@ -187,9 +197,16 @@ export default {
           updateModel(this.game, data.game);
           updateModelInArrayAll(this.game.players, data.players);
           break;
-        case "players-and-auction":
+        case "auction-start":
           this.auction = data.auction;
           updateModelInArrayAll(this.game.players, data.players);
+          break;
+        case "auction":
+          if (data.auction) updateModel(this.auction, data.auction);
+          if (data.game) updateModel(this.game, data.game);
+          if (data.players)
+            updateModelInArrayAll(this.game.players, data.players);
+            console.log('auction :>> ',this.auction);
           break;
         case "my-player-and-game":
           player = this.findPlayer(data.player.id);
@@ -197,11 +214,14 @@ export default {
           updateModel(this.game, data.game);
           break;
         case "estate-bought":
+          this.auction=null;
           player = this.findPlayer(data.player.id);
           updateModel(player, data.player);
           player.estates.push(data.estate);
           updateModel(this.game, data.game);
           break;
+        case "auction-leave":
+          this.auction = false;
         case "game":
           updateModel(this.game, data.game);
           break;
@@ -213,26 +233,38 @@ export default {
     });
   },
   methods: {
-    onleaveAuction(result){
+    onbetAuction(result){
       let data=result.data.data;
-      // debugger
-      let systemChatMessage;
-      if(data.chatHelp)
-        systemChatMessage=`${this.userNameAndHeroHTML()} ${data.chatHelp.message}`; 
-       this.socket.send(result, systemChatMessage);
+      let systemChatMessage=`${this.userNameAndHeroHTML()} поставил ставку в размере ${data.auction.cost}`;
+      this.socket.send(result, systemChatMessage);
     },
-    onauctionFinished(result) {},
+    onleaveAuction(result) {
+      let data = result.data.data;
+      let systemChatMessage;
+      if (data.chatHelp)
+        systemChatMessage = `${this.userNameAndHeroHTML()} ${
+          data.chatHelp.message
+        }`;
+      this.socket.send(result, systemChatMessage);
+    },
+    onauctionFinished(result) {
+    let systemChatMessage=`${this.userNameAndHeroHTML()} приобрел новую собственность. Ожидание завершения хода`;
+    this.socket.send(result,systemChatMessage);
+    },
     onauctionStarted(result) {
       let systemChatMessage;
-      if(result.data.data.auction)
-        systemChatMessage = `${this.userNameAndHeroHTML()} не изъявил желания приобрести ${result.data.data.auction.estate_name}. Начало аукциона`;
-      else systemChatMessage=`${this.userNameAndHeroHTML()} Остался совсем один одинёшенек во всём королевстве, но всё равно пытается провести аукцион. Что это, жест отчаяния или биполярное расстройство личности?`;
-      this.socket.send(result, systemChatMessage);
+      if (result.data.data.auction)
+        systemChatMessage = `${this.userNameAndHeroHTML()} не изъявил желания приобрести ${
+          result.data.data.auction.estate_name
+        }. Начало аукциона`;
+      else
+        systemChatMessage = `${this.userNameAndHeroHTML()} Остался совсем один одинёшенек во всём королевстве, но всё равно пытается провести аукцион. Что это, жест отчаяния или биполярное расстройство личности?`;
+    this.socket.send(result, systemChatMessage);
     },
     onutilityBuy(result) {
       let estate_type_id = result.data.data.chatHelp.estate_type_id;
       let estate_id = result.data.data.chatHelp.estate_id;
-      let utility = this.findEstate("utility",estate_id);
+      let utility = this.findEstate("utility", estate_id);
       if (!utility) throw new Error("utility have not found");
       let systemChatMessage = `${this.userNameAndHeroHTML()} купил коммунальное предприятие ${
         utility.name
@@ -242,9 +274,9 @@ export default {
     onpropertyBuy(result) {
       if (this.$response.handleGameError(result, this.socket)) return;
       console.log("onproperty buy result :>> ", result);
-      
+
       let estate_id = result.data.data.chatHelp.estate_id;
-      let property = this.findEstate("property",estate_id);
+      let property = this.findEstate("property", estate_id);
       let systemChatMessage = `${this.userNameAndHeroHTML()} купил новую собственность ${this.propertyHTML(
         property
       )}`;
@@ -253,7 +285,7 @@ export default {
     },
     ontaxBuy(result) {
       let estate_id = result.data.data.chatHelp.estate_id;
-      let tax = this.findEstate("tax",estate_id);
+      let tax = this.findEstate("tax", estate_id);
       if (!tax) throw new Error("Tax have not found");
       let systemChatMessage = `${this.userNameAndHeroHTML()} приобрел house ${
         tax.name
@@ -341,20 +373,25 @@ export default {
         let data = result.data.data;
         let nextPlayer = this.findPlayer(data.game.turn_player_id);
         let systemChatMessage = `${this.usernameHTML()} ${this.heroHTML()}
-        передал ход ${this.usernameHTML(nextPlayer)} ${this.heroHTML(nextPlayer)}`;
+        передал ход ${this.usernameHTML(nextPlayer)} ${this.heroHTML(
+          nextPlayer
+        )}`;
         this.socket.send(result, systemChatMessage);
       }
     },
     findPlayer(id) {
       return this.game.players.find((p) => p.id == id);
     },
-    findEstate(type,id) {
+    findEstate(type, id) {
       let cell = this.cells.find((t) => t[type] && t[type].id == id);
       if (!cell) return false;
       return cell[type];
     },
     playerOwner(cell_id) {
-      return this.game.players.find((p) =>p.estates &&p.estates.find((estate) => estate.cell_id == cell_id));
+      return this.game.players.find(
+        (p) =>
+          p.estates && p.estates.find((estate) => estate.cell_id == cell_id)
+      );
     },
     usernameHTML(player = this.myPlayer) {
       return `<span style="color:${player.hero.color}">
@@ -386,8 +423,8 @@ export default {
     canRollDices: function () {
       return this.isStartMoveTurn || this.isRollAgain;
     },
-    canFinishTurn: function(){
-      return this.isFinishedTurn||this.isActionCanSkipTurn;
+    canFinishTurn: function () {
+      return this.isFinishedTurn || this.isActionCanSkipTurn;
     },
     //turn stages
     isRollAgain: function () {
@@ -402,13 +439,13 @@ export default {
     isFinishedTurn: function () {
       return this.game.turn_stage == this.$turnStages["finished"];
     },
-    isReadOnly:function(){
+    isReadOnly: function () {
       return this.isFinishedTurn;
     },
     isActionUnSkipTurn: function () {
       return +this.game.turn_stage == this.$turnStages["actionUnskip"];
     },
-    isActionCanSkipTurn:function(){
+    isActionCanSkipTurn: function () {
       return +this.game.turn_stage == this.$turnStages["actionCanSkip"];
     },
   },

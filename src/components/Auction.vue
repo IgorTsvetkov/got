@@ -1,13 +1,11 @@
-<template>
+<template v-if="show">
   <div class="bg-secondary text-dark-50 shadow rounded p-3 m-3 w-75">
     <div v-if="is_finished">
-      <div v-if="player_id==max_bet_player">
+      <div v-if="player_id==max_bet_player_id">
         Поздравляю. Вы выйграли аукцион. Итоговая цена {{current}}
         <div class="btn btn-success" @click="finishAndBuy">Заплатить</div>
       </div>
-      <div v-else>
-        Аукцион не удался. Ожидание завершения хода...
-      </div>
+      <div v-else>Аукцион не удался. Ожидание завершения хода...</div>
     </div>
     <div v-else-if="min<max" class="form-group">
       <label
@@ -17,8 +15,8 @@
       <div class="lead">Цена: {{min}}</div>
       <!-- <div class="lead">Величина ставки: {{current}}</div> -->
       <div v-if="canBet">
-        <div v-if="!max_bet_player">
-          <div class="btn btn-success w-100" @click="makeBet()">Купить за {{current}}</div>
+        <div v-if="!max_bet_player_id">
+          <div class="btn btn-success w-100" @click="makeBet()">Поставить {{current}}</div>
         </div>
         <div v-else class="shadow p-2 shadow bg-dark text-light rounded">
           <div class>Повысить на:</div>
@@ -74,7 +72,7 @@ export default {
       required: true,
     },
     estate_type_id: {
-      type: String,
+      type: Number,
       required: true,
     },
     estate_id: {
@@ -93,8 +91,8 @@ export default {
       type: Number,
       required: true,
     },
-    max_bet_player: {
-      type: Object,
+    max_bet_player_id: {
+      type: Number,
       default: undefined,
     },
     is_finished: {
@@ -108,11 +106,13 @@ export default {
       current: this.min,
       step: (this.max - this.min) / 100,
       expend: false,
+      show: true,
     };
   },
   methods: {
-    makeBet(valueBet = this.current) {
-      this.$axios.post(`/auction/bet?cost=${valueBet}`);
+    async makeBet(valueBet = this.current) {
+      let result=await this.$axios.post(`/auction/bet?cost=${valueBet}`);
+      this.$emit("bet",result);
     },
     async leave() {
       let result = await this.$axios.post(
@@ -131,10 +131,8 @@ export default {
       this.makeBet(valueBet);
     },
     async finishAndBuy() {
-      let result = this.$axios.post(
-        `/auction/buy?player_id=${this.player_id}`
-      );
-      this.emit("finish", result);
+      let result =await this.$axios.post(`/auction/buy?player_id=${this.player_id}`);
+      this.$emit("finish", result);
     },
   },
   watch: {

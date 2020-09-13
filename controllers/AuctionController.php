@@ -30,20 +30,20 @@ class AuctionController extends \yii\web\Controller
         $name = $model->name;
         $auctionPlayersQuery = function ($query) use ($startCost, $my_user_id) {
             $query->where([">=", "money", $startCost]);
-            $query->andWhere(["not in", "user_id", $my_user_id]);
+            $query->andWhere(["not in", "user_id", $my_user_id]);    
         };
         /**
          * @var GameSession
          */
-        $game = GameSession::me()->with(["players" => $auctionPlayersQuery, "auction.maxBetPlayer"])->one();
+        $game = GameSession::me()->with(["players" => $auctionPlayersQuery])->one();
         if (isset($game->auction))
             throw new ActionDeniedException("Auction already started");
         $actionPlayers = $game->players;
         if (empty($actionPlayers)) {
             $game->turn_stage = TurnStageHelper::FINISHED;
             $game->update(false);
-            $data = ["game" => $game];
-            return ResponseHelper::Socket("game", $data);
+            $data = ["game" => $game,"auction"=>false];
+            return ResponseHelper::Socket("auction", $data);
         }
 
         $players = $game->players;
@@ -64,9 +64,9 @@ class AuctionController extends \yii\web\Controller
 
         $data = [
             "players" => $players,
-            "auction" => $auction,
+            "auction" => $auction->getAttributes(),
         ];
-        return ResponseHelper::Socket("players-and-auction", $data);
+        return ResponseHelper::Socket("auction-start", $data);
     }
     public function actionBet(int $cost)
     {
@@ -82,12 +82,19 @@ class AuctionController extends \yii\web\Controller
         }
         if (!$player->canPay($cost))
             throw new ActionDeniedException("Player don't have enough money.");
-            // VarDumper::dump($auctionPlayers,10,true);
-            $nextTurnPlayer=$player->getNextTurnPlayer($auctionPlayers);
+        $getIds=function($player){
+            return $player->id;
+        };
+        $ids=array_map($getIds,$auctionPlayers); 
+        $nextTurnPlayer=$player->getNextTurnPlayer(Player::find()->where(["in","id",$ids]));
 
         $auction->cost = $cost;
         $auction->max_bet_player_id = $player->id;
         $auction->turn_player_id = $nextTurnPlayer->id;
+        if(count($auctionPlayers)===1)
+        {
+            $auction->is_finished=YesNo::YES;
+        }
         $auction->update(false);
         $data = ["auction" => $auction];
         return ResponseHelper::Socket("auction", $data);
@@ -110,10 +117,10 @@ class AuctionController extends \yii\web\Controller
             $auction->delete();
             $data = [
                 "game" => ["turn_stage" => $game->turn_stage],
-                "chatHelp" => ["message" => "покинул аукцион.Аукцион не удался"],
+                "chatHelp" => ["message" => "покинул аукцион. Аукцион не состоялся"],
             ];
             //нужно еще сообщение в чат
-            return ResponseHelper::Socket("game", $data);
+            return ResponseHelper::Socket("auction-leave", $data);
         } else if (count($auctionPlayers) == 1 && $auction->isMaxBetPlayer($auctionPlayers[0])) {
             $auction->turn_player_id = $auction->max_bet_player_id;
             $auction->is_finished = YesNo::YES;
@@ -125,7 +132,8 @@ class AuctionController extends \yii\web\Controller
         $player = $player->getNextTurnPlayer($auctionPlayers);
         $auction->turn_player_id = $player_id;
         $auction->update(false);
-        return ResponseHelper::Success("");
+        $data=["auction"=>$auction];
+        return ResponseHelper::Success("auction",$data);
     }
     public function actionBuy($player_id)
     {

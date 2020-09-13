@@ -8,6 +8,7 @@
 
 namespace app\commands;
 
+use app\models\Auction;
 use app\models\Cell;
 use yii\console\Controller;
 use app\models\gamestatus\CommonEstateGameStatus;
@@ -27,7 +28,8 @@ class TestController extends Controller
 {
     function actionTest()
     {
-        
-        echo count(null);
+        $x=new Auction();
+        $a=$x->getAttributes();
+        echo $a["xx"];
     }
 }

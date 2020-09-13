@@ -77,13 +77,16 @@ export default {
   },
   computed: {
     isEnemyTax() {
-      return this.taxStatus.player_id !== this.my_player_id;
+      return +this.taxStatus.player_id !== this.my_player_id;
     },
     color() {
       return this.isEnemyTax ?"bg-danger":"bg-warning";
     },
     isBought() {
       return this.taxStatus && this.taxStatus.player_id;
+    },
+    isPlayerOwner() {
+      return this.my_player_id === this.taxStatus.player_id;
     },
   },
   async created() {

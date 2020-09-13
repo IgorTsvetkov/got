@@ -27,6 +27,8 @@ import ButtonLoad from './components/ButtonLoad.vue';
 import GameTable from './components/GameTable.vue';
 import PropertyCard from './components/PropertyCard.vue';
 import Auction from './components/Auction.vue';
+import Dices from './components/Dices.vue';
+
 
 
 const app=new Vue({
@@ -39,6 +41,8 @@ const app=new Vue({
         ButtonLoad,
         GameTable,
         PropertyCard,
-        Auction
+        Auction,
+        Dices,
+
     }
 })
