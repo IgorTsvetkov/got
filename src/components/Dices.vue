@@ -1,6 +1,6 @@
 <template>
-  <div class @click="rollDices">
-    <div class="cube-wrapper d-flex justify-content-center align-items-center">
+  <div>
+    <div  :class="{'active':!readonly}" class="cube-wrapper d-flex justify-content-center align-items-center">
       <dice :number="first" :isAnimate="isAnimate" :delay="200"></dice>
       <dice :number="second" :isAnimate="isAnimate"></dice>
     </div>
@@ -16,13 +16,18 @@ export default {
   props: {
     first: {
       type: Number,
-      required: true,
+      default: 1,
+
     },
     second: {
       type: Number,
-      required: true,
+      default: 1,
     },
     readonly:{
+      type:Boolean,
+      default:false
+    },
+    activate:{
       type:Boolean,
       default:false
     }
@@ -36,14 +41,20 @@ export default {
     rollDices() {
       if(this.readonly)
         return;
-        alert(this.readonly);
       if(this.isAnimate)
         return;
       this.isAnimate = true;
       setTimeout(() => {
         this.isAnimate = false;
+        this.$emit("rollFinish");
       }, 2000);
     },
+  },
+  watch: {
+    activate(newValue, oldValue) {
+      if(newValue)
+      this.rollDices();
+    }
   },
 };
 </script>

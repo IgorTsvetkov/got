@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\helpers\GameHelper;
 use Exception;
 use yii\db\Query;
 use app\models\Cell;
@@ -59,30 +60,44 @@ class GotController extends Controller
         $this->layout = false;
         return $this->render('index', compact('game', 'player_id'));
     }
-    public function actionMove()
+    public function actionRollDices(){
+        $game = GameSession::meOne();
+        $game->roll_count_first=GameHelper::roll();
+        $game->roll_count_second=GameHelper::roll();
+        $game->update(false);
+        return ResponseHelper::Socket("game",["game"=>$game]);
+    }
+    public function actionRollDicesFinish()
     {
-        $step = 1;
         /** @var Player */
         $player = Player::me()->with("gameSession")->one();
         $game = $player->gameSession;
-        if ($game->turn_stage!==TurnStageHelper::START_MOVE)
-            throw new Exception("вы не можете преместиться дважды за один ход");
-        $player->move($step);
-        if($player->canFinishTurn())
-            $game->turn_stage = TurnStageHelper::ACTION_CAN_SKIPPED;
-        else if($player->isUtilityRollRequired())
-            $game->turn_stage = TurnStageHelper::ROLL_AGAIN;
-        else
-            $game->turn_stage = TurnStageHelper::ACTION_UNSKIP;
-            
-        $game->update(false);
+        if($game->turn_stage===TurnStageHelper::ROLL_AGAIN)
+        {
+            $game->turn_stage = TurnStageHelper::ROLL_AGAIN_FINISH;
+            $game->update(false);
+            $data = ["game" => $game];
+            return ResponseHelper::Socket("game", $data);
+        }
+        if ($game->turn_stage===TurnStageHelper::START_MOVE)
+        {
+            $player->move($game->getRollSum());
+            if($player->canFinishTurn())
+                $game->turn_stage = TurnStageHelper::ACTION_CAN_SKIPPED;
+            else if($player->isUtilityRollRequired())
+                $game->turn_stage = TurnStageHelper::ROLL_AGAIN;
+            else
+                $game->turn_stage = TurnStageHelper::ACTION_UNSKIP;
+                
+            $game->update(false);
 
-        $data = [
-            "player" => $player,
-            "game" => $game,
-            "step" => $step
-        ];
-        return ResponseHelper::Socket("my-player-and-game", $data);
+            $data = [
+                "player" => $player,
+                "game" => $game,
+            ];
+            return ResponseHelper::Socket("my-player-and-game", $data);
+        }
+        throw new Exception("Can't roll");
     }
     public function actionEndTurn($player_id)
     {
@@ -97,18 +112,5 @@ class GotController extends Controller
         $data = ["game" => $game];
         return ResponseHelper::Socket("game", $data);
     }
-    //test
-    public function actionRollAgain()
-    {
-        $game = GameSession::meOne();
-        // if($game->turn_stage==TurnStageHelper::ROLL_AGAIN)
-        // {
-        $game->rollDices();
-        $game->turn_stage = TurnStageHelper::ROLL_AGAIN_FINISH;
-        $game->save();
-        $data = ["game" => $game];
-        return ResponseHelper::Socket("game", $data);
-        // }
-        // return $this->redirect("startMove");
-    }
+
 }

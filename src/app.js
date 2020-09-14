@@ -1,6 +1,8 @@
 window.Vue=require('vue');
 
 import axios from "axios";
+import {throttle} from "lodash";
+Vue.prototype.$_={throttle};
 Vue.prototype.$axios=axios;
 if(window.yii)
     Vue.prototype.$axios.defaults.headers.common["X-CSRF-TOKEN"] = window.yii.getCsrfToken();

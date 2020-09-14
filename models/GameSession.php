@@ -48,23 +48,13 @@ class GameSession extends \yii\db\ActiveRecord
     {
         return self::me()->limit(1)->one();
     }
-    public function getRollCount(){
+    public function getRollSum(){
         return $this->roll_count_first+$this->roll_count_second;
-    }
-    public function rollDices()
-    {
-        $this->roll_count_first=GameHelper::roll();
-        $this->roll_count_second=GameHelper::roll();
     }
     public function isTurn(int $player_id):bool
     {
        return $player_id===(int)$this->turn_player_id;
     }
-    // public function setRollCountFirst($value)
-    // {
-    //     if($value>self::ROLL_MAX)
-    //         throw new Error("Roll dice count can't be more than ".self::ROLL_MAX."you have ".$value);     
-    // }
     public function getFirstEmptySlot():int{
         $slots=GameSession::find()->where(["game_session.id"=>$this->id])->joinWith(["players"])->select("slot")->asArray()->all();
         $filledSlot=array_map(function($slot){

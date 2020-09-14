@@ -129,7 +129,7 @@ class CommonEstateController extends \yii\web\Controller
         if ($gameStatus->isNeedRollForPayRent()) {
             if ($game->turn_stage !== TurnStageHelper::ROLL_AGAIN_FINISH)
                 throw new AccessDeniedException();
-            $roll_value = $game->getRollCount();
+            $roll_value = $game->getRollSum();
         }
         $rentCost = $gameStatus->getRentCost($id, $type_id, $player_to_id, $roll_value);
         if (!$player_from->canPay($rentCost))

@@ -59,9 +59,9 @@ class SpyderController extends \yii\web\Controller
                 $player->teleportToProperty("king's landing");
                 break;
             case 'rollAndPayMultiply10':
-                $rollCount=$game->rollCount;
+                $rollSum=$game->getRollSum();
                 $multiplier = 10;
-                $cost = $rollCount * $multiplier;
+                $cost = $rollSum * $multiplier;
                 $player->pay($cost);
                 break;
             case 'payPrevious':

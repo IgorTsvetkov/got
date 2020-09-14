@@ -29,9 +29,18 @@
             </div>
             <div v-if="isMyTurn">
               <div class="bg-success">ВАШ ХОД</div>
-              <button v-if="canRollDices" class="btn btn-light" @click="rollDices()">Бросить кубики</button>
-              <dices v-if="canRollDices" :first="4" :second="2" readonly="true"/>
-              <button v-if="canFinishTurn" class="btn btn-light" @click="endTurn()">Закончить ход</button>
+              <button v-if="canFinishTurn" class="btn btn-danger w-100" @click="endTurn()">Закончить ход</button>
+
+              <!-- <button v-if="canRollDices" class="btn btn-light" @click="rollDices()">Бросить кубики</button> -->
+              <div @click="rollDicesIfCan()">
+              <dices
+                :first="+game.roll_count_first"
+                :second="+game.roll_count_second"
+                :activate="isRolled"
+                @rollFinish="onrollFinish"
+                :readonly="!canRollDices"
+              />
+              </div>
             </div>
             <div v-else>
               <div class="bg-danger"></div>
@@ -138,8 +147,7 @@ import EventCard from "./EventCard.vue";
 import Tax from "./Tax.vue";
 import Utility from "./Utility.vue";
 import Auction from "./Auction.vue";
-import Dices from './Dices.vue';
-
+import Dices from "./Dices.vue";
 
 import AuthSocket from "../js/AuthSocket";
 import { updateModel, updateModelInArrayAll } from "../js/modelHelper";
@@ -158,7 +166,7 @@ export default {
     Tax,
     Utility,
     Auction,
-    Dices
+    Dices,
   },
   props: {
     gameString: {
@@ -177,6 +185,7 @@ export default {
       cells: [],
       socket: undefined,
       auction: undefined,
+      isRolled: false,
     };
   },
   async beforeMount() {
@@ -206,7 +215,7 @@ export default {
           if (data.game) updateModel(this.game, data.game);
           if (data.players)
             updateModelInArrayAll(this.game.players, data.players);
-            console.log('auction :>> ',this.auction);
+          console.log("auction :>> ", this.auction);
           break;
         case "my-player-and-game":
           player = this.findPlayer(data.player.id);
@@ -214,7 +223,7 @@ export default {
           updateModel(this.game, data.game);
           break;
         case "estate-bought":
-          this.auction=null;
+          this.auction = null;
           player = this.findPlayer(data.player.id);
           updateModel(player, data.player);
           player.estates.push(data.estate);
@@ -233,9 +242,11 @@ export default {
     });
   },
   methods: {
-    onbetAuction(result){
-      let data=result.data.data;
-      let systemChatMessage=`${this.userNameAndHeroHTML()} поставил ставку в размере ${data.auction.cost}`;
+    onbetAuction(result) {
+      let data = result.data.data;
+      let systemChatMessage = `${this.userNameAndHeroHTML()} поставил ставку в размере ${
+        data.auction.cost
+      }`;
       this.socket.send(result, systemChatMessage);
     },
     onleaveAuction(result) {
@@ -248,8 +259,8 @@ export default {
       this.socket.send(result, systemChatMessage);
     },
     onauctionFinished(result) {
-    let systemChatMessage=`${this.userNameAndHeroHTML()} приобрел новую собственность. Ожидание завершения хода`;
-    this.socket.send(result,systemChatMessage);
+      let systemChatMessage = `${this.userNameAndHeroHTML()} приобрел новую собственность. Ожидание завершения хода`;
+      this.socket.send(result, systemChatMessage);
     },
     onauctionStarted(result) {
       let systemChatMessage;
@@ -258,8 +269,8 @@ export default {
           result.data.data.auction.estate_name
         }. Начало аукциона`;
       else
-        systemChatMessage = `${this.userNameAndHeroHTML()} Остался совсем один одинёшенек во всём королевстве, но всё равно пытается провести аукцион. Что это, жест отчаяния или биполярное расстройство личности?`;
-    this.socket.send(result, systemChatMessage);
+        systemChatMessage = `${this.userNameAndHeroHTML()} Остался совсем один одинёшенек во всём королевстве, но всё равно пытается провести аукцион. Что это, жест отчаяния или попытка закончить забагованную игру?`;
+      this.socket.send(result, systemChatMessage);
     },
     onutilityBuy(result) {
       let estate_type_id = result.data.data.chatHelp.estate_type_id;
@@ -325,28 +336,25 @@ export default {
       this.socket.send(result, systemChatMessage);
     },
     async rollDices() {
-      if (this.isStartMoveTurn) await this.move();
-      else if (this.isRollAgain) await this.rollAgain();
+      let result = await this.$axios.post(`/got/roll-dices`);
+      let game=result.data.data.game;
+      if(result.data.data.game)
+        updateModel(this.game,game);
+      this.isRolled=true;
     },
-    async rollAgain() {
-      let result = await this.$axios.post(`/got/roll-again`);
+    rollDicesIfCan(){
+      if(this.canRollDices)      
+        this.$_.throttle(this.rollDices,3000)();
+    },
+    async onrollFinish() {
+      this.isRolled=false;
+      let result = await this.$axios.post(`/got/roll-dices-finish`);
       if (result) {
-        if (this.$response.handleGameError(result, this.socket)) return;
+        if (this.$response.handleGameError(result, this.socket)) 
+          return;
         let game = result.data.data.game;
-        let systemChatMessage = `${this.userNameAndHeroHTML()} бросил кости и получил ${
-          game.roll_count_first
-        } и ${game.roll_count_second} `;
-        this.socket.send(result, systemChatMessage);
-      }
-    },
-
-    async move() {
-      let result = await this.$axios.post(`/got/move`);
-      if (result) {
-        let data = result.data.data;
-        let systemChatMessage = `${this.usernameHTML()} переместил ${this.heroHTML()} на ${
-          data.step
-        } ${this.getCellName(data.step)}`;
+        let systemChatMessage = `${this.userNameAndHeroHTML()} бросил кости и получил 
+        ${game.roll_count_first} и ${game.roll_count_second} `;
         this.socket.send(result, systemChatMessage);
       }
     },

@@ -91,11 +91,11 @@ export default {
   props: {
     number: {
       type: Number,
-      required: true,
+      default: 1,
     },
     isAnimate: {
       type: Boolean,
-      default: false,
+      default: 1,
     },
     delay: {
       type: Number,
@@ -105,7 +105,7 @@ export default {
   data() {
     return {
       delayedAnimation: false,
-      hide:false,
+      hide: false,
     };
   },
   computed: {
@@ -124,20 +124,21 @@ export default {
         case 6:
           return "six";
         default:
-          throw new Error(`Can't extract word from number ${this.number}`);
+          return "one";
       }
     },
   },
   watch: {
     isAnimate(newValue, oldValue) {
-      if(!newValue){
+      if (!newValue) {
         this.delayedAnimation = newValue;
         return;
-      } 
-      this.hide=true;
+      }
+      this.hide = true;
       setTimeout(() => {
         this.delayedAnimation = newValue;
-        this.hide=false;
+        this.hide = false;
+        this.$emit("");
       }, this.delay);
     },
   },
@@ -181,20 +182,26 @@ body .point {
   width: calc(var(--length) / 6);
   height: calc(var(--length) / 6);
   border-radius: calc(var(--length) / 6);
+  background: #6c757d;
+}
+.active .point {
   animation: point 3s linear infinite;
 }
 @keyframes point {
-  0%{
+  0% {
+    transform: scale(1.4);
     background: orangered;
   }
-  40%{
-    background:orange
+  40% {
+    background: orange;
   }
-  70%{
+  70% {
+    transform: scale(1);
     background-color: rgb(0, 89, 255);
-
   }
-  100%{
+  100% {
+    transform: scale(1.4);
+
     background: orangered;
   }
 }

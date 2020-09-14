@@ -1,5 +1,6 @@
 <template>
-  <div class="h-100 position-relative">
+  <div class="h-100 position-relative ">
+      <arrow-move :position="+cell.position"></arrow-move>
     <div
       class="inner-shadow position-absolute h-100 w-100 d-flex align-items-center justify-content-center"
     >
@@ -17,6 +18,7 @@
       <image-estate  v-else-if="cell.tax||cell.utility" :src="getImage(cell)" :playerOwner="playerOwner" />
       <image-component v-else :src="getImage(cell)" />
     </div>
+
   </div>
   <!-- :property_game_status="cell.property.propertyGameStatuses[0].player.userusername" -->
 </template>
@@ -25,11 +27,13 @@
 import ImageComponent from "./ImageComponent.vue";
 import PropertyCell from "./PropertyCell.vue";
 import ImageEstate from "./ImageEstate.vue";
+import ArrowMove from "./ArrowMove.vue";
 export default {
   components: {
     ImageComponent,
     PropertyCell,
-    ImageEstate
+    ImageEstate,
+    ArrowMove
   },
   props: {
     cell: {
@@ -69,4 +73,8 @@ export default {
 .inner-shadow {
   box-shadow: inset 0px 0px 20px black !important;
 }
+.z-index-1000{
+  z-index: 1000;
+}
+
 </style>
