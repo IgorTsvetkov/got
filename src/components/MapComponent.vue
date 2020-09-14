@@ -7,7 +7,13 @@
         </match-menu>
       </div>
       <div class="not-draggable" v-for="cell in cells" :key="cell.position">
-        <cell :playerOwner="playerOwner(cell.id)" :cell="cell">
+        <cell
+          :playerOwner="playerOwner(cell.id)"
+          :cell="cell"
+          :playerMoved="findPlayer(game.turn_player_id)"
+          :startPositionArrow="+startPositionArrow"
+          :endPositionArrow="+endPositionArrow"
+        >
           <div v-for="(player,key) in game.players" :key="key">
             <div v-if="player.position==cell.position">
               <figurine :hero="player.hero"></figurine>
@@ -29,17 +35,21 @@
             </div>
             <div v-if="isMyTurn">
               <div class="bg-success">ВАШ ХОД</div>
-              <button v-if="canFinishTurn" class="btn btn-danger w-100" @click="endTurn()">Закончить ход</button>
+              <button
+                v-if="canFinishTurn"
+                class="btn btn-danger w-100"
+                @click="endTurn()"
+              >Закончить ход</button>
 
               <!-- <button v-if="canRollDices" class="btn btn-light" @click="rollDices()">Бросить кубики</button> -->
               <div @click="rollDicesIfCan()">
-              <dices
-                :first="+game.roll_count_first"
-                :second="+game.roll_count_second"
-                :activate="isRolled"
-                @rollFinish="onrollFinish"
-                :readonly="!canRollDices"
-              />
+                <dices
+                  :first="+game.roll_count_first"
+                  :second="+game.roll_count_second"
+                  :activate="isRolled"
+                  @rollFinish="onrollFinish"
+                  :readonly="!canRollDices"
+                />
               </div>
             </div>
             <div v-else>
@@ -186,6 +196,9 @@ export default {
       socket: undefined,
       auction: undefined,
       isRolled: false,
+      startPositionArrow:undefined,
+      endPositionArrow:undefined,
+
     };
   },
   async beforeMount() {
@@ -335,23 +348,26 @@ export default {
       let systemChatMessage = "событие выполнено";
       this.socket.send(result, systemChatMessage);
     },
+    rollDicesIfCan() {
+      if (this.canRollDices) this.$_.throttle(this.rollDices, 3000)();
+    },
     async rollDices() {
       let result = await this.$axios.post(`/got/roll-dices`);
-      let game=result.data.data.game;
-      if(result.data.data.game)
-        updateModel(this.game,game);
-      this.isRolled=true;
-    },
-    rollDicesIfCan(){
-      if(this.canRollDices)      
-        this.$_.throttle(this.rollDices,3000)();
+      let game = result.data.data.game;
+      if (result.data.data.game) updateModel(this.game, game);
+      this.isRolled = true;
     },
     async onrollFinish() {
-      this.isRolled=false;
+      this.isRolled = false;
+      if (this.$turnStages["startMove"]==this.game.turn_stage) {
+        let player = this.findPlayer(this.game.turn_player_id);
+        this.startPositionArrow = player.position;
+        this.endPositionArrow =
+          (+player.position) +(+ this.game.roll_count_first)+( + this.game.roll_count_second);
+      }
       let result = await this.$axios.post(`/got/roll-dices-finish`);
       if (result) {
-        if (this.$response.handleGameError(result, this.socket)) 
-          return;
+        if (this.$response.handleGameError(result, this.socket)) return;
         let game = result.data.data.game;
         let systemChatMessage = `${this.userNameAndHeroHTML()} бросил кости и получил 
         ${game.roll_count_first} и ${game.roll_count_second} `;

@@ -1,7 +1,7 @@
 <template>
   <div
-    v-if="position==0"
-    class="position-relative position-absolute w-100 h-100 z-index-1000 d-flex arrow-corner-top-left"
+    class="position-absolute w-100 h-100 z-index-1000 d-flex"
+    :class="arrowClass"
   >
     <div class="arrow-content bg-warning"></div>
   </div>
@@ -15,11 +15,30 @@ export default {
       required: true,
     },
   },
-  //   computed: {
-  //       arrowType() {
-
-  //       }
-  //   },
+  computed: {
+    arrowClass() {
+      switch (true) {
+        case this.position == 0:
+          return "arrow-corner-top-left";
+        case this.position > 0 && this.position < 15:
+          return "arrow-line-to-right";
+        case this.position == 15:
+          return "arrow-corner-top-right";
+        case this.position > 15 && this.position < 20:
+          return "arrow-line-to-top";
+        case this.position == 20:
+          return "arrow-corner-bot-right";
+        case this.position > 20 && this.position < 35:
+          return "arrow-line-to-left";
+        case this.position == 35:
+          return "arrow-corner-bot-left";
+        case this.position > 35 && this.position < 40:
+          return "arrow-line-to-top";
+        default:
+          throw new Error("unpossible value");
+      }
+    },
+  },
 };
 </script>
 
@@ -43,33 +62,48 @@ export default {
   width: 2vw;
 }
 /* CORNERS */
-.arrow-corner-top-right .arrow-content::after,.arrow-corner-top-left .arrow-content::after{
-    content: "";
-    position: absolute;
-    background: #ffc107 !important;
-    height: calc(50% + 1vw);
-    width:2vw;
+.arrow-corner-top-right .arrow-content::after,
+.arrow-corner-top-left .arrow-content::after,
+.arrow-corner-bot-right .arrow-content::after,
+.arrow-corner-bot-left .arrow-content::after {
+  content: "";
+  position: absolute;
+  background: #ffc107 !important;
+  height: calc(50% + 1vw);
+  width: 2vw;
 }
-/* TOP RIGHT */
-.arrow-corner-top-right .arrow-content::after{
-    margin-left:calc(50% - 1vw);
+.arrow-corner-bot-right .arrow-content::after,
+.arrow-corner-bot-left .arrow-content::after {
+  top: 0px;
 }
-.arrow-corner-top-right,.arrow-corner-top-left{
+/* RIGHT */
+.arrow-corner-top-right .arrow-content::after,
+.arrow-corner-bot-right .arrow-content::after {
+  margin-left: calc(50% - 1vw);
+}
+.arrow-corner-top-right,
+.arrow-corner-top-left,
+.arrow-corner-bot-right,
+.arrow-corner-bot-left {
   align-items: center;
 }
-.arrow-corner-top-right .arrow-content{
-    height: 2vw;
-    width: calc(50% + 1vw);
+.arrow-corner-top-right .arrow-content,
+.arrow-corner-bot-right .arrow-content {
+  height: 2vw;
+  width: calc(50% + 1vw);
 }
-
-/* TOP LEFT */
-.arrow-corner-top-left{
-    justify-content: flex-end;
+/* LEFT */
+.arrow-corner-top-left,
+.arrow-corner-bot-left {
+  justify-content: flex-end;
 }
-.arrow-corner-top-left .arrow-content{
-    height: 2vw;
-    width: calc(50% + 1vw);
+.arrow-corner-top-left .arrow-content,
+.arrow-corner-bot-left .arrow-content {
+  height: 2vw;
+  width: calc(50% + 1vw);
 }
-.arrow-corner-top-left .arrow-content::after{
-    margin-right:calc(50% - 1vw);}
+.arrow-corner-top-left .arrow-content::after,
+.arrow-corner-bot-left .arrow-content::after {
+  margin-right: calc(50% - 1vw);
+}
 </style>

@@ -1,6 +1,6 @@
 <template>
-  <div class="h-100 position-relative ">
-      <arrow-move :position="+cell.position"></arrow-move>
+  <div class="h-100 position-relative">
+    <arrow-move v-if="showArrow" :position="+cell.position"></arrow-move>
     <div
       class="inner-shadow position-absolute h-100 w-100 d-flex align-items-center justify-content-center"
     >
@@ -15,10 +15,13 @@
       >
         <image-estate :src="getImage(cell)" :playerOwner="playerOwner" />
       </property-cell>
-      <image-estate  v-else-if="cell.tax||cell.utility" :src="getImage(cell)" :playerOwner="playerOwner" />
+      <image-estate
+        v-else-if="cell.tax||cell.utility"
+        :src="getImage(cell)"
+        :playerOwner="playerOwner"
+      />
       <image-component v-else :src="getImage(cell)" />
     </div>
-
   </div>
   <!-- :property_game_status="cell.property.propertyGameStatuses[0].player.userusername" -->
 </template>
@@ -33,7 +36,7 @@ export default {
     ImageComponent,
     PropertyCell,
     ImageEstate,
-    ArrowMove
+    ArrowMove,
   },
   props: {
     cell: {
@@ -42,6 +45,14 @@ export default {
     },
     playerOwner: {
       type: Object,
+      default: undefined,
+    },
+    startPositionArrow: {
+      type: Number,
+      default: undefined,
+    },
+    endPositionArrow: {
+      type: Number,
       default: undefined,
     },
   },
@@ -60,11 +71,11 @@ export default {
     },
   },
   computed: {
-    // playerOwner() {
-    //   if (this.cell && this.cell.property && this.cell.property.playerOwner)
-    //     return this.cell.property.playerOwner;
-    //   return null;
-    // },
+    showArrow(){
+      let isShow=(+this.cell.position)>=this.startPositionArrow&&(+this.cell.position)<=this.endPositionArrow;
+      
+      return 
+    }
   },
 };
 </script>
@@ -73,8 +84,7 @@ export default {
 .inner-shadow {
   box-shadow: inset 0px 0px 20px black !important;
 }
-.z-index-1000{
+.z-index-1000 {
   z-index: 1000;
 }
-
 </style>
