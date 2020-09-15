@@ -196,9 +196,8 @@ export default {
       socket: undefined,
       auction: undefined,
       isRolled: false,
-      startPositionArrow:undefined,
-      endPositionArrow:undefined,
-
+      startPositionArrow: undefined,
+      endPositionArrow: undefined,
     };
   },
   async beforeMount() {
@@ -246,6 +245,20 @@ export default {
           this.auction = false;
         case "game":
           updateModel(this.game, data.game);
+          break;
+        case "roll":
+          updateModel(this.game, data.game);
+          this.isRolled = true;
+          break;
+        case "arrow":
+          this.isRolled = false;
+          // debugger
+          let turn_player = this.findPlayer(this.game.turn_player_id);
+          this.startPositionArrow = turn_player.position;
+          this.endPositionArrow =
+            +turn_player.position +
+            +this.game.roll_count_first +
+            +this.game.roll_count_second;
           break;
         default:
           throw new Error("can't handle this socket action");
@@ -353,17 +366,12 @@ export default {
     },
     async rollDices() {
       let result = await this.$axios.post(`/got/roll-dices`);
-      let game = result.data.data.game;
-      if (result.data.data.game) updateModel(this.game, game);
-      this.isRolled = true;
+      this.socket.send(result);
     },
     async onrollFinish() {
-      this.isRolled = false;
-      if (this.$turnStages["startMove"]==this.game.turn_stage) {
-        let player = this.findPlayer(this.game.turn_player_id);
-        this.startPositionArrow = player.position;
-        this.endPositionArrow =
-          (+player.position) +(+ this.game.roll_count_first)+( + this.game.roll_count_second);
+      if (this.$turnStages["startMove"] == this.game.turn_stage) {
+        let result = this.$response.setAction("arrow");
+        this.socket.send(result);
       }
       let result = await this.$axios.post(`/got/roll-dices-finish`);
       if (result) {

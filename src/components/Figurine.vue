@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex figurine">
-    <img class="z-index-10" height="100%" :src="hero.src" />
+    <img class="z-index-1000" height="100%" :src="hero.src" />
     <!-- <div class="bg-danger">position:{{player.position}}</div> -->
   </div>
 </template>
@@ -24,5 +24,8 @@ export default {
   display: flex;
   width: inherit;
   flex-wrap: wrap;
+}
+.z-index-1000{
+  z-index:1000;
 }
 </style>

@@ -16,6 +16,9 @@ export default class Helper {
         if (result.data)
             return result.data.action;
     }
+    setAction(actionName){
+        return {data:{action:actionName}};
+    }
     isRedirect(result) {
         if (result.data.redirect)
             return true;
