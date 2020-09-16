@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use app\models\Player;
+use yii\db\Expression;
 use yii\db\ActiveRecord;
 use app\models\GameSession;
 
@@ -16,6 +17,12 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
         return $this->hasOne(GameSession::class,["id"=>"game_session_id"])
         ->orderBy(['created_at'=>SORT_DESC])
         ->viaTable("user_game_session",["user_id"=>"id"]);
+    }
+    public function hasActiveGame(){
+        return $this->hasOne(GameSession::class,["id"=>"game_session_id"])
+        ->viaTable("user_game_session",["user_id"=>"id"])
+        ->where(["is","finished_at",new Expression("NULL")])
+        ->exists();
     }
     public function getLastPlayer():?Player{
         return $this->hasMany(Player::class,["user_id"=>"id"])->orderBy(["id"=>SORT_DESC])->limit(1)->one();

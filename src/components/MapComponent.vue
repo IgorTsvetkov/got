@@ -247,18 +247,12 @@ export default {
           updateModel(this.game, data.game);
           break;
         case "roll":
-          updateModel(this.game, data.game);
           this.isRolled = true;
+          updateModel(this.game, data.game);
           break;
         case "arrow":
-          this.isRolled = false;
-          // debugger
-          let turn_player = this.findPlayer(this.game.turn_player_id);
-          this.startPositionArrow = turn_player.position;
-          this.endPositionArrow =
-            +turn_player.position +
-            +this.game.roll_count_first +
-            +this.game.roll_count_second;
+          this.startPositionArrow=data.startPositionArrow;
+          this.endPositionArrow=data.endPositionArrow;
           break;
         default:
           throw new Error("can't handle this socket action");
@@ -369,8 +363,18 @@ export default {
       this.socket.send(result);
     },
     async onrollFinish() {
+      this.isRolled = false;
+
       if (this.$turnStages["startMove"] == this.game.turn_stage) {
         let result = this.$response.setAction("arrow");
+        let turn_player = this.findPlayer(this.game.turn_player_id);
+        let startPositionArrow = (+turn_player.position);
+        let endPositionArrow =
+          (+turn_player.position) +
+          (+this.game.roll_count_first) +
+          (+this.game.roll_count_second);
+        let data = { startPositionArrow, endPositionArrow };
+        result=this.$response.setData(result,data);
         this.socket.send(result);
       }
       let result = await this.$axios.post(`/got/roll-dices-finish`);

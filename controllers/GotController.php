@@ -62,8 +62,8 @@ class GotController extends Controller
     }
     public function actionRollDices(){
         $game = GameSession::meOne();
-        $game->roll_count_first=1;
-        $game->roll_count_second=1;
+        $game->roll_count_first=GameHelper::roll();
+        $game->roll_count_second=GameHelper::roll();
         $game->update(false);
         return ResponseHelper::Socket("roll",["game"=>$game]);
     }

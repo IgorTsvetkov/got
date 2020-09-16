@@ -1,6 +1,6 @@
 <template>
   <div class="h-100 position-relative">
-    <arrow-move v-if="showArrow" :position="+cell.position" :isArrowFinish="isArrowFinish"></arrow-move>
+    <arrow-move v-if="showArrow" :position="+cell.position" :isArrowFinish="isArrowFinish" :isStartCell="isStartCell" :index="index"></arrow-move>
     <div
       class="inner-shadow position-absolute h-100 w-100 d-flex align-items-center justify-content-center"
     >
@@ -89,12 +89,18 @@ export default {
           ? (+this.cell.position) + this.cellCount
           : (+this.cell.position);
     },
+    index(){
+        return this.playerPositionComparable-this.startPositionArrow;
+    },
     playerFinishPosition() {
       return this.endPositionArrow;
     },
     arrowFinishPosition(){
       return this.endPositionArrow-1;
     },
+    isStartCell(){
+      return Number(this.cell.position)===Number(this.startPositionArrow);
+    }
   },
 };
 </script>

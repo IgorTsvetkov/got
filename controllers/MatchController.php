@@ -11,6 +11,7 @@ use app\models\GameSession;
 use yii\filters\AccessControl;
 use app\helpers\ResponseHelper;
 use app\helpers\TurnStageHelper;
+use yii\db\Expression;
 
 class MatchController extends Controller
 {
@@ -84,6 +85,9 @@ class MatchController extends Controller
     public function actionCreateLobby()
     {
         $user = User::me();
+        $hasActiveGame=$user->hasActiveGame();
+        if($hasActiveGame)
+            return ResponseHelper::Error("Имеет незаконченную игру");
         $game = new GameSession();
         $game->leader_user_id = $user->id;
         $game->save();

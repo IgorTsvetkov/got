@@ -17,7 +17,12 @@ export default class Helper {
             return result.data.action;
     }
     setAction(actionName){
-        return {data:{action:actionName}};
+        let data={data:{action:actionName}};
+        return data;
+    }
+    setData(result,data){
+        result.data.data=data;
+        return result;
     }
     isRedirect(result) {
         if (result.data.redirect)

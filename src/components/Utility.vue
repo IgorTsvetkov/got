@@ -68,7 +68,7 @@ export default {
   },
   computed: {
     isEnemyUtility() {
-      return this.utilityStatus.player_id !== this.my_player_id;
+      return Number(this.utilityStatus.player_id) !== Number(this.my_player_id);
     },
     color() {
       return this.isEnemyTax ?"bg-danger":"bg-warning";

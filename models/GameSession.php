@@ -38,7 +38,7 @@ class GameSession extends \yii\db\ActiveRecord
 {
     public const MAX_PLAYERS=2;
     public const ROLL_MAX=6;
-    public const START_PLAYER_POSITION=16;
+    public const START_PLAYER_POSITION=39;
     public const START_MONEY=20000;
     public static function me()
     {
