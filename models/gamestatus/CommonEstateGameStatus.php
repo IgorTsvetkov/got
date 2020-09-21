@@ -8,8 +8,6 @@ use app\models\Cell;
 use app\models\Player;
 use app\helpers\IPayRent;
 use app\models\GameSession;
-use app\helpers\EstateHelper;
-
 /**
  * This is the model class for table "common_game_status".
  *

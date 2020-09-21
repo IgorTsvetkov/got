@@ -6,5 +6,5 @@ use yii\rest\ActiveController;
 
 class TaxController extends ActiveController
 {
-    public $modelClass="app\models\Tax";
+    public $modelClass="app\models\estate\Tax";
 }

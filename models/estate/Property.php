@@ -2,7 +2,7 @@
 
 namespace app\models\estate;
 
-use app\helpers\EstateHelper;
+use app\helpers\EstateManager;
 use app\helpers\EstateTypeHelper;
 use Yii;
 use app\models\Cell;
@@ -37,6 +37,10 @@ class Property extends Estate
     public static function getEstateType()
     {
         return EstateTypeHelper::PROPERTY;
+    }
+    public static function hasGroup()
+    {
+        return true;
     }
     public static function tableName()
     {

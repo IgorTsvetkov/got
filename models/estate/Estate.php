@@ -17,4 +17,7 @@ class Estate extends ActiveRecord
     public static function getEstateType(){
         throw new Exception("Not implemented");
     }
+    public static function hasGroup(){
+        return false;
+    }
 }

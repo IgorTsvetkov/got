@@ -2,7 +2,7 @@
 
 namespace app\controllers;
 
-use app\helpers\EstateHelper;
+use app\helpers\EstateManager;
 use app\helpers\EstateTypeHelper;
 use app\helpers\exceptions\ActionDeniedException;
 use Yii;
@@ -25,7 +25,8 @@ class AuctionController extends \yii\web\Controller
     {
         $my_user_id = Yii::$app->user->id;
         // $types=["property","tax","utility"];
-        $model = EstateHelper::getEstate($type_id, $id);
+        $manager =new  EstateManager($type_id);
+        $model=$manager->getEstate($id);
         $startCost = $model->cost;
         $name = $model->name;
         $auctionPlayersQuery = function ($query) use ($startCost, $my_user_id) {
@@ -142,8 +143,8 @@ class AuctionController extends \yii\web\Controller
         $player = $auction->maxBetPlayer;
         /** @var GameSession */
         $game=$auction->gameSession;
-        $estate = EstateHelper::getEstate($auction->estate_type_id, $auction->estate_id);
-
+        $manager =new  EstateManager($auction->estate_type_id);
+        $estate=$manager->getEstate($auction->estate_id);
         $cost = $auction->cost;
         if (!$player->canPay($cost))
             return ResponseHelper::Error("Недостаточно средств");

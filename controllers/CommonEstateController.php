@@ -13,7 +13,7 @@ use app\models\estate\Tax;
 use yii\helpers\VarDumper;
 use app\models\GameSession;
 use yii\filters\VerbFilter;
-use app\helpers\EstateHelper;
+use app\helpers\EstateManager;
 use app\models\estate\Utility;
 use app\helpers\ResponseHelper;
 use app\models\estate\Property;
@@ -63,7 +63,8 @@ class CommonEstateController extends \yii\web\Controller
         //это этот игрок?
         if ($player->user_id !== Yii::$app->user->id)
             return ResponseHelper::Error("вы не можете использовать данные другого пользователя");
-        $estate = EstateHelper::getEstate($type_id, $id);
+        $manager =new  EstateManager($type_id);
+        $estate=$manager->getEstate($id);
         /** @var Cell */
         $cell = $estate->cell;
         // защита от злоумышленников
