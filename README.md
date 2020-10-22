@@ -5,10 +5,10 @@
 <p>Выполните следующие команды:</p>
 <ul>
   <li>composer install</li>
-  <li>npm instal</li>
+  <li>npm install</li>
   <li>sh migrate.sh</li>
-  <li>npm run serve</li>
   <li>./yii socket/all</li>
   <li>./yii socket/local</li>
+  <li>npm run serve</li>
 </ul>
 
